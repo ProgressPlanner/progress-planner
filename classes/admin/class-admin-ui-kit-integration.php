@@ -1,17 +1,13 @@
 <?php
 /**
- * Integrates progress-planner's admin UI with the wp-admin-ui kit when
- * {@see PROGRESS_PLANNER_USE_ADMIN_UI_PKG} is defined and truthy.
+ * Integrates progress-planner's admin UI with the wp-admin-ui kit.
  *
- * When the flag is on:
- * - {@see Admin_UI_Instance::get()} boots the kit with register_page=true,
- *   so the kit's PageRegistrar owns the top-level admin menu.
- * - This class adds progress-planner's widgets to the kit instance and
- *   wires the plugin's legacy UI bits (notification counter,
- *   welcome/privacy gate, tour button, subscribe popover, JS templates,
- *   overlay script) into the kit's action/filter hooks.
- *
- * When the flag is off, nothing in this class fires.
+ * {@see Admin_UI_Instance::get()} boots the kit with register_page=true,
+ * so the kit's PageRegistrar owns the top-level admin menu. This class
+ * adds progress-planner's widgets to the kit instance and wires the
+ * plugin's UI bits (notification counter, welcome/privacy gate, tour
+ * button, subscribe popover, JS templates, overlay script) into the
+ * kit's action/filter hooks.
  *
  * @package Progress_Planner
  */
@@ -27,13 +23,9 @@ final class Admin_UI_Kit_Integration {
 
 	/**
 	 * Plugin bootstrap entry point (hooked from progress-planner.php on
-	 * plugins_loaded when the flag is on).
+	 * plugins_loaded).
 	 */
 	public static function boot(): void {
-		if ( ! Admin_UI_Instance::kit_renders_page() ) {
-			return;
-		}
-
 		$ui = Admin_UI_Instance::get();
 
 		// Register all progress-planner widgets with the kit — the kit's

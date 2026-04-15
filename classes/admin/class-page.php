@@ -1,25 +1,28 @@
 <?php
 /**
- * Create the admin page.
+ * Admin page class.
+ *
+ * Since the wp-admin-ui extraction, the kit's PageRegistrar owns menu
+ * registration and page rendering. This class provides:
+ *
+ * - The widget registry ({@see get_widgets()}), consumed by the kit at
+ *   render time via {@see Admin_UI_Kit_Integration::boot()}.
+ * - Widget-specific asset enqueue on the kit's page (the kit handles
+ *   tokens + layout + masonry itself).
+ * - Focus-element script hookups for task providers (fires on any admin
+ *   page, not just Progress Planner's).
+ * - Miscellaneous admin-area polish: notice stripping, activity-scores
+ *   cache invalidation, menu-bubble CSS tweak.
  *
  * @package Progress_Planner
  */
 
 namespace Progress_Planner\Admin;
 
-use Progress_Planner\Admin\Admin_UI_Instance;
-
 /**
  * Admin page class.
  */
 class Page {
-
-	/**
-	 * Whether the branding inline styles have been added.
-	 *
-	 * @var boolean
-	 */
-	protected static $branding_inline_styles_added = false;
 
 	/**
 	 * Constructor.
@@ -34,7 +37,6 @@ class Page {
 	 * @return void
 	 */
 	private function register_hooks() {
-		\add_action( 'admin_menu', [ $this, 'add_page' ] );
 		\add_action( 'admin_enqueue_scripts', [ $this, 'enqueue_assets' ] );
 		\add_action( 'in_admin_header', [ $this, 'remove_admin_notices' ], PHP_INT_MAX );
 
@@ -42,7 +44,7 @@ class Page {
 		\add_action( 'progress_planner_activity_saved', [ $this, 'clear_activity_scores_cache' ] );
 		\add_action( 'progress_planner_activity_deleted', [ $this, 'clear_activity_scores_cache' ] );
 
-		// Add a custom admin footer.
+		// Add a custom admin footer (notification-bubble positioning).
 		\add_action( 'admin_footer', [ $this, 'admin_footer' ] );
 	}
 
@@ -91,74 +93,10 @@ class Page {
 	}
 
 	/**
-	 * Add the admin page.
+	 * Enqueue widget-specific scripts/styles on the kit's admin page.
 	 *
-	 * @return void
-	 */
-	public function add_page() {
-		// When the wp-admin-ui kit renders the page, its PageRegistrar owns
-		// the menu registration. Bail so we don't register a duplicate page.
-		if ( Admin_UI_Instance::kit_renders_page() ) {
-			return;
-		}
-
-		global $admin_page_hooks;
-
-		$page_identifier = 'progress-planner';
-
-		\add_menu_page(
-			\progress_planner()->get_ui__branding()->get_admin_submenu_name(),
-			\progress_planner()->get_ui__branding()->get_admin_menu_name() . $this->get_notification_counter(),
-			'manage_options',
-			$page_identifier,
-			'__return_empty_string',
-			\progress_planner()->get_ui__branding()->get_admin_menu_icon(),
-			\progress_planner()->get_ui__branding()->get_admin_submenu_position()
-		);
-
-		\add_submenu_page(
-			$page_identifier,
-			\progress_planner()->get_ui__branding()->get_admin_submenu_name(),
-			\progress_planner()->get_ui__branding()->get_admin_submenu_name() . $this->get_notification_counter(),
-			'manage_options',
-			$page_identifier,
-			[ $this, 'render_page' ],
-		);
-
-		// Wipe notification bits from hooks.
-		// phpcs:ignore WordPress.WP.GlobalVariablesOverride -- This is a deliberate action.
-		$admin_page_hooks[ $page_identifier ] = $page_identifier;
-	}
-
-	/**
-	 * Returns the notification count in HTML format.
-	 *
-	 * @return string The notification count in HTML format.
-	 */
-	protected function get_notification_counter() {
-		$notification_count = \wp_count_posts( 'prpl_recommendations' )->pending;
-
-		if ( 0 === $notification_count ) {
-			return '';
-		}
-
-		/* translators: Hidden accessibility text; %s: number of notifications. */
-		$notifications = \sprintf( \_n( '%s pending celebration', '%s pending celebrations', $notification_count, 'progress-planner' ), \number_format_i18n( $notification_count ) );
-
-		return \sprintf( '<span class="update-plugins count-%1$d" style="background-color:var(--prpl-background-banner);color:#38296d;"><span class="plugin-count" aria-hidden="true">%1$d</span><span class="screen-reader-text">%2$s</span></span>', $notification_count, $notifications );
-	}
-
-	/**
-	 * Render the admin page.
-	 *
-	 * @return void
-	 */
-	public function render_page() {
-		\progress_planner()->the_view( 'legacy-admin-page.php' );
-	}
-
-	/**
-	 * Enqueue scripts and styles.
+	 * The kit handles tokens + layout + masonry; this method only
+	 * enqueues the bits specific to progress-planner's widgets.
 	 *
 	 * @param string $hook The current admin page.
 	 *
@@ -170,27 +108,6 @@ class Page {
 			return;
 		}
 
-		// When the kit renders the page it already enqueues its base tokens +
-		// layout CSS + grid-masonry via PageRegistrar, and the legacy
-		// privacy-gate + welcome/onboard branch is served by the kit's hooks
-		// (see Admin_UI_Kit_Integration). We still enqueue widget-specific
-		// scripts/styles needed for widgets rendered inside the kit view.
-		if ( Admin_UI_Instance::kit_renders_page() ) {
-			$this->enqueue_widget_assets();
-			return;
-		}
-
-		$this->enqueue_scripts();
-		$this->enqueue_styles();
-	}
-
-	/**
-	 * Enqueue just the scripts/styles needed for widgets when the kit
-	 * renders the page. The kit handles tokens + layout + masonry itself.
-	 *
-	 * @return void
-	 */
-	private function enqueue_widget_assets(): void {
 		$default_localization_data = [
 			'name' => 'progressPlanner',
 			'data' => [
@@ -223,47 +140,6 @@ class Page {
 		if ( ! \progress_planner()->is_privacy_policy_accepted() ) {
 			\progress_planner()->get_admin__enqueue()->enqueue_style( 'progress-planner/welcome' );
 			\progress_planner()->get_admin__enqueue()->enqueue_style( 'progress-planner/onboard' );
-		}
-	}
-
-	/**
-	 * Enqueue scripts.
-	 *
-	 * @return void
-	 */
-	public function enqueue_scripts() {
-		$current_screen = \get_current_screen();
-		if ( ! $current_screen ) {
-			return;
-		}
-
-		if ( 'toplevel_page_progress-planner' === $current_screen->id ) {
-			$default_localization_data = [
-				'name' => 'progressPlanner',
-				'data' => [
-					'onboardNonceURL' => \progress_planner()->get_utils__onboard()->get_remote_url( 'get-nonce' ),
-					'onboardAPIUrl'   => \progress_planner()->get_utils__onboard()->get_remote_url( 'onboard' ),
-					'ajaxUrl'         => \admin_url( 'admin-ajax.php' ),
-					'nonce'           => \wp_create_nonce( 'progress_planner' ),
-				],
-			];
-
-			if ( true === \progress_planner()->is_privacy_policy_accepted() ) {
-				\progress_planner()->get_admin__enqueue()->enqueue_script( 'web-components/prpl-gauge' );
-				\progress_planner()->get_admin__enqueue()->enqueue_script( 'web-components/prpl-badge-progress-bar' );
-				\progress_planner()->get_admin__enqueue()->enqueue_script( 'web-components/prpl-chart-bar' );
-				\progress_planner()->get_admin__enqueue()->enqueue_script( 'web-components/prpl-chart-line' );
-				\progress_planner()->get_admin__enqueue()->enqueue_script( 'web-components/prpl-big-counter' );
-				\progress_planner()->get_admin__enqueue()->enqueue_script( 'web-components/prpl-tooltip' );
-				\progress_planner()->get_admin__enqueue()->enqueue_script( 'header-filters', $default_localization_data );
-				\progress_planner()->get_admin__enqueue()->enqueue_script( 'settings', $default_localization_data );
-				\progress_planner()->get_admin__enqueue()->enqueue_script( 'grid-masonry' );
-				\progress_planner()->get_admin__enqueue()->enqueue_script( 'upgrade-tasks' );
-			} else {
-				\progress_planner()->get_admin__enqueue()->enqueue_script( 'onboard', $default_localization_data );
-			}
-
-			\progress_planner()->get_admin__enqueue()->enqueue_script( 'external-link-accessibility-helper' );
 		}
 	}
 
@@ -333,41 +209,6 @@ class Page {
 	}
 
 	/**
-	 * Enqueue styles.
-	 *
-	 * @return void
-	 */
-	public function enqueue_styles() {
-		$current_screen = \get_current_screen();
-		if ( ! $current_screen ) {
-			return;
-		}
-
-		\progress_planner()->get_admin__enqueue()->enqueue_style( 'progress-planner/variables-color' );
-		\progress_planner()->get_admin__enqueue()->enqueue_style( 'progress-planner/admin' );
-		if ( ! static::$branding_inline_styles_added ) {
-			\wp_add_inline_style( 'progress-planner/admin', \progress_planner()->get_ui__branding()->get_custom_css() );
-			static::$branding_inline_styles_added = true;
-		}
-		\progress_planner()->get_admin__enqueue()->enqueue_style( 'progress-planner/web-components/prpl-tooltip' );
-		\progress_planner()->get_admin__enqueue()->enqueue_style( 'progress-planner/web-components/prpl-install-plugin' );
-
-		if ( 'toplevel_page_progress-planner' === $current_screen->id ) {
-			// Enqueue ugprading (onboarding) tasks styles, these are needed both when privacy policy is accepted and when it is not.
-			\progress_planner()->get_admin__enqueue()->enqueue_style( 'progress-planner/upgrade-tasks' );
-		}
-
-		$prpl_privacy_policy_accepted = \progress_planner()->is_privacy_policy_accepted();
-		if ( ! $prpl_privacy_policy_accepted ) {
-			// Enqueue welcome styles.
-			\progress_planner()->get_admin__enqueue()->enqueue_style( 'progress-planner/welcome' );
-
-			// Enqueue onboarding styles.
-			\progress_planner()->get_admin__enqueue()->enqueue_style( 'progress-planner/onboard' );
-		}
-	}
-
-	/**
 	 * Remove all admin notices when the user is on the Progress Planner page.
 	 *
 	 * @return void
@@ -377,13 +218,7 @@ class Page {
 		if ( ! $current_screen ) {
 			return;
 		}
-		if ( ! \in_array(
-			$current_screen->id,
-			[
-				'toplevel_page_progress-planner',
-			],
-			true
-		) ) {
+		if ( 'toplevel_page_progress-planner' !== $current_screen->id ) {
 			return;
 		}
 
@@ -408,7 +243,8 @@ class Page {
 	}
 
 	/**
-	 * Add a custom admin footer.
+	 * Add a custom admin footer — positions the notification bubble on
+	 * the top-level menu item.
 	 *
 	 * @return void
 	 */

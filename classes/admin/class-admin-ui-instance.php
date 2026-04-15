@@ -3,20 +3,11 @@
  * Singleton accessor for the kit's AdminUI instance used inside
  * progress-planner.
  *
- * Two boot modes, keyed off {@see PROGRESS_PLANNER_USE_ADMIN_UI_PKG}:
- *
- * - Off (default, Phase 4-style): register_page = false. The kit is used
- *   only as a back-end for the Widget base class and AssetEnqueuer.
- *   progress-planner's own Admin\Page class renders the admin page and
- *   enqueues assets. No behavior change.
- *
- * - On (Phase 5): register_page = true. The kit's PageRegistrar takes
- *   over the top-level admin menu and renders views/admin-page.php from
- *   the kit (with progress-planner views/host overrides where present).
- *   Progress-planner's Admin\Page::add_page() short-circuits, and
- *   progress-planner-specific UI (notification counter, welcome/privacy
- *   gate, tour, subscribe, JS templates) attaches via the kit's
- *   {asset_prefix}_admin_ui_* filters/actions.
+ * The kit owns the top-level admin page: its PageRegistrar registers the
+ * menu and renders views/admin-page.php. Progress-planner-specific UI
+ * (notification counter, welcome/privacy gate, tour, subscribe popover,
+ * JS templates) attaches via {@see Admin_UI_Kit_Integration} on the
+ * kit's {asset_prefix}_admin_ui_* filters/actions.
  *
  * @package Progress_Planner
  */
@@ -35,14 +26,6 @@ final class Admin_UI_Instance {
 	 * @var AdminUI|null
 	 */
 	private static $instance = null;
-
-	/**
-	 * Whether the kit should render the admin page itself.
-	 */
-	public static function kit_renders_page(): bool {
-		return \defined( 'PROGRESS_PLANNER_USE_ADMIN_UI_PKG' )
-			&& (bool) \constant( 'PROGRESS_PLANNER_USE_ADMIN_UI_PKG' );
-	}
 
 	public static function get(): AdminUI {
 		if ( null !== self::$instance ) {
@@ -71,7 +54,7 @@ final class Admin_UI_Instance {
 			'manage_options',
 			\progress_planner()->get_ui__branding()->get_admin_submenu_position(),
 			true, // show_range_filter — matches progress-planner's existing header.
-			self::kit_renders_page()
+			true  // register_page — the kit owns the admin menu.
 		);
 
 		self::$instance = AdminUI::boot( $config );

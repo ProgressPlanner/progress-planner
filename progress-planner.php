@@ -27,26 +27,14 @@ if ( ! \defined( 'ABSPATH' ) ) {
 \define( 'PROGRESS_PLANNER_URL', \untrailingslashit( \plugin_dir_url( __FILE__ ) ) );
 
 require_once PROGRESS_PLANNER_DIR . '/autoload.php';
+require_once PROGRESS_PLANNER_DIR . '/vendor/autoload.php';
 
-// Load the Composer autoloader if present — currently only used by the
-// optional wp-admin-ui package integration (Phase 2 dual-load).
-if ( \file_exists( PROGRESS_PLANNER_DIR . '/vendor/autoload.php' ) ) {
-	require_once PROGRESS_PLANNER_DIR . '/vendor/autoload.php';
-}
-
-// Dual-load the extracted admin-ui kit behind a feature flag so we can
-// validate it boots cleanly in the host context without changing any
-// existing behavior. Off by default — define the constant to true in
-// wp-config.php to see the shadow page at
-// /wp-admin/admin.php?page=progress-planner-adminui.
-if (
-	\defined( 'PROGRESS_PLANNER_USE_ADMIN_UI_PKG' )
-	&& \constant( 'PROGRESS_PLANNER_USE_ADMIN_UI_PKG' )
-	&& \class_exists( \ProgressPlanner\AdminUI\AdminUI::class )
-) {
-	require_once PROGRESS_PLANNER_DIR . '/classes/admin/class-admin-ui-kit-integration.php';
-	\add_action( 'plugins_loaded', [ \Progress_Planner\Admin\Admin_UI_Kit_Integration::class, 'boot' ], 20 );
-}
+// The wp-admin-ui kit owns the admin page. Admin_UI_Kit_Integration wires
+// progress-planner's widgets + UI bits (notification counter, welcome
+// gate, tour button, subscribe popover, JS templates) into the kit's
+// action/filter hooks.
+require_once PROGRESS_PLANNER_DIR . '/classes/admin/class-admin-ui-kit-integration.php';
+\add_action( 'plugins_loaded', [ \Progress_Planner\Admin\Admin_UI_Kit_Integration::class, 'boot' ], 20 );
 
 if ( ! \function_exists( 'progress_planner' ) ) {
 	/**
