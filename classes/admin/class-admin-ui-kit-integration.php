@@ -13,10 +13,6 @@
  *
  * When the flag is off, nothing in this class fires.
  *
- * NOTE: the filename still says "shadow" for history — Phase 2 used this
- * file for a separate shadow page. Phase 5 repurposed the flag to flip
- * the real page to the kit; the class was renamed accordingly.
- *
  * @package Progress_Planner
  */
 
@@ -27,7 +23,7 @@ use ProgressPlanner\AdminUI\AdminUI;
 /**
  * Attaches progress-planner UI onto the kit's admin page.
  */
-final class Admin_UI_Pkg_Shadow {
+final class Admin_UI_Kit_Integration {
 
 	/**
 	 * Plugin bootstrap entry point (hooked from progress-planner.php on

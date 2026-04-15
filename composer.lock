@@ -8,16 +8,16 @@
     "packages": [
         {
             "name": "progressplanner/wp-admin-ui",
-            "version": "v0.1.0",
+            "version": "v0.1.1",
             "source": {
                 "type": "git",
                 "url": "git@github.com:ProgressPlanner/wp-admin-ui.git",
-                "reference": "b8f1c6b0c5860cd3011e8e8f069177d6defb7c12"
+                "reference": "7ec599a9630417153e2df9c07a57032ec4c089e4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/ProgressPlanner/wp-admin-ui/zipball/b8f1c6b0c5860cd3011e8e8f069177d6defb7c12",
-                "reference": "b8f1c6b0c5860cd3011e8e8f069177d6defb7c12",
+                "url": "https://api.github.com/repos/ProgressPlanner/wp-admin-ui/zipball/7ec599a9630417153e2df9c07a57032ec4c089e4",
+                "reference": "7ec599a9630417153e2df9c07a57032ec4c089e4",
                 "shasum": ""
             },
             "require": {
@@ -44,10 +44,10 @@
             "description": "Reusable admin UI kit for WordPress plugins — CSS tokens, web components, page framework.",
             "homepage": "https://github.com/progressplanner/wp-admin-ui",
             "support": {
-                "source": "https://github.com/ProgressPlanner/wp-admin-ui/tree/v0.1.0",
+                "source": "https://github.com/ProgressPlanner/wp-admin-ui/tree/v0.1.1",
                 "issues": "https://github.com/ProgressPlanner/wp-admin-ui/issues"
             },
-            "time": "2026-04-15T19:44:20+00:00"
+            "time": "2026-04-15T19:57:22+00:00"
         }
     ],
     "packages-dev": [

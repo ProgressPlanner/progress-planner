@@ -44,8 +44,8 @@ if (
 	&& \constant( 'PROGRESS_PLANNER_USE_ADMIN_UI_PKG' )
 	&& \class_exists( \ProgressPlanner\AdminUI\AdminUI::class )
 ) {
-	require_once PROGRESS_PLANNER_DIR . '/classes/admin/class-admin-ui-pkg-shadow.php';
-	\add_action( 'plugins_loaded', [ \Progress_Planner\Admin\Admin_UI_Pkg_Shadow::class, 'boot' ], 20 );
+	require_once PROGRESS_PLANNER_DIR . '/classes/admin/class-admin-ui-kit-integration.php';
+	\add_action( 'plugins_loaded', [ \Progress_Planner\Admin\Admin_UI_Kit_Integration::class, 'boot' ], 20 );
 }
 
 if ( ! \function_exists( 'progress_planner' ) ) {
