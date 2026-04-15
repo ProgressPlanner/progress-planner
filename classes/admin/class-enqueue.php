@@ -84,9 +84,19 @@ class Enqueue {
 			$this->kit_enqueuer = new AssetEnqueuer(
 				'progress-planner',
 				[
+					// Host first so progress-planner's own files still win
+					// (they're supersets of the kit's layout/tokens).
 					[
 						'path' => \constant( 'PROGRESS_PLANNER_DIR' ) . '/assets',
 						'url'  => \constant( 'PROGRESS_PLANNER_URL' ) . '/assets',
+					],
+					// Package fallback — lets the kit supply any generic
+					// file progress-planner doesn't ship locally, and makes
+					// Phase 3C/6 deletions possible (files fall through to
+					// the kit's copies).
+					[
+						'path' => \constant( 'PROGRESS_PLANNER_DIR' ) . '/vendor/progressplanner/wp-admin-ui/assets',
+						'url'  => \plugin_dir_url( \constant( 'PROGRESS_PLANNER_FILE' ) ) . 'vendor/progressplanner/wp-admin-ui/assets',
 					],
 				],
 				static function ( $file_path ) {
