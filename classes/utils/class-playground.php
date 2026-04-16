@@ -47,7 +47,7 @@ class Playground {
 			);
 			\update_option( 'progress_planner_demo_data_generated', true );
 		}
-		\add_action( 'progress_planner_admin_page_header_before', [ $this, 'show_header_notice' ] );
+		\add_action( 'progress-planner_admin_ui_header_before', [ $this, 'show_header_notice' ] );
 		\add_action( 'wp_ajax_progress_planner_hide_onboarding', [ $this, 'hide_onboarding' ] );
 		\add_action( 'wp_ajax_progress_planner_show_onboarding', [ $this, 'show_onboarding' ] );
 
