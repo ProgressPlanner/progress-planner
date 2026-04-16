@@ -37,7 +37,9 @@ class Dashboard_Widget_Todo extends Dashboard_Widget {
 	 * @return void
 	 */
 	public function render_widget() {
-		\progress_planner()->get_admin__page()->enqueue_styles();
+		// Enqueue base stylesheets (variables + admin layout).
+		\progress_planner()->get_admin__enqueue()->enqueue_style( 'progress-planner/variables-color' );
+		\progress_planner()->get_admin__enqueue()->enqueue_style( 'progress-planner/admin' );
 
 		$todo_widget = \progress_planner()->get_admin__page()->get_widget( 'todo' );
 		if ( $todo_widget ) {
