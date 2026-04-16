@@ -72,7 +72,7 @@ class Enqueue {
 	/**
 	 * Lazily build the kit enqueuer.
 	 *
-	 * handle_prefix is set to 'progress-planner' so existing `Dependencies:
+	 * Handle_prefix is set to 'progress-planner' so existing `Dependencies:
 	 * progress-planner/foo` file headers across the plugin round-trip
 	 * cleanly through the kit's resolver.
 	 *
@@ -178,8 +178,8 @@ class Enqueue {
 	/**
 	 * Enqueue a vendor script (plain wp_enqueue_script, no dep resolution).
 	 *
-	 * @param string                                $file_handle The internal file stem, e.g. 'vendor/driver.js.iife'.
-	 * @param array{handle:string,version:string}   $vendor_meta Handle + version.
+	 * @param string                              $file_handle The internal file stem, e.g. 'vendor/driver.js.iife'.
+	 * @param array{handle:string,version:string} $vendor_meta Handle + version.
 	 */
 	private function enqueue_vendor_script( $file_handle, $vendor_meta ): void {
 		if ( isset( $this->registered_vendors[ $vendor_meta['handle'] ] ) ) {

@@ -23,10 +23,17 @@ use ProgressPlanner\AdminUI\Config;
 final class Admin_UI_Instance {
 
 	/**
+	 * The single kit AdminUI instance, or null before first access.
+	 *
 	 * @var AdminUI|null
 	 */
 	private static $instance = null;
 
+	/**
+	 * Get (or create) the kit AdminUI instance for progress-planner.
+	 *
+	 * @return AdminUI
+	 */
 	public static function get(): AdminUI {
 		if ( null !== self::$instance ) {
 			return self::$instance;

@@ -337,7 +337,6 @@ final class Branding {
 		$this->the_logo();
 		$logo_html = (string) \ob_get_clean();
 
-
 		// Pass null for every color override — progress-planner's own
 		// variables-color.css owns these tokens and the kit's inline CSS
 		// overrides would clobber them (e.g. --prpl-background-monthly
