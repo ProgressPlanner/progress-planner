@@ -22,6 +22,13 @@ final class Branding {
 	];
 
 	/**
+	 * Style handles that have already received the branding inline CSS this request.
+	 *
+	 * @var array<string, bool>
+	 */
+	private static $inline_css_attached = [];
+
+	/**
 	 * Constructor.
 	 */
 	public function __construct() {
@@ -122,6 +129,30 @@ final class Branding {
 		return empty( $this->get_api_data() ) || empty( $this->get_api_data()['custom_css'] )
 			? ''
 			: $this->get_api_data()['custom_css'];
+	}
+
+	/**
+	 * Attach the branding custom CSS to a registered/enqueued stylesheet.
+	 *
+	 * Idempotent per handle within a single request, so callers do not need to
+	 * track whether the CSS has already been added.
+	 *
+	 * @param string $handle The style handle to attach the inline CSS to.
+	 *
+	 * @return void
+	 */
+	public function enqueue_inline_css( string $handle ): void {
+		if ( isset( self::$inline_css_attached[ $handle ] ) ) {
+			return;
+		}
+		self::$inline_css_attached[ $handle ] = true;
+
+		$css = $this->get_custom_css();
+		if ( '' === $css ) {
+			return;
+		}
+
+		\wp_add_inline_style( $handle, $css );
 	}
 
 	/**
