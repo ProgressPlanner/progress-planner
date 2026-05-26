@@ -183,12 +183,14 @@ class Task {
 
 		// Make sure WP_REST_Posts_Controller is loaded.
 		if ( ! \class_exists( 'WP_REST_Posts_Controller' ) ) {
-			require_once ABSPATH . 'wp-includes/rest-api/endpoints/class-wp-rest-posts-controller.php'; // @phpstan-ignore requireOnce.fileNotFound
+			// @phpstan-ignore-next-line requireOnce.fileNotFound
+			require_once ABSPATH . 'wp-includes/rest-api/endpoints/class-wp-rest-posts-controller.php';
 		}
 
 		// Make sure WP_REST_Request is loaded.
 		if ( ! \class_exists( 'WP_REST_Request' ) ) {
-			require_once ABSPATH . 'wp-includes/rest-api/class-wp-rest-request.php'; // @phpstan-ignore requireOnce.fileNotFound
+			// @phpstan-ignore-next-line requireOnce.fileNotFound
+			require_once ABSPATH . 'wp-includes/rest-api/class-wp-rest-request.php';
 		}
 
 		// Use the appropriate controller for the post type.
