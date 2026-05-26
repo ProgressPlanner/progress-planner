@@ -1,4 +1,4 @@
-/* global HTMLElement, prplSuggestedTask, prplL10n, prplUpdateRaviGauge, prplTerms */
+/* global HTMLElement, DOMParser, prplSuggestedTask, prplL10n, prplUpdateRaviGauge, prplTerms */
 /*
  * Suggested Task scripts & helpers.
  *
@@ -80,6 +80,35 @@ prplSuggestedTask = {
 
 		// Trigger the grid resize event.
 		window.dispatchEvent( new CustomEvent( 'prpl/grid/resize' ) );
+	},
+
+	/**
+	 * Sanitize a task title for rendering.
+	 *
+	 * Titles come from `title.rendered`, which WordPress entity-encodes but does
+	 * NOT strip of HTML tags. Because the task template prints the title with the
+	 * unescaped `{{{ }}}` syntax, an attacker-controlled tag (e.g. an
+	 * `<img onerror>`) would otherwise execute. We strip any tags here so the
+	 * already entity-encoded text (e.g. `&amp;`) still renders correctly while
+	 * markup cannot run.
+	 *
+	 * @param {string} title The raw `title.rendered` value.
+	 * @return {string} The title with any HTML tags removed.
+	 */
+	sanitizeTitle: ( title ) => {
+		// Parse the string inert (DOMParser does NOT execute scripts, run
+		// `onerror`/`onload` handlers, or fetch resources), then read back only
+		// its text content. This drops any element/script nodes while preserving
+		// decoded entities such as `&amp;`.
+		const doc = new DOMParser().parseFromString(
+			String( title ?? '' ),
+			'text/html'
+		);
+		const text = doc.body.textContent || '';
+
+		// Re-encode for safe insertion via the template's `{{{ }}}` (raw) output.
+		// `_.escape` is bundled with WordPress (Underscore) and used by wp.template.
+		return window._ && window._.escape ? window._.escape( text ) : text;
 	},
 
 	/**
@@ -472,11 +501,13 @@ prplSuggestedTask = {
 					} )
 				)
 			);
+			// Use textContent (not innerHTML) so a title typed into the
+			// contenteditable field cannot inject markup.
 			el
 				.closest( 'li.prpl-suggested-task' )
 				.querySelector(
 					'label:has(.prpl-suggested-task-checkbox) .screen-reader-text'
-				).innerHTML = `${ title }: ${ prplL10n( 'markAsComplete' ) }`;
+				).textContent = `${ title }: ${ prplL10n( 'markAsComplete' ) }`;
 		}, 300 );
 	},
 

@@ -4,7 +4,7 @@
 			<# if ( 'user' === data.post.prpl_provider.slug ) { #>
 				<label>
 					<input type="checkbox" class="prpl-suggested-task-checkbox" onchange="prplSuggestedTask.maybeComplete( {{ data.post.id }} );" style="margin: 0;"<# if ( 'trash' === data.post.status || 'pending' === data.post.status ) { #> checked<# } #>>
-					<span class="screen-reader-text">{{{ data.post.title.rendered }}}: {{ data.l10n.markAsComplete }}</span>
+					<span class="screen-reader-text">{{{ prplSuggestedTask.sanitizeTitle( data.post.title.rendered ) }}}: {{ data.l10n.markAsComplete }}</span>
 				</label>
 			<# } else { #>
 				<span style="width: 0.75rem; height: 100%; display: flex; align-items: center; justify-content: center;">
@@ -15,7 +15,7 @@
 
 		<div class="prpl-suggested-task-title-wrapper">
 			<h3 class="prpl-task-title">
-				<span <# if ( 'user' === data.post.prpl_provider.slug ) { #>contenteditable="plaintext-only" role="textbox" aria-label="Edit task title" aria-multiline="false" onkeydown="prplSuggestedTask.preventEnterKey( event ); prplSuggestedTask.updateTaskTitle( this );" data-post-id="{{ data.post.id }}"<# } #>>{{{ data.post.title.rendered }}}</span>
+				<span <# if ( 'user' === data.post.prpl_provider.slug ) { #>contenteditable="plaintext-only" role="textbox" aria-label="Edit task title" aria-multiline="false" onkeydown="prplSuggestedTask.preventEnterKey( event ); prplSuggestedTask.updateTaskTitle( this );" data-post-id="{{ data.post.id }}"<# } #>>{{{ prplSuggestedTask.sanitizeTitle( data.post.title.rendered ) }}}</span>
 			</h3>
 		</div>
 
