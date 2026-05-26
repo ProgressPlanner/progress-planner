@@ -34,19 +34,30 @@ class Update_191 {
 	 * @return void
 	 */
 	private function sanitize_recommendation_titles() {
+		$db = \progress_planner()->get_suggested_tasks_db();
+
 		// get() defaults to all relevant statuses (publish, trash, draft, future, pending).
-		$recommendations = \progress_planner()->get_suggested_tasks_db()->get();
+		$recommendations = $db->get();
 
 		foreach ( $recommendations as $recommendation ) {
 			$sanitized = \sanitize_text_field( \wp_strip_all_tags( $recommendation->post_title ) );
 
-			// Only update if stripping actually changed the title.
-			if ( $sanitized !== $recommendation->post_title ) {
-				\progress_planner()->get_suggested_tasks_db()->update_recommendation(
-					$recommendation->ID,
-					[ 'post_title' => $sanitized ]
-				);
+			// Nothing to do if stripping didn't change the title.
+			if ( $sanitized === $recommendation->post_title ) {
+				continue;
 			}
+
+			// A title that was pure markup strips to an empty string. The plugin
+			// never stores title-less recommendations (Suggested_Tasks_DB::add()
+			// rejects them), so such a row is junk - delete it. This also avoids
+			// WordPress's empty-content guard, which would otherwise reject an
+			// update that leaves the title empty and leave the markup in place.
+			if ( '' === $sanitized ) {
+				$db->delete_recommendation( (int) $recommendation->ID );
+				continue;
+			}
+
+			$db->update_recommendation( $recommendation->ID, [ 'post_title' => $sanitized ] );
 		}
 	}
 }

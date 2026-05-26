@@ -29,11 +29,17 @@ class Upgrade_Migrations_191_Test extends \WP_UnitTestCase {
 		// in-request object cache (Suggested_Tasks_DB::format_recommendation())
 		// observes the placeholder - this mirrors a legacy row loaded fresh by the
 		// migration in its own request.
+		//
+		// Content and excerpt are left empty (as they are for programmatic/CLI
+		// recommendation inserts) so the empty-content guard is exercised when a
+		// pure-markup title strips to an empty string.
 		$post_id = self::factory()->post->create(
 			[
-				'post_type'   => 'prpl_recommendations',
-				'post_title'  => 'placeholder',
-				'post_status' => 'publish',
+				'post_type'    => 'prpl_recommendations',
+				'post_title'   => 'placeholder',
+				'post_content' => '',
+				'post_excerpt' => '',
+				'post_status'  => 'publish',
 			]
 		);
 
@@ -62,6 +68,26 @@ class Upgrade_Migrations_191_Test extends \WP_UnitTestCase {
 		$this->assertStringNotContainsString( '<img', $title );
 		$this->assertStringNotContainsString( 'onerror', $title );
 		$this->assertStringContainsString( 'Hello', $title );
+	}
+
+	/**
+	 * Test that a recommendation whose title is *pure* markup is deleted, even
+	 * when post_content and post_excerpt are empty.
+	 *
+	 * Stripping leaves an empty title. The plugin never stores title-less
+	 * recommendations, so the row is junk and is removed. (Updating it in place
+	 * would hit WordPress's empty-content guard and leave the markup behind.)
+	 *
+	 * @return void
+	 */
+	public function test_migration_deletes_pure_markup_title_with_empty_content() {
+		\progress_planner()->get_suggested_tasks_db()->delete_all_recommendations();
+
+		$task_id = $this->create_recommendation_with_raw_title( '<img src=x onerror=alert(1)>' );
+
+		( new \Progress_Planner\Update\Update_191() )->run();
+
+		$this->assertNull( \get_post( $task_id ), 'Pure-markup recommendation should be deleted.' );
 	}
 
 	/**
