@@ -85,6 +85,9 @@ https://youtu.be/e1bmxZYyXFY
 
 = 1.9.1 =
 
+- Security fix: Authenticated (Editor and above) Stored Cross-Site Scripting (XSS) via recommendation titles. Titles are now sanitized when saved, and existing recommendations are cleaned up via an update script.
+- Thanks to [hongdo](https://patchstack.com/database/researchers/b19114df-00a1-4c42-b2f1-627b22001d57) for responsibly disclosing this issue via the Patchstack Bug Bounty Program.
+
 = 1.9.0 =
 
 In this release we've added an integration with the **All In One Seo** plugin so you’ll now see personalized suggestions based on your current SEO configuration.
