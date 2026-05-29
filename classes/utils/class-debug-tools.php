@@ -273,9 +273,11 @@ class Debug_Tools {
 
 					$admin_bar->add_node(
 						[
-							'id'     => 'prpl-suggested-' . $key . '-' . $title,
+							// Use the post ID (not the title) for the node ID, and escape the
+							// title for display - the admin bar renders 'title' as raw HTML.
+							'id'     => 'prpl-suggested-' . $key . '-' . $task->ID,
 							'parent' => 'prpl-suggested-' . $key,
-							'title'  => $title . ' <a href="' . \esc_url( $delete_url ) . '" style="color: #dc3232; display: inline-block; margin-left: 5px; text-decoration: none;">×</a>',
+							'title'  => \esc_html( $title ) . ' <a href="' . \esc_url( $delete_url ) . '" style="color: #dc3232; display: inline-block; margin-left: 5px; text-decoration: none;">×</a>',
 						]
 					);
 				}
@@ -307,7 +309,7 @@ class Debug_Tools {
 				[
 					'id'     => 'prpl-activity-' . $activity->id,
 					'parent' => 'prpl-activities',
-					'title'  => $activity->data_id . ' - ' . $activity->category,
+					'title'  => \esc_html( $activity->data_id . ' - ' . $activity->category ),
 				]
 			);
 		}

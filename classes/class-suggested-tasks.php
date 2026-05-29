@@ -67,6 +67,9 @@ class Suggested_Tasks {
 		// Filter the REST API response.
 		\add_filter( 'rest_prepare_prpl_recommendations', [ $this, 'rest_prepare_recommendation' ], 10, 2 );
 
+		// Sanitize the recommendation title on insert/update via the REST API, to prevent stored XSS.
+		\add_filter( 'rest_pre_insert_prpl_recommendations', [ $this, 'rest_sanitize_recommendation' ], 10, 2 );
+
 		\add_filter( 'wp_trash_post_days', [ $this, 'change_trashed_posts_lifetime' ], 10, 2 );
 	}
 
@@ -489,6 +492,28 @@ class Suggested_Tasks {
 		}
 
 		return $args;
+	}
+
+	/**
+	 * Sanitize a recommendation before it is inserted or updated via the REST API.
+	 *
+	 * Recommendation titles are plain text (they are rendered unescaped in JS
+	 * templates such as views/js-templates/suggested-task.html), so we strip any
+	 * HTML tags here to prevent stored XSS. This runs regardless of the user's
+	 * `unfiltered_html` capability, which WordPress would otherwise honor for the
+	 * post title.
+	 *
+	 * @param \stdClass        $prepared_post An object representing a single post prepared for inserting or updating the database.
+	 * @param \WP_REST_Request $request       The request object.
+	 *
+	 * @return \stdClass The sanitized post object.
+	 */
+	public function rest_sanitize_recommendation( $prepared_post, $request ) { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.FoundAfterLastUsed
+		if ( isset( $prepared_post->post_title ) ) {
+			$prepared_post->post_title = \sanitize_text_field( \wp_strip_all_tags( $prepared_post->post_title ) );
+		}
+
+		return $prepared_post;
 	}
 
 	/**
