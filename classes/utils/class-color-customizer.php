@@ -130,7 +130,7 @@ class Color_Customizer {
 					$post_value  = isset( $_POST[ $key ] ) ? \sanitize_text_field( \wp_unslash( $_POST[ $key ] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing
 					$color_value = \sanitize_text_field( \wp_unslash( $post_value ) );
 					if ( ! empty( $color_value ) ) {
-						$colors[ $variable ] = $color_value;
+						$colors[ $variable ] = $color_value; // @phpstan-ignore offsetAccess.invalidOffset
 					}
 				}
 			}
