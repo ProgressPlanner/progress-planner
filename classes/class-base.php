@@ -86,10 +86,12 @@ class Base {
 	 */
 	public function init() {
 		if ( ! \function_exists( 'current_user_can' ) ) {
-			require_once ABSPATH . 'wp-includes/capabilities.php'; // @phpstan-ignore requireOnce.fileNotFound
+			// @phpstan-ignore-next-line requireOnce.fileNotFound
+			require_once ABSPATH . 'wp-includes/capabilities.php';
 		}
 		if ( ! \function_exists( 'wp_get_current_user' ) ) {
-			require_once ABSPATH . 'wp-includes/pluggable.php'; // @phpstan-ignore requireOnce.fileNotFound
+			// @phpstan-ignore-next-line requireOnce.fileNotFound
+			require_once ABSPATH . 'wp-includes/pluggable.php';
 		}
 
 		if ( \defined( '\IS_PLAYGROUND_PREVIEW' ) && \constant( '\IS_PLAYGROUND_PREVIEW' ) === true ) {
@@ -380,7 +382,8 @@ class Base {
 
 		// Otherwise, use the plugin header.
 		if ( ! \function_exists( 'get_file_data' ) ) {
-			require_once ABSPATH . 'wp-includes/functions.php'; // @phpstan-ignore requireOnce.fileNotFound
+			// @phpstan-ignore-next-line requireOnce.fileNotFound
+			require_once ABSPATH . 'wp-includes/functions.php';
 		}
 
 		if ( ! self::$plugin_version ) {

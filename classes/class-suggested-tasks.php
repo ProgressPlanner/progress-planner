@@ -479,6 +479,7 @@ class Suggested_Tasks {
 
 		// Handle sorting parameters.
 		if ( isset( $request['filter']['orderby'] ) ) {
+			// @phpstan-ignore-next-line argument.templateType
 			$args['orderby'] = \sanitize_sql_orderby( $request['filter']['orderby'] );
 		}
 		if ( isset( $request['filter']['order'] ) ) {
