@@ -472,11 +472,13 @@ prplSuggestedTask = {
 					} )
 				)
 			);
+			// Use textContent (not innerHTML) so a title typed into the
+			// contenteditable field cannot inject markup.
 			el
 				.closest( 'li.prpl-suggested-task' )
 				.querySelector(
 					'label:has(.prpl-suggested-task-checkbox) .screen-reader-text'
-				).innerHTML = `${ title }: ${ prplL10n( 'markAsComplete' ) }`;
+				).textContent = `${ title }: ${ prplL10n( 'markAsComplete' ) }`;
 		}, 300 );
 	},
 
