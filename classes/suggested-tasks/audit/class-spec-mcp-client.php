@@ -30,19 +30,20 @@ namespace Progress_Planner\Suggested_Tasks\Audit;
  * This uses the *verified* WP 7.0 AI API surface and avoids a hand-rolled MCP
  * JSON-RPC client.
  *
- * EVERYTHING that touches the WP 7.0 API is guarded by function/method-existence
- * checks, so this class is a safe no-op on WordPress < 7.0 or when no AI
- * connector is configured — {@see is_available()} returns false and the local
- * source falls back to deterministic PHP checks only.
+ * The WP 7.0 entry point is guarded by `function_exists( 'wp_ai_client_prompt' )`
+ * and `wp_supports_ai()`, so this class is a safe no-op on WordPress < 7.0 or
+ * when no AI provider is configured — {@see is_available()} returns false and the
+ * local source falls back to deterministic PHP checks only.
  *
- * UNVERIFIED (could not be exercised without a running WP 7.0 + configured
- * connector). Items marked `TODO(wp7-verify)` need confirmation against a real
- * 7.0 install:
- *   - exact `wp_ai_client_prompt()` builder method chain & return type,
- *   - `is_supported_for_text_generation()` as the availability gate,
- *   - `as_json_response( $schema )` behavior and whether `generate_text()`
- *     returns a JSON string vs a structured object,
- *   - the specification checklist endpoint shape.
+ * Verified against WordPress 7.0 core (wp-includes/ai-client.php +
+ * wp-includes/ai-client/class-wp-ai-client-prompt-builder.php): the builder is
+ * WP_AI_Client_Prompt_Builder, which delegates SDK methods via __call (so
+ * method_exists() must NOT be used to guard them). `is_supported_for_text_generation()`
+ * returns bool and is gated by wp_supports_ai() + the wp_ai_client_prevent_prompt
+ * filter; `using_max_tokens( int )`, `as_json_response( ?array )` and
+ * `generate_text()` (returns string or WP_Error) all resolve through the wrapper.
+ * The one thing still not exercised is the specification.website checklist
+ * endpoint shape (we tolerate an empty checklist).
  * ---------------------------------------------------------------------------
  */
 class Spec_Mcp_Client {
@@ -69,24 +70,22 @@ class Spec_Mcp_Client {
 			return false;
 		}
 
-		// WP 7.0 core AI client entry point. Absent on older WP / when the
-		// feature is not loaded.
-		if ( ! \function_exists( 'wp_ai_client_prompt' ) ) {
+		// WP 7.0 core AI client entry point + environment support check.
+		if ( ! \function_exists( 'wp_ai_client_prompt' ) || ! \function_exists( 'wp_supports_ai' ) ) {
+			return false;
+		}
+		if ( ! \wp_supports_ai() ) { // @phpstan-ignore-line function.notFound
 			return false;
 		}
 
-		// TODO(wp7-verify): confirm builder exposes is_supported_for_text_generation().
+		// is_supported_for_text_generation() is delegated through the builder's
+		// __call, so it must be called directly (method_exists() would miss it).
+		// It returns false when no provider/model is configured for text generation.
 		try {
-			$prompt = \wp_ai_client_prompt( 'ping' ); // @phpstan-ignore-line function.notFound
-			if ( \is_object( $prompt ) && \method_exists( $prompt, 'is_supported_for_text_generation' ) ) {
-				return (bool) $prompt->is_supported_for_text_generation();
-			}
+			return (bool) \wp_ai_client_prompt( 'ping' )->is_supported_for_text_generation(); // @phpstan-ignore-line function.notFound
 		} catch ( \Throwable $e ) {
 			return false;
 		}
-
-		// Entry point exists but we couldn't confirm a configured provider.
-		return false;
 	}
 
 	/**
@@ -188,20 +187,15 @@ class Spec_Mcp_Client {
 			$html_excerpt
 		);
 
-		// TODO(wp7-verify): confirm method names using_max_tokens / as_json_response /
-		// generate_text and that generate_text() returns a JSON string for a JSON response.
-		$builder = \wp_ai_client_prompt( $instruction ); // @phpstan-ignore-line function.notFound
+		// These methods are delegated via WP_AI_Client_Prompt_Builder::__call, so
+		// they are called directly (method_exists() would not see them). The
+		// builder is fluent; generate_text() returns a JSON string (per the schema)
+		// or a WP_Error.
+		$result = \wp_ai_client_prompt( $instruction ) // @phpstan-ignore-line function.notFound
+			->using_max_tokens( 2000 )
+			->as_json_response( $schema )
+			->generate_text();
 
-		if ( \method_exists( $builder, 'using_max_tokens' ) ) {
-			$builder = $builder->using_max_tokens( 2000 );
-		}
-		if ( \method_exists( $builder, 'as_json_response' ) ) {
-			$builder = $builder->as_json_response( $schema );
-		}
-
-		$result = $builder->generate_text();
-
-		// generate_text() returns WP_Error on failure in the wrapper.
 		if ( \is_wp_error( $result ) ) {
 			return null;
 		}
