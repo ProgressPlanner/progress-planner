@@ -148,6 +148,18 @@ class Rest_Recommendations_Xss_Test extends \WP_UnitTestCase {
 		$editor_id = self::factory()->user->create( [ 'role' => 'editor' ] );
 		\wp_set_current_user( $editor_id );
 
+		// This test isolates our XSS sanitization: a legitimate plain-text title
+		// must survive `wp_strip_all_tags()` + `sanitize_text_field()` unchanged.
+		// Core's kses would additionally encode the ampersand, but only for users
+		// without `unfiltered_html` — which on multisite excludes editors. Ensure
+		// the current user has the capability so the assertion is environment-
+		// independent and tests our code, not core's kses.
+		if ( \is_multisite() ) {
+			\grant_super_admin( $editor_id );
+		} else {
+			( new \WP_User( $editor_id ) )->add_cap( 'unfiltered_html' );
+		}
+
 		$post = $this->create_recommendation_via_rest( 'Buy milk & eggs' );
 
 		$this->assertSame( 'Buy milk & eggs', $post->post_title );
