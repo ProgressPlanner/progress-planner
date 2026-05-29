@@ -14,7 +14,7 @@ class ProgressPlannerYoastFocus {
 	constructor() {
 		this.container = document.querySelector( '#yoast-seo-settings' );
 		this.tasks = progressPlannerYoastFocusElement.tasks;
-		this.baseUrl = progressPlannerYoastFocusElement.base_url;
+		this.iconUrl = progressPlannerYoastFocusElement.iconUrl;
 
 		if ( this.container ) {
 			this.init();
@@ -219,7 +219,7 @@ class ProgressPlannerYoastFocus {
 
 		// Create an icon image.
 		const iconImg = document.createElement( 'img' );
-		iconImg.src = this.baseUrl + '/assets/images/icon_progress_planner.svg';
+		iconImg.src = this.iconUrl;
 		iconImg.alt = 'Ravi';
 		iconImg.width = 16;
 		iconImg.height = 16;

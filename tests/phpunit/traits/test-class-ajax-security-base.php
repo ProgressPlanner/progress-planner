@@ -115,7 +115,7 @@ class Ajax_Security_Base_Test extends \WP_Ajax_UnitTestCase {
 		} catch ( \WPAjaxDieContinueException $e ) {
 			// WordPress Core's dieHandler() calls ob_get_clean() which gets output and cleans buffer.
 			// Get the response.
-			$response = json_decode( $this->_last_response, true );
+			$response = \json_decode( $this->_last_response, true );
 			$this->assertFalse( $response['success'] );
 			$this->assertArrayHasKey( 'data', $response );
 			$this->assertArrayHasKey( 'message', $response['data'] );
@@ -168,7 +168,7 @@ class Ajax_Security_Base_Test extends \WP_Ajax_UnitTestCase {
 		} catch ( \WPAjaxDieContinueException $e ) {
 			// WordPress Core's dieHandler() calls ob_get_clean() which gets output and cleans buffer.
 			// Get the response.
-			$response = json_decode( $this->_last_response, true );
+			$response = \json_decode( $this->_last_response, true );
 			$this->assertFalse( $response['success'] );
 			$this->assertArrayHasKey( 'data', $response );
 			$this->assertArrayHasKey( 'message', $response['data'] );

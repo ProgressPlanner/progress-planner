@@ -157,10 +157,16 @@ class Content {
 	 * @return bool
 	 */
 	private function should_skip_saving( $post ) {
+		// Bail if content helpers are not available (can happen during plugin updates).
+		$content_helpers = \progress_planner()->get_activities__content_helpers();
+		if ( null === $content_helpers ) {
+			return true;
+		}
+
 		// Bail if the post is not included in the post-types we're tracking.
 		if ( ! \in_array(
 			$post->post_type,
-			\progress_planner()->get_activities__content_helpers()->get_post_types_names(),
+			$content_helpers->get_post_types_names(),
 			true
 		) ) {
 			return true;

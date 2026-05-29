@@ -48,7 +48,6 @@ class Debug_Tools {
 		\add_action( 'init', [ $this, 'check_toggle_migrations' ] );
 		\add_action( 'init', [ $this, 'check_delete_single_task' ] );
 		\add_action( 'init', [ $this, 'check_toggle_recommendations_ui' ] );
-		\add_action( 'init', [ $this, 'check_delete_onboarding_progress' ] );
 		if ( \defined( '\IS_PLAYGROUND_PREVIEW' ) && \constant( '\IS_PLAYGROUND_PREVIEW' ) === true ) {
 			\add_action( 'init', [ $this, 'check_toggle_placeholder_demo' ] );
 		}
@@ -100,8 +99,6 @@ class Debug_Tools {
 		$this->add_toggle_recommendations_ui_submenu_item( $admin_bar );
 
 		$this->add_placeholder_demo_submenu_item( $admin_bar );
-
-		$this->add_onboarding_submenu_item( $admin_bar );
 	}
 
 	/**
@@ -729,75 +726,5 @@ class Debug_Tools {
 			return true;
 		}
 		return $show_ui;
-	}
-
-	/**
-	 * Add Onboarding submenu to the debug menu.
-	 *
-	 * @param \WP_Admin_Bar $admin_bar The WordPress admin bar object.
-	 * @return void
-	 */
-	protected function add_onboarding_submenu_item( $admin_bar ) {
-		$admin_bar->add_node(
-			[
-				'id'     => 'prpl-onboarding',
-				'parent' => 'prpl-debug',
-				'title'  => 'Onboarding',
-			]
-		);
-
-		// Start onboarding.
-		$admin_bar->add_node(
-			[
-				'id'     => 'prpl-start-onboarding',
-				'parent' => 'prpl-onboarding',
-				'title'  => 'Start Onboarding',
-				'href'   => '#',
-				'meta'   => [
-					'onclick' => 'window.prplOnboardWizard.startOnboarding(); return false;',
-				],
-			]
-		);
-
-		// Delete onboarding progress.
-		$admin_bar->add_node(
-			[
-				'id'     => 'prpl-delete-onboarding-progress',
-				'parent' => 'prpl-onboarding',
-				'title'  => 'Delete Onboarding Progress',
-				'href'   => \add_query_arg( 'prpl_delete_onboarding_progress', '1', $this->current_url ),
-			]
-		);
-	}
-
-	/**
-	 * Check and process the delete onboarding progress action.
-	 *
-	 * Deletes onboarding progress if the appropriate query parameter is set
-	 * and user has required capabilities.
-	 *
-	 * @return void
-	 */
-	public function check_delete_onboarding_progress() {
-		if (
-			! isset( $_GET['prpl_delete_onboarding_progress'] ) || // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-			$_GET['prpl_delete_onboarding_progress'] !== '1' || // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-			! \current_user_can( 'manage_options' )
-		) {
-			return;
-		}
-
-		// Verify nonce for security.
-		$this->verify_nonce();
-
-		// Delete the onboarding progress.
-		\delete_option( 'prpl_onboard_progress' );
-
-		// Delete the license key.
-		\delete_option( 'progress_planner_license_key' );
-
-		// Redirect to the same page without the parameter.
-		\wp_safe_redirect( \remove_query_arg( [ 'prpl_delete_onboarding_progress', '_wpnonce' ] ) );
-		exit;
 	}
 }

@@ -28,18 +28,19 @@ if ( ! \defined( 'ABSPATH' ) ) {
 
 require_once PROGRESS_PLANNER_DIR . '/autoload.php';
 
-/**
- * Get the progress planner instance.
- *
- * @return \Progress_Planner\Base
- */
-function progress_planner() {
-	global $progress_planner;
-	if ( ! $progress_planner ) {
-		$progress_planner = new \Progress_Planner\Base();
-		$progress_planner->init();
+if ( ! \function_exists( 'progress_planner' ) ) {
+	/**
+	 * Get the progress planner instance.
+	 *
+	 * @return \Progress_Planner\Base
+	 */
+	function progress_planner() {
+		global $progress_planner;
+		if ( ! $progress_planner ) {
+			$progress_planner = new \Progress_Planner\Base();
+			$progress_planner->init();
+		}
+		return $progress_planner;
 	}
-	return $progress_planner;
 }
-
 \progress_planner();
