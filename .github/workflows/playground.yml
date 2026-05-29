@@ -103,18 +103,18 @@ blueprint.plugins = blueprint.plugins.map(plugin =>
 let prLabels = [];
 try {
   const prLabelsJson = fs.readFileSync('/tmp/pr_labels.json', 'utf8').trim();
-  console.log('Raw PR labels JSON:', prLabelsJson);
+  console.error('Raw PR labels JSON:', prLabelsJson);
   prLabels = JSON.parse(prLabelsJson);
 } catch (e) {
   console.error('Error parsing PR labels JSON:', e);
   console.error('Error details:', e.message);
 }
-console.log('PR Labels:', JSON.stringify(prLabels, null, 2));
+console.error('PR Labels:', JSON.stringify(prLabels, null, 2));
 
 const pluginSlugs = prLabels
   .filter(label => label.name && label.name.startsWith('plugin:'))
   .map(label => label.name.replace(/^plugin:/, ''));
-console.log('Plugin slugs:', JSON.stringify(pluginSlugs, null, 2));
+console.error('Plugin slugs:', JSON.stringify(pluginSlugs, null, 2));
 
 // Add plugin slugs to the plugins array (avoid duplicates)
 pluginSlugs.forEach(slug => {
