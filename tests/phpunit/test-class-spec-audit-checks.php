@@ -10,6 +10,7 @@ namespace Progress_Planner\Tests;
 use Progress_Planner\Suggested_Tasks\Audit\Checks\Doctype_Check;
 use Progress_Planner\Suggested_Tasks\Audit\Checks\Lang_Attribute_Check;
 use Progress_Planner\Suggested_Tasks\Audit\Checks\Charset_Check;
+use Progress_Planner\Suggested_Tasks\Audit\Checks\Meta_Description_Check;
 
 /**
  * Class Spec_Audit_Checks_Test.
@@ -87,5 +88,48 @@ class Spec_Audit_Checks_Test extends \WP_UnitTestCase {
 			[ 'headers' => [ 'content-type' => 'text/html; charset=UTF-8' ] ]
 		);
 		$this->assertSame( 'pass', $header_pass['status'] );
+	}
+
+	/**
+	 * Test the meta-description check.
+	 *
+	 * @return void
+	 */
+	public function test_meta_description_check() {
+		$check = new Meta_Description_Check();
+
+		$with_desc = '<!doctype html><html lang="en"><head><meta name="description" content="A great site about widgets."><title>T</title></head><body></body></html>';
+		$pass      = $check->run( 'https://example.com', $with_desc, [] );
+		$this->assertSame( 'meta-description', $pass['rule_id'] );
+		$this->assertSame( 'pass', $pass['status'] );
+
+		// Missing meta description -> fail.
+		$fail = $check->run( 'https://example.com', self::GOOD_HTML, [] );
+		$this->assertSame( 'fail', $fail['status'] );
+
+		// Present but empty content attribute -> fail.
+		$empty_html = '<!doctype html><html lang="en"><head><meta name="description" content=""></head><body></body></html>';
+		$empty      = $check->run( 'https://example.com', $empty_html, [] );
+		$this->assertSame( 'fail', $empty['status'] );
+
+		// Single quotes around attribute values are accepted.
+		$single_quote_html = "<!doctype html><html lang='en'><head><meta name='description' content='Yes'></head><body></body></html>";
+		$sq_pass           = $check->run( 'https://example.com', $single_quote_html, [] );
+		$this->assertSame( 'pass', $sq_pass['status'] );
+
+		// Attribute order reversed (content before name) is accepted.
+		$reversed = '<!doctype html><html lang="en"><head><meta content="Reversed order" name="description"></head><body></body></html>';
+		$rev_pass = $check->run( 'https://example.com', $reversed, [] );
+		$this->assertSame( 'pass', $rev_pass['status'] );
+	}
+
+	/**
+	 * Empty body yields no finding for the meta-description check.
+	 *
+	 * @return void
+	 */
+	public function test_meta_description_check_empty_html_returns_no_finding() {
+		$check = new Meta_Description_Check();
+		$this->assertSame( [], $check->run( 'https://example.com', '', [] ) );
 	}
 }

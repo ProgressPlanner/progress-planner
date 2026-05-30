@@ -22,7 +22,7 @@ class Checks_Registry {
 			new Doctype_Check(),
 			new Lang_Attribute_Check(),
 			new Charset_Check(),
-			new Robots_Txt_Check(),
+			new Meta_Description_Check(),
 			new Sitemap_Check(),
 		];
 
