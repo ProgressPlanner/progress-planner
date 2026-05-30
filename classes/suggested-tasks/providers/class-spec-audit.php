@@ -9,6 +9,7 @@ namespace Progress_Planner\Suggested_Tasks\Providers;
 
 use Progress_Planner\Suggested_Tasks\Data_Collector\Spec_Audit as Spec_Audit_Data_Collector;
 use Progress_Planner\Suggested_Tasks\Audit\Audit_Runner;
+use Progress_Planner\Suggested_Tasks\Audit\Checks\Checks_Registry;
 
 /**
  * Turns failing audit findings into suggested tasks.
@@ -272,6 +273,11 @@ class Spec_Audit extends Tasks {
 		$task_data['rule_id']  = $finding['rule_id'];
 		$task_data['category'] = $finding['category'] ?? 'basics';
 		$task_data['severity'] = $finding['severity'] ?? 'medium';
+		// Persist the finding's source so completion logic can distinguish
+		// deterministic (php-check) tasks from probabilistic (mcp-llm / saas)
+		// ones — e.g. so a retired PHP check auto-completes its orphan tasks
+		// without doing the same to LLM tasks the model just didn't mention.
+		$task_data['source'] = $finding['source'] ?? '';
 
 		return $task_data;
 	}
@@ -371,6 +377,18 @@ class Spec_Audit extends Tasks {
 			return false;
 		}
 
+		// Self-healing for retired/renamed PHP-check rules: if this is a
+		// php-check task whose rule_id is no longer in the registry, the rule
+		// was removed (by us upgrading the check set, or by a 3rd-party filter)
+		// and the task is orphaned. Mark it complete so it stops nagging.
+		//
+		// Limited to php-check because the LLM/SaaS rule space is open-ended:
+		// a rule disappearing from one audit run doesn't mean it was retired,
+		// just that the model didn't mention it this time.
+		if ( 'php-check' === $this->get_task_source( $task_id ) && ! $this->rule_is_registered( $rule_id ) ) {
+			return true;
+		}
+
 		$collector = $this->get_audit_collector();
 		$findings  = $collector->collect();
 
@@ -389,6 +407,40 @@ class Spec_Audit extends Tasks {
 		}
 
 		return isset( $finding['status'] ) && 'pass' === $finding['status'];
+	}
+
+	/**
+	 * Read the `prpl_source` meta for a task. Backfills missing values to
+	 * 'php-check' so legacy tasks (injected before this meta existed) still
+	 * benefit from the retired-rule auto-completion path.
+	 *
+	 * @param string $task_id The task slug.
+	 *
+	 * @return string
+	 */
+	protected function get_task_source( string $task_id ): string {
+		$post = \progress_planner()->get_suggested_tasks_db()->get_post( $task_id );
+		if ( ! $post ) {
+			return 'php-check';
+		}
+		$source = \get_post_meta( $post->ID, 'prpl_source', true );
+		return '' === $source ? 'php-check' : (string) $source;
+	}
+
+	/**
+	 * Whether the given rule_id is present in the current PHP-check registry.
+	 *
+	 * @param string $rule_id The rule ID.
+	 *
+	 * @return bool
+	 */
+	protected function rule_is_registered( string $rule_id ): bool {
+		foreach ( ( new Checks_Registry() )->get_checks() as $check ) {
+			if ( $check->get_rule_id() === $rule_id ) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	/**

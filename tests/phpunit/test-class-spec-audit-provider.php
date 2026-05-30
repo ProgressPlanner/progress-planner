@@ -9,6 +9,7 @@ namespace Progress_Planner\Tests;
 
 use Progress_Planner\Suggested_Tasks\Providers\Spec_Audit;
 use Progress_Planner\Suggested_Tasks\Data_Collector\Spec_Audit as Spec_Audit_Data_Collector;
+use Progress_Planner\Suggested_Tasks\Audit\Checks\Check;
 
 /**
  * Class Spec_Audit_Provider_Test.
@@ -52,6 +53,54 @@ class Spec_Audit_Provider_Test extends \WP_UnitTestCase {
 		// Guarantee isolation: Settings uses a static cache that survives across
 		// tests in the same process, so explicitly reset the throttle state.
 		\progress_planner()->get_settings()->set( 'spec_audit', [] );
+
+		// Most tests use synthetic rule IDs (rule-a, rule-b, etc.) that aren't
+		// in the real registry. The provider's retired-rule self-healing would
+		// trip on those and mark every task complete. Register stub checks for
+		// the synthetic IDs so the retired-rule path doesn't fire.
+		\add_filter(
+			'progress_planner_audit_checks',
+			function ( $checks ) {
+				foreach ( [ 'rule-a', 'rule-b', 'rule-c', 'low-rule', 'medium-rule', 'high-rule' ] as $rid ) {
+					$checks[] = new class($rid) implements Check {
+						/**
+						 * The rule ID.
+						 *
+						 * @var string
+						 */
+						private $rid;
+						/**
+						 * Constructor.
+						 *
+						 * @param string $rid Rule ID.
+						 */
+						public function __construct( string $rid ) {
+							$this->rid = $rid;
+						}
+						/**
+						 * Rule ID.
+						 *
+						 * @return string
+						 */
+						public function get_rule_id(): string {
+							return $this->rid;
+						}
+						/**
+						 * No-op run.
+						 *
+						 * @param string $url     URL.
+						 * @param string $html    HTML.
+						 * @param array  $context Context.
+						 * @return array<string, mixed>
+						 */
+						public function run( string $url, string $html, array $context ): array {
+							return [];
+						}
+					};
+				}
+				return $checks;
+			}
+		);
 	}
 
 	/**
@@ -69,6 +118,7 @@ class Spec_Audit_Provider_Test extends \WP_UnitTestCase {
 
 		\remove_all_filters( 'progress_planner_spec_audit_max_tasks_per_window' );
 		\remove_all_filters( 'progress_planner_spec_audit_window' );
+		\remove_all_filters( 'progress_planner_audit_checks' );
 
 		parent::tearDown();
 	}
@@ -328,5 +378,94 @@ class Spec_Audit_Provider_Test extends \WP_UnitTestCase {
 
 		$injections = \progress_planner()->get_settings()->get( [ 'spec_audit', 'injections' ], [] );
 		$this->assertSame( 1, $injections[ \gmdate( 'Ymd' ) ] ?? 0 );
+	}
+
+	/**
+	 * Test that a task for a PHP-check rule that no longer exists in the
+	 * registry is auto-completed. This is the self-healing path for stale
+	 * tasks left over from a previous plugin version where a rule was
+	 * renamed or retired.
+	 *
+	 * @return void
+	 */
+	public function test_task_auto_completed_when_php_check_rule_retired() {
+		// Register one controllable check while we inject the task, so the
+		// rule_id exists at injection time.
+		$stub_check = new class() implements Check {
+			/**
+			 * Rule ID.
+			 *
+			 * @return string
+			 */
+			public function get_rule_id(): string {
+				return 'rule-a';
+			}
+			/**
+			 * Reports failing so the test can inject.
+			 *
+			 * @param string $url     URL.
+			 * @param string $html    HTML.
+			 * @param array  $context Context.
+			 * @return array<string, mixed>
+			 */
+			public function run( string $url, string $html, array $context ): array {
+				return [
+					'rule_id' => 'rule-a',
+					'status'  => 'fail',
+					'title'   => 'Stub',
+					'source'  => 'php-check',
+				];
+			}
+		};
+		\add_filter(
+			'progress_planner_audit_checks',
+			static fn() => [ $stub_check ],
+			10,
+			0
+		);
+
+		$this->seed_findings( [ $this->finding( 'rule-a' ) ] );
+		$created = $this->provider->get_tasks_to_inject();
+		$this->assertCount( 1, $created, 'Sanity: task is injected while rule exists.' );
+
+		// Now retire the rule by removing it from the registry. The task
+		// remains in the DB but its rule_id is no longer known.
+		\remove_all_filters( 'progress_planner_audit_checks' );
+
+		// Even with the cache still populated and the rule still listed as
+		// failing in it, the task should be reported complete because the
+		// rule itself is gone from the registry.
+		$this->assertTrue(
+			$this->provider->is_task_completed( 'spec-audit-rule-a' ),
+			'A PHP-check task whose rule was retired must auto-complete.'
+		);
+	}
+
+	/**
+	 * Backfill safety: a task with no stored source meta is treated as
+	 * php-check and auto-completed when its rule_id is missing from the
+	 * current registry.
+	 *
+	 * @return void
+	 */
+	public function test_legacy_task_without_source_meta_is_treated_as_php_check() {
+		// Inject directly into the DB without a 'source' key — emulates a
+		// task created by a previous plugin version that didn't store source.
+		$post_id = \progress_planner()->get_suggested_tasks_db()->add(
+			[
+				'task_id'     => 'spec-audit-legacy-rule',
+				'provider_id' => 'spec-audit',
+				'post_title'  => 'Legacy task',
+				'rule_id'     => 'legacy-rule',
+			]
+		);
+		$this->assertGreaterThan( 0, $post_id );
+
+		// 'legacy-rule' is not registered in any Check — the legacy task
+		// should still auto-complete.
+		$this->assertTrue(
+			$this->provider->is_task_completed( 'spec-audit-legacy-rule' ),
+			'A legacy task with no source meta must be treated as php-check and auto-complete when its rule is missing.'
+		);
 	}
 }
