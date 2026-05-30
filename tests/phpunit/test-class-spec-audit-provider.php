@@ -249,7 +249,7 @@ class Spec_Audit_Provider_Test extends \WP_UnitTestCase {
 	 * @return void
 	 */
 	public function test_task_id_is_stable_per_rule() {
-		$this->assertSame( 'spec-audit-html-doctype', $this->provider->get_task_id( [ 'rule_id' => 'html-doctype' ] ) );
+		$this->assertSame( 'spec-audit-doctype', $this->provider->get_task_id( [ 'rule_id' => 'doctype' ] ) );
 		$this->assertSame( 'spec-audit', $this->provider->get_task_id( [] ) );
 	}
 

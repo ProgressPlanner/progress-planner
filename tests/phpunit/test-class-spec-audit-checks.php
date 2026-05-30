@@ -33,7 +33,7 @@ class Spec_Audit_Checks_Test extends \WP_UnitTestCase {
 		$check = new Doctype_Check();
 
 		$pass = $check->run( 'https://example.com', self::GOOD_HTML, [] );
-		$this->assertSame( 'html-doctype', $pass['rule_id'] );
+		$this->assertSame( 'doctype', $pass['rule_id'] );
 		$this->assertSame( 'pass', $pass['status'] );
 
 		$fail = $check->run( 'https://example.com', '<html><head></head><body>No doctype</body></html>', [] );

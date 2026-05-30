@@ -18,7 +18,7 @@ class Sitemap_Check implements Check {
 	 * @return string
 	 */
 	public function get_rule_id(): string {
-		return 'xml-sitemap';
+		return 'xml-sitemaps';
 	}
 
 	/**
@@ -75,7 +75,7 @@ class Sitemap_Check implements Check {
 			'description' => \__( 'An XML sitemap lists your important URLs so search engines can discover and index them efficiently. WordPress can generate one automatically, or an SEO plugin can provide it.', 'progress-planner' ),
 			'severity'    => 'medium',
 			'status'      => $status,
-			'doc_url'     => 'https://specification.website/',
+			'doc_url'     => 'https://specification.website/spec/seo/xml-sitemaps/',
 			'source'      => 'php-check',
 		];
 	}

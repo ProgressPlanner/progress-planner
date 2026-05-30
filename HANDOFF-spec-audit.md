@@ -254,46 +254,14 @@ On `http://planner.test/` (WP 7.0 + Yoast + Woo + Anthropic Sonnet 4.5):
 
 ## Open questions for the next agent
 
-### 1. (priority) Use spec.website's canonical slugs as `rule_id`s.
+**Note on rule_id slugs:** PHP checks and the AI prompt now both use
+**spec.website's canonical slugs** (e.g. `doctype`, `html-lang`,
+`meta-charset`, `meta-description`, `xml-sitemaps`). Each finding's
+`doc_url` points at the actual spec page
+(`https://specification.website/spec/{category}/{slug}/`). PHP and LLM
+findings dedupe naturally when they cover the same rule.
 
-Currently the PHP checks invent slugs (`html-doctype`, `meta-description`)
-and the LLM invents its own (`doctype`, `meta-charset`). They overlap
-conceptually but use different identifiers.
-
-The spec itself publishes canonical slugs in its URL structure:
-```
-https://specification.website/spec/foundations/meta-viewport/
-                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-                              category   / rule slug
-```
-
-If we used those:
-- PHP and LLM findings naturally dedupe.
-- `doc_url` becomes
-  `https://specification.website/spec/{category}/{rule_id}/` — a real link to
-  the actual spec page, not the homepage.
-- Cross-source consistency: future MCP/Abilities/etc. integrations align
-  automatically.
-
-**Implementation sketch:**
-- Rename PHP check rule_ids to match canonical slugs:
-  `html-doctype` → `doctype`, `html-lang-attribute` → `lang`,
-  `charset-meta` → `meta-charset`, `meta-description` → `meta-description`
-  (already matches!), `xml-sitemap` → `xml-sitemap` (need to verify exact spec
-  slug).
-- Update `doc_url` in each check to point to `/spec/{category}/{rule_id}/`.
-- Update the AI prompt to instruct the model to use spec.website canonical
-  slugs (and provide examples).
-- Handle migration: existing tasks with the OLD rule_ids will be considered
-  retired by the self-heal logic → auto-completed cleanly on next eval.
-  **This is the right behavior** — they were the right tasks under the old
-  schema and the user will get fresh ones under the new schema. No data
-  needs hand-migration.
-
-Estimated effort: 1-2 hours of code + tests + a careful verification run.
-Worth doing before shipping.
-
-### 2. (medium) Local-dev false positive on `https-tls`.
+### 1. (medium) Local-dev false positive on `https-tls`.
 
 The AI correctly flags non-HTTPS sites, but on a dev environment like
 `http://planner.test/` this is noise. Two options:
@@ -303,24 +271,23 @@ The AI correctly flags non-HTTPS sites, but on a dev environment like
 
 I'd lean (b) — sanitizing for dev environments risks hiding real prod issues.
 
-### 3. (medium) Rename `Spec_Mcp_Client` → `Spec_Ai_Client`.
+### 2. (medium) Rename `Spec_Mcp_Client` → `Spec_Ai_Client`.
 
 The "MCP" in the name was aspirational and incorrect (see decision 5).
-Simple rename, no behavior change. Wait until after canonical-slug work so
-both refactors land in one commit.
+Simple rename, no behavior change. Simple rename, no behavior change.
 
-### 4. (low) Add a `--dry-run` flag to the CLI command.
+### 3. (low) Add a `--dry-run` flag to the CLI command.
 
 Run the audit, print findings, inject nothing. Useful for evaluating AI
 output quality without cluttering the suggested-tasks UI between runs.
 ~10 lines.
 
-### 5. (low) UI for "Run audit now."
+### 4. (low) UI for "Run audit now."
 
 The AJAX endpoint (`progress_planner_run_spec_audit`) exists and is
 fastcgi-detached. There's no admin UI button wired to it yet.
 
-### 6. (low) Audit should respect a deactivation cleanup.
+### 5. (low) Audit should respect a deactivation cleanup.
 
 When the plugin is deactivated, the daily cron hook
 `progress_planner_spec_audit_run` should be unscheduled. Not currently wired.

@@ -18,7 +18,7 @@ class Lang_Attribute_Check implements Check {
 	 * @return string
 	 */
 	public function get_rule_id(): string {
-		return 'html-lang-attribute';
+		return 'html-lang';
 	}
 
 	/**
@@ -39,12 +39,12 @@ class Lang_Attribute_Check implements Check {
 
 		return [
 			'rule_id'     => $this->get_rule_id(),
-			'category'    => 'accessibility',
+			'category'    => 'foundations',
 			'title'       => \__( "Declare your site's language", 'progress-planner' ),
 			'description' => \__( 'Add a lang attribute to the <html> tag (for example lang="en"). It helps screen readers pronounce content correctly and search engines serve the right language.', 'progress-planner' ),
 			'severity'    => 'medium',
 			'status'      => $pass ? 'pass' : 'fail',
-			'doc_url'     => 'https://specification.website/',
+			'doc_url'     => 'https://specification.website/spec/foundations/html-lang/',
 			'source'      => 'php-check',
 		];
 	}

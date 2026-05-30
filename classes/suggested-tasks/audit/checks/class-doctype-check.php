@@ -18,7 +18,7 @@ class Doctype_Check implements Check {
 	 * @return string
 	 */
 	public function get_rule_id(): string {
-		return 'html-doctype';
+		return 'doctype';
 	}
 
 	/**
@@ -41,12 +41,12 @@ class Doctype_Check implements Check {
 
 		return [
 			'rule_id'     => $this->get_rule_id(),
-			'category'    => 'basics',
+			'category'    => 'foundations',
 			'title'       => \__( 'Add an HTML5 doctype to your homepage', 'progress-planner' ),
 			'description' => \__( 'Every page should start with <!doctype html> so browsers render it in standards mode. Without it, browsers fall back to quirks mode, which can break your layout.', 'progress-planner' ),
 			'severity'    => 'high',
 			'status'      => $pass ? 'pass' : 'fail',
-			'doc_url'     => 'https://specification.website/',
+			'doc_url'     => 'https://specification.website/spec/foundations/doctype/',
 			'source'      => 'php-check',
 		];
 	}

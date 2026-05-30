@@ -18,7 +18,7 @@ class Charset_Check implements Check {
 	 * @return string
 	 */
 	public function get_rule_id(): string {
-		return 'charset-meta';
+		return 'meta-charset';
 	}
 
 	/**
@@ -44,12 +44,12 @@ class Charset_Check implements Check {
 
 		return [
 			'rule_id'     => $this->get_rule_id(),
-			'category'    => 'basics',
+			'category'    => 'foundations',
 			'title'       => \__( 'Declare a UTF-8 charset', 'progress-planner' ),
 			'description' => \__( 'Add <meta charset="utf-8"> near the top of your <head>. Without an explicit charset, special characters and emoji can render as garbled text.', 'progress-planner' ),
 			'severity'    => 'medium',
 			'status'      => $pass ? 'pass' : 'fail',
-			'doc_url'     => 'https://specification.website/',
+			'doc_url'     => 'https://specification.website/spec/foundations/meta-charset/',
 			'source'      => 'php-check',
 		];
 	}

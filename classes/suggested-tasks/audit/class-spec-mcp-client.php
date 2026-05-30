@@ -196,7 +196,22 @@ class Spec_Mcp_Client {
 		$html_excerpt = \substr( $html, 0, 20000 );
 
 		$instruction = \sprintf(
-			"You are auditing a website against the Website Specification.\n\nURL: %s\n\nSpecification (Markdown index):\n%s\n\nFor each BASIC checklist rule you can evaluate from the HTML below, return a finding with a stable rule_id slug (kebab-case, derived from the spec rule's identifier), the category, a short human title and description of the fix, a severity, and status 'pass' or 'fail'. Only include rules you can actually evaluate from the provided HTML. Do not invent rules. Keep rule_id values consistent across runs.\n\nHTML:\n%s",
+			"You are auditing a website against the Website Specification.\n\n"
+			. "URL: %s\n\n"
+			. "Specification (Markdown index):\n%s\n\n"
+			. "Each spec rule has a CANONICAL identifier derived from its URL on specification.website:\n"
+			. "  https://specification.website/spec/{category}/{slug}/\n"
+			. "For example: /spec/foundations/meta-viewport/ → category=foundations, rule_id=meta-viewport.\n\n"
+			. "For each BASIC rule from the spec that you can evaluate from the HTML below, return a finding:\n"
+			. "  - rule_id: the exact canonical slug from the spec URL (e.g. 'meta-viewport', 'open-graph', 'theme-color'). NEVER invent slugs.\n"
+			. "  - category: the spec category from the URL ('foundations', 'seo', 'accessibility', 'security', 'performance', 'privacy', 'agent-readiness', 'resilience', 'i18n', 'well-known').\n"
+			. "  - title: a short, human title for the fix.\n"
+			. "  - description: 1–2 sentences explaining what's wrong and how to fix it.\n"
+			. "  - severity: 'high' | 'medium' | 'low'.\n"
+			. "  - status: 'pass' if the HTML satisfies the rule, 'fail' otherwise.\n"
+			. "  - doc_url: the full /spec/{category}/{slug}/ URL.\n\n"
+			. "Only include rules whose canonical slug appears in the specification above and which you can actually evaluate from the provided HTML. Do not invent rules. Keep rule_id values consistent across runs.\n\n"
+			. "HTML:\n%s",
 			$url,
 			$checklist,
 			$html_excerpt

@@ -52,12 +52,12 @@ class Meta_Description_Check implements Check {
 
 		return [
 			'rule_id'     => $this->get_rule_id(),
-			'category'    => 'seo',
+			'category'    => 'foundations',
 			'title'       => \__( 'Add a meta description to your homepage', 'progress-planner' ),
 			'description' => \__( 'A meta description is the snippet search engines show under your page title in search results. Without one, search engines auto-generate a snippet which is often less compelling and less accurate. Install an SEO plugin like Yoast SEO or set a description in your theme to control how your site is summarized.', 'progress-planner' ),
 			'severity'    => 'medium',
 			'status'      => $pass ? 'pass' : 'fail',
-			'doc_url'     => 'https://specification.website/',
+			'doc_url'     => 'https://specification.website/spec/foundations/meta-description/',
 			'source'      => 'php-check',
 		];
 	}
