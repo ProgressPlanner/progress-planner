@@ -56,12 +56,44 @@ class Spec_Audit extends Tasks {
 	protected $external_link_url = '';
 
 	/**
+	 * Post IDs injected this request, pending verification on shutdown that
+	 * they still exist. Used to keep the throttle counter honest when an
+	 * injected task is removed in the same request (e.g. by an immediate
+	 * evaluate_tasks() pass that fires after a cache refresh).
+	 *
+	 * @var array<int, int>
+	 */
+	protected $pending_release_ids = [];
+
+	/**
+	 * The cron hook that refreshes the audit cache + injects tasks.
+	 *
+	 * @var string
+	 */
+	public const CRON_HOOK = 'progress_planner_spec_audit_run';
+
+	/**
 	 * Initialize the task provider.
 	 *
 	 * @return void
 	 */
 	public function init() {
 		\add_action( 'wp_ajax_progress_planner_run_spec_audit', [ $this, 'ajax_run_audit' ] );
+		\add_action( 'shutdown', [ $this, 'finalize_throttle_on_shutdown' ] );
+
+		// The audit's outbound HTTP must NEVER block a user-facing request.
+		// A dedicated cron hook is the only context (besides explicit CLI/AJAX
+		// triggers) where the audit may run; system-cron-driven WP cron keeps it
+		// off the web FPM pool entirely.
+		\add_action(
+			self::CRON_HOOK,
+			function () {
+				$this->run_audit_now();
+			}
+		);
+		if ( ! \wp_next_scheduled( self::CRON_HOOK ) ) {
+			\wp_schedule_event( \time() + DAY_IN_SECONDS, 'daily', self::CRON_HOOK );
+		}
 	}
 
 	/**
@@ -247,16 +279,26 @@ class Spec_Audit extends Tasks {
 	/**
 	 * Inject up to the per-window limit of pending findings as tasks.
 	 *
-	 * @return array<int, int> Created post IDs.
+	 * This method does NO outbound HTTP — it reads findings from the cache
+	 * populated by run_audit_now() (which only runs from CLI/AJAX/cron, never
+	 * from admin_init). The throttle counter is incremented at shutdown after
+	 * verifying each created task survived (handles the case where an
+	 * evaluate_tasks() pass in the same request removed it).
+	 *
+	 * @return array<int, int> Created post IDs (provisional — final count is
+	 *                         taken on shutdown).
 	 */
 	public function get_tasks_to_inject() {
 		if ( true === $this->is_task_snoozed() ) {
 			return [];
 		}
 
-		$limit    = $this->get_max_per_window();
-		$released = $this->get_released_this_window();
-		if ( $released >= $limit ) {
+		$limit = $this->get_max_per_window();
+		// Count both finalized (counter) and in-flight (pending shutdown
+		// verification) releases against the cap, so two calls within the same
+		// request can't both blow past the limit.
+		$used = $this->get_released_this_window() + \count( $this->pending_release_ids );
+		if ( $used >= $limit ) {
 			return [];
 		}
 
@@ -265,7 +307,7 @@ class Spec_Audit extends Tasks {
 			return [];
 		}
 
-		$to_release = \array_slice( $pending, 0, $limit - $released );
+		$to_release = \array_slice( $pending, 0, $limit - $used );
 
 		$created = [];
 		foreach ( $to_release as $finding ) {
@@ -277,13 +319,43 @@ class Spec_Audit extends Tasks {
 
 			$post_id = \progress_planner()->get_suggested_tasks_db()->add( $task_data );
 			if ( $post_id ) {
-				$created[] = $post_id;
+				$created[]                   = $post_id;
+				$this->pending_release_ids[] = $post_id;
 			}
 		}
 
-		$this->record_released( \count( $created ) );
-
 		return $created;
+	}
+
+	/**
+	 * Finalize the per-window throttle counter on shutdown.
+	 *
+	 * Counts only the tasks injected this request that actually survived (i.e.
+	 * were not deleted/trashed by a same-request evaluate_tasks() pass), so the
+	 * counter reflects real user-visible throttling rather than transient creates.
+	 *
+	 * @return void
+	 */
+	public function finalize_throttle_on_shutdown() {
+		if ( empty( $this->pending_release_ids ) ) {
+			return;
+		}
+
+		$surviving = 0;
+		foreach ( $this->pending_release_ids as $post_id ) {
+			$post = \get_post( $post_id );
+			// A 'publish' task that's still around is the only kind that should
+			// consume a window slot; trashed/auto-completed tasks shouldn't.
+			if ( $post && 'publish' === $post->post_status ) {
+				++$surviving;
+			}
+		}
+
+		$this->pending_release_ids = [];
+
+		if ( $surviving > 0 ) {
+			$this->record_released( $surviving );
+		}
 	}
 
 	/**
@@ -299,9 +371,19 @@ class Spec_Audit extends Tasks {
 			return false;
 		}
 
-		$finding = $this->get_audit_collector()->get_finding( $rule_id );
+		$collector = $this->get_audit_collector();
+		$findings  = $collector->collect();
 
-		// Rule no longer reported as failing -> the user fixed it.
+		// No cached audit at all -> we don't know; leave the task alone rather
+		// than declare it complete (which would happen if we treated the
+		// missing finding as "rule no longer reported as failing").
+		if ( empty( $findings ) ) {
+			return false;
+		}
+
+		$finding = $collector->get_finding( $rule_id );
+
+		// Rule no longer reported in a populated audit -> the user fixed it.
 		if ( null === $finding ) {
 			return true;
 		}
@@ -324,6 +406,12 @@ class Spec_Audit extends Tasks {
 	/**
 	 * AJAX handler for the manual "run audit now" trigger.
 	 *
+	 * The audit's outbound HTTP can take seconds, and running it inline would
+	 * keep the user's FPM worker busy the whole time. Instead the response is
+	 * flushed immediately ("queued") and the audit is run after the worker
+	 * detaches from the client (via fastcgi_finish_request() when available),
+	 * on the `shutdown` action.
+	 *
 	 * @return void
 	 */
 	public function ajax_run_audit() {
@@ -335,25 +423,58 @@ class Spec_Audit extends Tasks {
 			\wp_send_json_error( [ 'message' => \esc_html__( 'Invalid nonce.', 'progress-planner' ) ] );
 		}
 
-		$injected = $this->run_audit_now();
+		// Defer the actual audit to shutdown so the user's worker can be released
+		// back to the FPM pool before the outbound HTTP starts.
+		\add_action( 'shutdown', [ $this, 'shutdown_run_audit' ], 5 );
 
 		\wp_send_json_success(
 			[
+				'queued'         => true,
 				'failing_count'  => \count( $this->get_audit_collector()->get_failing_findings() ),
-				'injected_count' => \count( $injected ),
+				'injected_count' => 0,
 			]
 		);
 	}
 
 	/**
+	 * Run the audit at end-of-request, after the response is flushed.
+	 *
+	 * Uses fastcgi_finish_request() where available so the FPM worker is freed
+	 * back to the pool immediately and the outbound HTTP doesn't hold up the
+	 * user's request. Also raises set_time_limit() since the audit may take a
+	 * few seconds.
+	 *
+	 * @return void
+	 */
+	public function shutdown_run_audit() {
+		if ( \function_exists( 'fastcgi_finish_request' ) ) {
+			\fastcgi_finish_request();
+		}
+		// We are now detached from the client; allow more wall-clock time.
+		if ( \function_exists( 'set_time_limit' ) ) {
+			@\set_time_limit( 60 ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+		}
+
+		$this->run_audit_now();
+	}
+
+	/**
 	 * Refresh the audit cache and inject any newly surfaced tasks.
 	 *
-	 * Shared by the AJAX handler and the WP-CLI command.
+	 * Outbound HTTP runs here. Allowed callers: the WP-CLI command (separate
+	 * php process), the cron hook ({@see CRON_HOOK}), and the AJAX shutdown
+	 * handler ({@see shutdown_run_audit()}). Never called from `admin_init`,
+	 * which would amplify into FPM pool starvation.
 	 *
 	 * @return array<int, int> Created post IDs.
 	 */
 	public function run_audit_now(): array {
-		$this->get_audit_collector()->update_cache();
+		$collector = $this->get_audit_collector();
+		Spec_Audit_Data_Collector::with_explicit_refresh(
+			static function () use ( $collector ) {
+				$collector->update_cache();
+			}
+		);
 		return $this->get_tasks_to_inject();
 	}
 }

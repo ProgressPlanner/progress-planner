@@ -8,6 +8,7 @@
 namespace Progress_Planner\Tests;
 
 use Progress_Planner\Suggested_Tasks\Providers\Spec_Audit;
+use Progress_Planner\Suggested_Tasks\Data_Collector\Spec_Audit as Spec_Audit_Data_Collector;
 
 /**
  * Class Spec_Audit_Provider_Test.
@@ -223,7 +224,12 @@ class Spec_Audit_Provider_Test extends \WP_UnitTestCase {
 	}
 
 	/**
-	 * Test completion: a rule that disappears from the audit marks the task complete.
+	 * Test completion: a rule that disappears from a NON-EMPTY audit marks the
+	 * task complete.
+	 *
+	 * Note: an *empty* cache is NOT treated as "rule passed" — see
+	 * test_task_not_completed_when_cache_is_empty — so this test seeds a
+	 * non-empty cache that simply doesn't include rule-a.
 	 *
 	 * @return void
 	 */
@@ -231,9 +237,96 @@ class Spec_Audit_Provider_Test extends \WP_UnitTestCase {
 		$this->seed_findings( [ $this->finding( 'rule-a' ) ] );
 		$this->provider->get_tasks_to_inject();
 
-		// Rule no longer present in the audit at all.
-		$this->seed_findings( [] );
+		// Audit ran again and the rule is no longer reported (but other rules are).
+		$this->seed_findings( [ $this->finding( 'rule-b' ) ] );
 
 		$this->assertTrue( $this->provider->is_task_completed( 'spec-audit-rule-a' ) );
+	}
+
+	/**
+	 * Test that an empty/missing audit cache does NOT mark tasks as completed.
+	 *
+	 * If we treated a missing cache as "rule no longer reported", a single
+	 * object-cache flush could mass-complete every audit task. Tasks must wait
+	 * for a real audit before changing state.
+	 *
+	 * @return void
+	 */
+	public function test_task_not_completed_when_cache_is_empty() {
+		$this->seed_findings( [ $this->finding( 'rule-a' ) ] );
+		$this->provider->get_tasks_to_inject();
+
+		// Simulate the cache being cleared (object cache flush, restart, etc.).
+		$this->seed_findings( [] );
+
+		$this->assertFalse(
+			$this->provider->is_task_completed( 'spec-audit-rule-a' ),
+			'An empty cache must not be treated as evidence the rule passes.'
+		);
+	}
+
+	/**
+	 * Test that the data collector's update_cache() is a no-op unless an
+	 * explicit caller (CLI/cron/AJAX-shutdown) has opted in. This is the
+	 * guard that keeps the audit's outbound HTTP off the admin_init path.
+	 *
+	 * @return void
+	 */
+	public function test_update_cache_is_noop_without_explicit_refresh() {
+		$collector = new Spec_Audit_Data_Collector();
+
+		// Pre-seed a sentinel so we can detect whether update_cache ran.
+		$this->seed_findings( [ $this->finding( 'sentinel-rule' ) ] );
+
+		// Call update_cache() outside the with_explicit_refresh() guard —
+		// emulates the Data_Collector_Manager admin_init sweep.
+		$collector->update_cache();
+
+		$findings = $collector->collect();
+		$this->assertSame(
+			'sentinel-rule',
+			$findings[0]['rule_id'] ?? null,
+			'update_cache() without explicit refresh must NOT overwrite the cache (which would imply it tried to run a fresh audit and its outbound HTTP).'
+		);
+	}
+
+	/**
+	 * Test that the throttle counter is not consumed when an injected task
+	 * is removed in the same request (the shutdown verification step skips it).
+	 *
+	 * @return void
+	 */
+	public function test_throttle_window_not_consumed_for_canceled_injection() {
+		$this->seed_findings( [ $this->finding( 'rule-a' ) ] );
+
+		$created = $this->provider->get_tasks_to_inject();
+		$this->assertCount( 1, $created );
+
+		// Simulate the same-request evaluate_tasks() removing the task because
+		// the cache contradicted itself after injection.
+		\wp_delete_post( $created[0], true );
+
+		// shutdown action runs at request end; call it directly.
+		$this->provider->finalize_throttle_on_shutdown();
+
+		$injections = \progress_planner()->get_settings()->get( [ 'spec_audit', 'injections' ], [] );
+		$this->assertSame( [], $injections, 'Canceled injection should not consume the per-window quota.' );
+	}
+
+	/**
+	 * Test that a surviving injection DOES consume the window quota at shutdown.
+	 *
+	 * @return void
+	 */
+	public function test_throttle_window_consumed_for_surviving_injection() {
+		$this->seed_findings( [ $this->finding( 'rule-a' ) ] );
+
+		$created = $this->provider->get_tasks_to_inject();
+		$this->assertCount( 1, $created );
+
+		$this->provider->finalize_throttle_on_shutdown();
+
+		$injections = \progress_planner()->get_settings()->get( [ 'spec_audit', 'injections' ], [] );
+		$this->assertSame( 1, $injections[ \gmdate( 'Ymd' ) ] ?? 0 );
 	}
 }
