@@ -49,11 +49,16 @@ namespace Progress_Planner\Suggested_Tasks\Audit;
 class Spec_Mcp_Client {
 
 	/**
-	 * The specification checklist endpoint (published Markdown/JSON source).
+	 * Endpoint for the specification's LLM-oriented index.
+	 *
+	 * Per https://specification.website/, /llms.txt is the canonical structured
+	 * Markdown index designed for LLM consumption (~37KB). The /mcp/ URL we used
+	 * earlier returns the HTML page describing the MCP server, NOT spec content,
+	 * so the model was being fed irrelevant HTML.
 	 *
 	 * @var string
 	 */
-	protected const SPEC_CHECKLIST_URL = 'https://specification.website/mcp/';
+	protected const SPEC_CHECKLIST_URL = 'https://specification.website/llms.txt';
 
 	/**
 	 * Whether the AI client is available and a provider is configured.
@@ -84,6 +89,7 @@ class Spec_Mcp_Client {
 		try {
 			return (bool) \wp_ai_client_prompt( 'ping' )->is_supported_for_text_generation(); // @phpstan-ignore-line function.notFound
 		} catch ( \Throwable $e ) {
+			$this->log_error( 'is_supported_for_text_generation threw', \get_class( $e ), $e->getMessage() );
 			return false;
 		}
 	}
@@ -114,11 +120,13 @@ class Spec_Mcp_Client {
 		try {
 			$json = $this->run_prompt( $url, $checklist, $html );
 		} catch ( \Throwable $e ) {
+			$this->log_error( 'run_prompt threw', \get_class( $e ), $e->getMessage() );
 			return [];
 		}
 
 		$decoded = \is_string( $json ) ? \json_decode( $json, true ) : $json;
 		if ( ! \is_array( $decoded ) ) {
+			$this->log_error( 'json_decode failed or non-array result', '', \is_string( $json ) ? \substr( $json, 0, 200 ) : \gettype( $json ) );
 			return [];
 		}
 
@@ -148,14 +156,21 @@ class Spec_Mcp_Client {
 	 * @return string|array<mixed>|null
 	 */
 	protected function run_prompt( string $url, string $checklist, string $html ) {
+		// NOTE: Anthropic's structured-output API requires `additionalProperties:false`
+		// on every `type:object` in the schema. Without it the call 400s with:
+		// output_format.schema: For 'object' type, 'additionalProperties' must
+		// be explicitly set to false.
+		// Verified against the live Connectors API on 2026-05-30.
 		$schema = [
-			'type'       => 'object',
-			'properties' => [
+			'type'                 => 'object',
+			'additionalProperties' => false,
+			'properties'           => [
 				'findings' => [
 					'type'  => 'array',
 					'items' => [
-						'type'       => 'object',
-						'properties' => [
+						'type'                 => 'object',
+						'additionalProperties' => false,
+						'properties'           => [
 							'rule_id'     => [ 'type' => 'string' ],
 							'category'    => [ 'type' => 'string' ],
 							'title'       => [ 'type' => 'string' ],
@@ -170,18 +185,18 @@ class Spec_Mcp_Client {
 							],
 							'doc_url'     => [ 'type' => 'string' ],
 						],
-						'required'   => [ 'rule_id', 'status', 'title' ],
+						'required'             => [ 'rule_id', 'status', 'title' ],
 					],
 				],
 			],
-			'required'   => [ 'findings' ],
+			'required'             => [ 'findings' ],
 		];
 
 		// Keep the HTML payload bounded so we don't blow the context / token budget.
 		$html_excerpt = \substr( $html, 0, 20000 );
 
 		$instruction = \sprintf(
-			"You are auditing a website against the Website Specification.\n\nURL: %s\n\nSpecification checklist:\n%s\n\nFor each BASIC checklist rule you can evaluate from the HTML below, return a finding with a stable rule_id slug, the category, a short human title and description of the fix, a severity, and status 'pass' or 'fail'. Only include rules you can actually evaluate from the provided HTML. Do not invent rules.\n\nHTML:\n%s",
+			"You are auditing a website against the Website Specification.\n\nURL: %s\n\nSpecification (Markdown index):\n%s\n\nFor each BASIC checklist rule you can evaluate from the HTML below, return a finding with a stable rule_id slug (kebab-case, derived from the spec rule's identifier), the category, a short human title and description of the fix, a severity, and status 'pass' or 'fail'. Only include rules you can actually evaluate from the provided HTML. Do not invent rules. Keep rule_id values consistent across runs.\n\nHTML:\n%s",
 			$url,
 			$checklist,
 			$html_excerpt
@@ -197,10 +212,34 @@ class Spec_Mcp_Client {
 			->generate_text();
 
 		if ( \is_wp_error( $result ) ) {
+			$this->log_error( 'wp_ai_client_prompt returned WP_Error', $result->get_error_code(), $result->get_error_message() );
 			return null;
 		}
 
 		return $result;
+	}
+
+	/**
+	 * Log a diagnostic line about the AI call when WP_DEBUG is on.
+	 *
+	 * The AI path is best-effort and we deliberately return [] on failure so the
+	 * audit still produces deterministic findings. But silent failure makes the
+	 * feature impossible to debug — this surfaces the cause in debug.log without
+	 * changing the public contract.
+	 *
+	 * @param string $context Short label for where in the flow we failed.
+	 * @param string $code    Optional WP_Error code (or exception class name).
+	 * @param string $message Optional human-readable error message.
+	 *
+	 * @return void
+	 */
+	protected function log_error( string $context, string $code = '', string $message = '' ) {
+		if ( ! ( \defined( 'WP_DEBUG' ) && \WP_DEBUG ) ) {
+			return;
+		}
+		\error_log( // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+			\sprintf( '[progress-planner spec-audit ai] %s | code=%s | %s', $context, $code, $message )
+		);
 	}
 
 	/**
