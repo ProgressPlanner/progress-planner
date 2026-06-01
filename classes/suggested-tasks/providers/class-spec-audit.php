@@ -529,7 +529,12 @@ class Spec_Audit extends Tasks {
 	 * handler ({@see shutdown_run_audit()}). Never called from `admin_init`,
 	 * which would amplify into FPM pool starvation.
 	 *
-	 * @return array<int, int> Created post IDs.
+	 * @return array<int, int> Post IDs injected this request. This includes any
+	 *                         task already injected earlier in the same request
+	 *                         by the bootstrap inject_tasks() sweep — not just
+	 *                         the ones this call created — so callers report an
+	 *                         accurate "injected this run" count even when the
+	 *                         sweep consumed the throttle slot before us.
 	 */
 	public function run_audit_now(): array {
 		$collector = $this->get_audit_collector();
@@ -538,6 +543,8 @@ class Spec_Audit extends Tasks {
 				$collector->update_cache();
 			}
 		);
-		return $this->get_tasks_to_inject();
+		$this->get_tasks_to_inject();
+
+		return $this->pending_release_ids;
 	}
 }

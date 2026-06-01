@@ -366,11 +366,31 @@ foreach (progress_planner()->get_settings()->get("progress_planner_data_collecto
 ```
 
 ### Clean state (delete all spec-audit tasks + reset throttle + clear cache)
+
+NOTE: collect the task IDs with a raw `get_posts()` (+ provider tax_query), NOT
+`$db->get_tasks_by()`. `get_tasks_by()` is cached in `GET_TASKS_CACHE_GROUP`,
+and `delete_recommendation()` flushes that group mid-loop — so iterating the
+cached list while deleting from it skips tasks and leaves survivors behind
+(this is what made tasks look like they accumulate across runs). A raw
+`get_posts()` snapshot of IDs is stable across the deletes.
+
 ```bash
 wp eval '
+$ids = get_posts([
+    "post_type"   => "prpl_recommendations",
+    "post_status" => "any",
+    "numberposts" => -1,
+    "fields"      => "ids",
+    "tax_query"   => [[
+        "taxonomy" => "prpl_recommendations_provider",
+        "field"    => "slug",
+        "terms"    => "spec-audit",
+    ]],
+]);
 $db = progress_planner()->get_suggested_tasks_db();
-foreach ((array) $db->get_tasks_by(["post_status"=>["publish","trash","draft","future","pending"],"provider_id"=>"spec-audit"]) as $t) {
-    if (is_object($t) && isset($t->ID)) wp_delete_post($t->ID, true);
+foreach ($ids as $id) {
+    $db->delete_recommendation($id);
+    wp_delete_post($id, true);
 }
 $s = progress_planner()->get_settings();
 $dc = $s->get("progress_planner_data_collector", []);
@@ -380,7 +400,7 @@ $s->set("spec_audit", []);
 progress_planner()->get_utils__cache()->delete("spec_audit_checklist");
 $ts = wp_next_scheduled("progress_planner_spec_audit_run");
 if ($ts) wp_unschedule_event($ts, "progress_planner_spec_audit_run");
-echo "clean\n";
+echo "deleted " . count($ids) . " spec-audit task(s)\n";
 '
 ```
 
