@@ -150,6 +150,16 @@ Fix (commit `bbfaf446`):
   a rule "missing" from one audit just means the model didn't mention it
   this time, not that it was retired.
 
+**Follow-up fix (found in PR review testing):** the exemption above was only
+applied to the *retired-rule registry* path. A second branch in
+`is_specific_task_completed()` — "rule no longer reported in a populated
+audit" — returned `true` for **any** source, so an `mcp-llm` task
+auto-completed the moment the (non-deterministic) model omitted its rule on a
+later run. That contradicted this decision. The branch is now guarded the same
+way: only `php-check` tasks treat rule-absence as "fixed"; `mcp-llm`/`saas`
+tasks complete only on an explicit `pass` status. Regression test:
+`test_llm_task_not_completed_when_rule_gone`.
+
 ### 4. **AI engine: phase C now, phase B later.**
 
 Phase C (now): plugin is the AI client, using the site owner's WP 7.0
@@ -390,7 +400,7 @@ around the relevant call sites.
 
 ## Final state of `filip/spec-audit` as of handoff
 
-- 424/424 PHPUnit tests pass.
+- 425/425 PHPUnit tests pass.
 - PHPStan clean.
 - phpcs clean at hook severity (`--warning-severity=6`).
 - 9 commits ahead of base.

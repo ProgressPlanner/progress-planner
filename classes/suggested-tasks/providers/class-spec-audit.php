@@ -401,9 +401,20 @@ class Spec_Audit extends Tasks {
 
 		$finding = $collector->get_finding( $rule_id );
 
-		// Rule no longer reported in a populated audit -> the user fixed it.
+		// Rule no longer reported in a populated audit.
+		//
+		// For php-check tasks this means the user fixed it (or the rule was
+		// retired): the deterministic check set is fixed, so a passing rule is
+		// simply omitted. Mark complete.
+		//
+		// For mcp-llm / saas tasks we must NOT treat absence as completion: the
+		// LLM/SaaS rule space is open-ended and non-deterministic, so a rule
+		// missing from one audit run usually just means the model didn't mention
+		// it this time, not that the user fixed it. Those tasks only complete on
+		// an explicit 'pass' status (handled below). See decision 3 in
+		// HANDOFF-spec-audit.md.
 		if ( null === $finding ) {
-			return true;
+			return 'php-check' === $this->get_task_source( $task_id );
 		}
 
 		return isset( $finding['status'] ) && 'pass' === $finding['status'];

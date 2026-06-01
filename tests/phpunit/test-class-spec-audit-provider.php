@@ -274,8 +274,13 @@ class Spec_Audit_Provider_Test extends \WP_UnitTestCase {
 	}
 
 	/**
-	 * Test completion: a rule that disappears from a NON-EMPTY audit marks the
-	 * task complete.
+	 * Test completion: a PHP-CHECK rule that disappears from a NON-EMPTY audit
+	 * marks the task complete.
+	 *
+	 * The deterministic check set is fixed, so a passing rule is simply omitted
+	 * from the findings — absence therefore means "fixed" for php-check tasks.
+	 * (mcp-llm / saas tasks are handled differently — see
+	 * test_llm_task_not_completed_when_rule_gone.)
 	 *
 	 * Note: an *empty* cache is NOT treated as "rule passed" — see
 	 * test_task_not_completed_when_cache_is_empty — so this test seeds a
@@ -283,14 +288,64 @@ class Spec_Audit_Provider_Test extends \WP_UnitTestCase {
 	 *
 	 * @return void
 	 */
-	public function test_task_completed_when_rule_gone() {
+	public function test_php_check_task_completed_when_rule_gone() {
+		// finding() defaults source to 'php-check'.
 		$this->seed_findings( [ $this->finding( 'rule-a' ) ] );
 		$this->provider->get_tasks_to_inject();
 
 		// Audit ran again and the rule is no longer reported (but other rules are).
 		$this->seed_findings( [ $this->finding( 'rule-b' ) ] );
 
-		$this->assertTrue( $this->provider->is_task_completed( 'spec-audit-rule-a' ) );
+		$this->assertTrue(
+			$this->provider->is_task_completed( 'spec-audit-rule-a' ),
+			'A php-check task whose rule vanished from a populated audit must complete.'
+		);
+	}
+
+	/**
+	 * Test completion: an mcp-llm task whose rule simply disappears from a
+	 * populated audit must NOT be marked complete.
+	 *
+	 * Regression guard. The LLM/SaaS rule space is open-ended and the model is
+	 * non-deterministic: a rule missing from one audit run usually just means
+	 * the model didn't mention it this time, not that the user fixed it.
+	 * Treating absence as completion let AI-surfaced tasks silently self-complete
+	 * between runs. Such tasks must only complete on an explicit 'pass' status.
+	 * See decision 3 in HANDOFF-spec-audit.md.
+	 *
+	 * @return void
+	 */
+	public function test_llm_task_not_completed_when_rule_gone() {
+		$llm_finding           = $this->finding( 'llm-rule' );
+		$llm_finding['source'] = 'mcp-llm';
+		$this->seed_findings( [ $llm_finding ] );
+
+		$created = $this->provider->get_tasks_to_inject();
+		$this->assertCount( 1, $created, 'Sanity: the mcp-llm task is injected.' );
+		$this->assertSame(
+			'mcp-llm',
+			\get_post_meta( $created[0], 'prpl_source', true ),
+			'Sanity: the injected task carries the mcp-llm source.'
+		);
+
+		// Audit ran again; the model simply didn't mention llm-rule this time
+		// (cache is non-empty — another rule is present).
+		$this->seed_findings( [ $this->finding( 'rule-b' ) ] );
+
+		$this->assertFalse(
+			$this->provider->is_task_completed( 'spec-audit-llm-rule' ),
+			'An mcp-llm task must NOT complete just because the model omitted its rule.'
+		);
+
+		// It DOES complete when the rule is explicitly reported as passing.
+		$passing           = $llm_finding;
+		$passing['status'] = 'pass';
+		$this->seed_findings( [ $passing ] );
+
+		$this->assertTrue(
+			$this->provider->is_task_completed( 'spec-audit-llm-rule' ),
+			'An mcp-llm task completes when its rule is explicitly reported pass.'
+		);
 	}
 
 	/**
