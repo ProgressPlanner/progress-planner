@@ -16,17 +16,16 @@ jobs:
             coverage: none
             tools: wp-cli
 
-        # The stable WP-CLI phar bundles an old Composer that rejects the new
-        # GitHub Actions token format (ghs_<id>_<base64url-JWT>, contains
-        # hyphens) with "contains invalid characters" — see
-        # https://github.com/composer/composer/issues/12076. setup-php exports
-        # the token via COMPOSER_AUTH, so clearing GITHUB_TOKEN does not help;
-        # the nightly build bundles a Composer with relaxed token validation.
-        - name: Update WP-CLI to nightly
-          # setup-php installs the wp-cli phar to a root-owned path, so the
-          # in-place update needs sudo to overwrite it.
-          run: sudo -E $(which wp) cli update --nightly --yes
-
+        # Do NOT switch to the WP-CLI nightly here. It reports itself as
+        # wp-cli 3.0.0-alpha, while every released dist-archive-command
+        # requires wp-cli ^2 / ^2.13, so the install below fails to resolve.
+        # The nightly was previously used to dodge Composer rejecting the
+        # GitHub Actions token ("contains invalid characters",
+        # https://github.com/composer/composer/issues/12076); that bug is
+        # fixed since Composer 2.10.0, which the stable phar now bundles.
+        # Pinned to v3.1.0 deliberately: it is the newest release that still
+        # accepts wp-cli ^2. v3.2.x requires wp-cli ^2.13, which has no stable
+        # release yet (latest stable is 2.12.0), so it cannot resolve here.
         - name: Install latest version of dist-archive-command
           run: wp package install wp-cli/dist-archive-command:v3.1.0
 
