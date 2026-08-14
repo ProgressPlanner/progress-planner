@@ -240,6 +240,16 @@ class Security_Update_Provider_Test extends \WP_UnitTestCase {
 	}
 
 	/**
+	 * Test that the task description recommends a backup without inviting delay.
+	 */
+	public function test_task_description_recommends_backup() {
+		$description = $this->task_provider->get_task_details()['description'];
+
+		$this->assertStringContainsString( 'backup', $description );
+		$this->assertStringContainsString( 'postpone', $description );
+	}
+
+	/**
 	 * Test that the task actions include a form that updates to the branch version directly.
 	 *
 	 * The wp-admin Updates page only shows the latest major (get_core_updates() skips

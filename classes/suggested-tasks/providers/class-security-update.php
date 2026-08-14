@@ -118,7 +118,7 @@ class Security_Update extends Tasks {
 	 * @return string
 	 */
 	protected function get_description() {
-		return \esc_html__( 'A WordPress security release is available. Security issues are typically exploited within hours of a release, so install this update as soon as possible.', 'progress-planner' );
+		return \esc_html__( 'A WordPress security release is available. Security issues are typically exploited within hours of a release, so install this update as soon as possible. If you have a backup solution, make a fresh backup first — but do not postpone the update if you have none.', 'progress-planner' );
 	}
 
 	/**

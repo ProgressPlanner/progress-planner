@@ -203,6 +203,9 @@ class Security_Update_Monitor_Test extends \WP_UnitTestCase {
 		$mail = $mails->calls[0];
 		$this->assertStringContainsString( $this->get_offered_version(), $mail['subject'] . $mail['message'] );
 		$this->assertStringContainsString( \admin_url( 'update-core.php' ), $mail['message'] );
+		// The backup advice must be present, but phrased not to delay the update.
+		$this->assertStringContainsString( 'backup', $mail['message'] );
+		$this->assertStringContainsString( 'https://wordpress.org/documentation/article/wordpress-backups/', $mail['message'] );
 	}
 
 	/**

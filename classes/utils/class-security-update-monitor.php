@@ -109,13 +109,15 @@ class Security_Update_Monitor {
 		);
 
 		$message = \sprintf(
-			/* translators: 1: The offered WordPress version, 2: The installed WordPress version, 3: The URL of the updates page. */
+			/* translators: 1: The offered WordPress version, 2: The installed WordPress version, 3: The URL of the updates page, 4: The URL of the WordPress backups documentation. */
 			\__(
 				'A WordPress security release is available: version %1$s (your site runs %2$s).
 
 Security issues in WordPress are typically exploited within hours of a release, so please update as soon as possible:
 
 %3$s
+
+If you have a backup solution, make a fresh backup before updating — but do not postpone the update if you have none. Learn more about backups: %4$s
 
 If your site has automatic updates enabled, it may install this update by itself — in that case, please verify on the page above that the update has been applied.
 
@@ -124,7 +126,8 @@ This alert was sent by the Progress Planner plugin.',
 			),
 			$offered,
 			$installed,
-			\admin_url( 'update-core.php' )
+			\admin_url( 'update-core.php' ),
+			'https://wordpress.org/documentation/article/wordpress-backups/'
 		);
 
 		foreach ( $this->get_recipients() as $email ) {
