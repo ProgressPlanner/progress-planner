@@ -209,6 +209,23 @@ class Security_Update_Monitor_Test extends \WP_UnitTestCase {
 	}
 
 	/**
+	 * Test that onboarded sites are sent to the Progress Planner dashboard,
+	 * where the one-click branch-pinned update button lives.
+	 */
+	public function test_alert_email_links_to_dashboard_when_onboarded() {
+		\update_option( 'progress_planner_license_key', 'test-license-key' );
+		$mails = $this->capture_mails();
+
+		( new Security_Update_Monitor() )->maybe_alert( $this->get_security_transient() );
+
+		$this->assertNotEmpty( $mails->calls );
+		$message = $mails->calls[0]['message'];
+		$this->assertStringContainsString( \admin_url( 'admin.php?page=progress-planner' ), $message );
+		$this->assertStringContainsString( 'one-click', $message );
+		$this->assertStringNotContainsString( \admin_url( 'update-core.php' ), $message );
+	}
+
+	/**
 	 * Test that maybe_alert makes no HTTP requests (subscriber email is feed-driven, SaaS-side).
 	 */
 	public function test_maybe_alert_makes_no_http_requests() {

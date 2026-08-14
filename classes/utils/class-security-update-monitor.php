@@ -108,27 +108,47 @@ class Security_Update_Monitor {
 			$offered
 		);
 
-		$message = \sprintf(
-			/* translators: 1: The offered WordPress version, 2: The installed WordPress version, 3: The URL of the updates page, 4: The URL of the WordPress backups documentation. */
-			\__(
-				'A WordPress security release is available: version %1$s (your site runs %2$s).
+		// Onboarded sites go to the Progress Planner dashboard, which carries the
+		// one-click branch-pinned update button. The wp-admin Updates page only
+		// offers the latest major, so it is just the fallback for sites that have
+		// not onboarded yet (their dashboard would show the welcome screen).
+		$is_onboarded = \progress_planner()->is_privacy_policy_accepted();
+		$action_url   = $is_onboarded
+			? \admin_url( 'admin.php?page=progress-planner' )
+			: \admin_url( 'update-core.php' );
 
-Security issues in WordPress are typically exploited within hours of a release, so please update as soon as possible:
-
-%3$s
-
-If you have a backup solution, make a fresh backup before updating — but do not postpone the update if you have none. Learn more about backups: %4$s
-
-If your site has automatic updates enabled, it may install this update by itself — in that case, please verify on the page above that the update has been applied.
-
-This alert was sent by the Progress Planner plugin.',
-				'progress-planner'
+		$paragraphs = [
+			\sprintf(
+				/* translators: 1: The offered WordPress version, 2: The installed WordPress version. */
+				\__( 'A WordPress security release is available: version %1$s (your site runs %2$s).', 'progress-planner' ),
+				$offered,
+				$installed
 			),
-			$offered,
-			$installed,
-			\admin_url( 'update-core.php' ),
+			\sprintf(
+				/* translators: %s: The URL where the update can be installed. */
+				\__(
+					'Security issues in WordPress are typically exploited within hours of a release, so please update as soon as possible:
+
+%s',
+					'progress-planner'
+				),
+				$action_url
+			),
+		];
+
+		if ( $is_onboarded ) {
+			$paragraphs[] = \__( 'Your Progress Planner dashboard has a one-click button to install exactly this update; the task will be marked complete once your site is updated.', 'progress-planner' );
+		}
+
+		$paragraphs[] = \sprintf(
+			/* translators: %s: The URL of the WordPress backups documentation. */
+			\__( 'If you have a backup solution, make a fresh backup before updating — but do not postpone the update if you have none. Learn more about backups: %s', 'progress-planner' ),
 			'https://wordpress.org/documentation/article/wordpress-backups/'
 		);
+		$paragraphs[] = \__( 'If your site has automatic updates enabled, it may install this update by itself — in that case, please verify that the update has been applied.', 'progress-planner' );
+		$paragraphs[] = \__( 'This alert was sent by the Progress Planner plugin.', 'progress-planner' );
+
+		$message = \implode( "\n\n", $paragraphs );
 
 		foreach ( $this->get_recipients() as $email ) {
 			\wp_mail( $email, $subject, $message );
