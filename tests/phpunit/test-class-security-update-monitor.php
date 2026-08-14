@@ -92,6 +92,39 @@ class Security_Update_Monitor_Test extends \WP_UnitTestCase {
 	}
 
 	/**
+	 * Test the real API shape for a branch-behind site: the same-branch patch is
+	 * only offered with response "autoupdate" once a newer major exists.
+	 *
+	 * A 6.9.1 site gets: upgrade 7.0.4, autoupdate 7.0.4, autoupdate 6.9.7.
+	 */
+	public function test_get_pending_security_update_detects_autoupdate_offer_on_older_branch() {
+		$transient = (object) [
+			'updates' => [
+				(object) [
+					'response' => 'upgrade',
+					'current'  => '7.0.4',
+				],
+				(object) [
+					'response' => 'autoupdate',
+					'current'  => '7.0.4',
+				],
+				(object) [
+					'response' => 'autoupdate',
+					'current'  => '6.9.7',
+				],
+			],
+		];
+
+		$this->assertSame(
+			[
+				'installed' => '6.9.1',
+				'offered'   => '6.9.7',
+			],
+			Security_Update_Monitor::get_pending_security_update( $transient, '6.9.1' )
+		);
+	}
+
+	/**
 	 * Test that non-upgrade offers are ignored.
 	 */
 	public function test_get_pending_security_update_ignores_non_upgrade_offers() {

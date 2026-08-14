@@ -231,9 +231,12 @@ This alert was sent by the Progress Planner plugin.',
 
 		$offered = null;
 		foreach ( $transient->updates as $update ) {
+			// Same-branch point releases are offered with response "autoupdate" (only the
+			// newest release gets "upgrade"), so a branch-behind site (e.g. 6.9.1 when
+			// 7.0.x is current) receives its 6.9.x security patch as an autoupdate offer.
 			if ( ! \is_object( $update )
 				|| ! isset( $update->response, $update->current )
-				|| 'upgrade' !== $update->response
+				|| ! \in_array( $update->response, [ 'upgrade', 'autoupdate' ], true )
 				|| ! \is_string( $update->current )
 				|| ! self::is_security_release( $installed, $update->current )
 			) {
