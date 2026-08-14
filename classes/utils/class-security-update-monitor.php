@@ -217,6 +217,32 @@ This alert was sent by the Progress Planner plugin.',
 	 * @return array{installed: string, offered: string}|null
 	 */
 	public static function get_pending_security_update( $transient = null, $installed = null ) {
+		if ( null === $installed ) {
+			$installed = self::get_installed_version();
+		}
+
+		$offer = self::get_pending_security_update_offer( $transient, $installed );
+
+		return null === $offer
+			? null
+			: [
+				'installed' => $installed,
+				'offered'   => $offer->current,
+			];
+	}
+
+	/**
+	 * Get the update offer object for the pending security update, if any.
+	 *
+	 * The offer carries the exact version and locale needed to run a
+	 * version-pinned core upgrade through wp-admin/update-core.php.
+	 *
+	 * @param object|null $transient The update_core site transient. Defaults to the stored transient.
+	 * @param string|null $installed The installed version. Defaults to the running WordPress version.
+	 *
+	 * @return object{response: string, current: string, locale?: string}|null
+	 */
+	public static function get_pending_security_update_offer( $transient = null, $installed = null ) {
 		if ( null === $transient ) {
 			$transient = \get_site_transient( 'update_core' );
 		}
@@ -229,7 +255,12 @@ This alert was sent by the Progress Planner plugin.',
 			return null;
 		}
 
-		$offered = null;
+		/**
+		 * The best matching offer.
+		 *
+		 * @var object{response: string, current: string, locale?: string}|null $offer
+		 */
+		$offer = null;
 		foreach ( $transient->updates as $update ) {
 			// Same-branch point releases are offered with response "autoupdate" (only the
 			// newest release gets "upgrade"), so a branch-behind site (e.g. 6.9.1 when
@@ -243,17 +274,12 @@ This alert was sent by the Progress Planner plugin.',
 				continue;
 			}
 
-			if ( null === $offered || \version_compare( $update->current, $offered, '>' ) ) {
-				$offered = $update->current;
+			if ( null === $offer || \version_compare( $update->current, $offer->current, '>' ) ) {
+				$offer = $update;
 			}
 		}
 
-		return null === $offered
-			? null
-			: [
-				'installed' => $installed,
-				'offered'   => $offered,
-			];
+		return $offer;
 	}
 
 	/**

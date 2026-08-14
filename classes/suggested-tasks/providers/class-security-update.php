@@ -236,12 +236,43 @@ class Security_Update extends Tasks {
 	/**
 	 * Add task actions specific to this task.
 	 *
+	 * The wp-admin Updates page only lists the latest release (get_core_updates()
+	 * skips "autoupdate" offers), so a branch-behind site would only be offered the
+	 * next major there. This form posts the exact branch version and locale to
+	 * core's own do-core-upgrade handler, which accepts any offer in the transient.
+	 *
 	 * @param array $data    The task data.
 	 * @param array $actions The existing actions.
 	 *
 	 * @return array
 	 */
 	public function add_task_actions( $data = [], $actions = [] ) {
+		$offer = Security_Update_Monitor::get_pending_security_update_offer();
+
+		if ( null !== $offer ) {
+			$form_action = \is_multisite()
+				? \network_admin_url( 'update-core.php?action=do-core-upgrade' )
+				: \admin_url( 'update-core.php?action=do-core-upgrade' );
+			$locale      = $offer->locale ?? 'en_US';
+
+			$actions[] = [
+				'priority' => 5,
+				'html'     => '<form method="post" action="' . \esc_url( $form_action ) . '" class="prpl-security-update-form">'
+					. \wp_nonce_field( 'upgrade-core', '_wpnonce', true, false )
+					. '<input type="hidden" name="upgrade" value="1">'
+					. '<input type="hidden" name="version" value="' . \esc_attr( $offer->current ) . '">'
+					. '<input type="hidden" name="locale" value="' . \esc_attr( $locale ) . '">'
+					. '<button type="submit" class="prpl-tooltip-action-text">'
+					. \sprintf(
+						/* translators: %s: The offered WordPress version. */
+						\esc_html__( 'Update to WordPress %s now', 'progress-planner' ),
+						\esc_html( $offer->current )
+					)
+					. '</button>'
+					. '</form>',
+			];
+		}
+
 		$actions[] = [
 			'priority' => 10,
 			'html'     => '<a class="prpl-tooltip-action-text" href="' . \admin_url( 'update-core.php' ) . '" target="_self">' . \esc_html__( 'Go to the Updates page', 'progress-planner' ) . '</a>',

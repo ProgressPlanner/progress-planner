@@ -240,6 +240,61 @@ class Security_Update_Provider_Test extends \WP_UnitTestCase {
 	}
 
 	/**
+	 * Test that the task actions include a form that updates to the branch version directly.
+	 *
+	 * The wp-admin Updates page only shows the latest major (get_core_updates() skips
+	 * "autoupdate" offers), so the task must offer the branch-pinned update itself.
+	 */
+	public function test_task_action_contains_branch_pinned_update_form() {
+		$actions = $this->task_provider->add_task_actions( [], [] );
+		$html    = \implode( ' ', \array_column( $actions, 'html' ) );
+
+		$this->assertStringContainsString( 'update-core.php?action=do-core-upgrade', $html );
+		$this->assertStringContainsString( 'name="version" value="' . $this->get_offered_version() . '"', $html );
+		$this->assertStringContainsString( 'name="locale" value="en_US"', $html );
+		$this->assertStringContainsString( 'name="upgrade"', $html );
+		$this->assertStringContainsString( 'name="_wpnonce"', $html );
+		// The fallback link to the Updates page remains.
+		$this->assertStringContainsString( 'Go to the Updates page', $html );
+	}
+
+	/**
+	 * Test that the update form uses the locale of the matched offer.
+	 */
+	public function test_task_action_form_uses_offer_locale() {
+		\set_site_transient(
+			'update_core',
+			(object) [
+				'updates' => [
+					(object) [
+						'response' => 'autoupdate',
+						'current'  => $this->get_offered_version(),
+						'locale'   => 'de_DE',
+					],
+				],
+			]
+		);
+
+		$actions = $this->task_provider->add_task_actions( [], [] );
+		$html    = \implode( ' ', \array_column( $actions, 'html' ) );
+
+		$this->assertStringContainsString( 'name="locale" value="de_DE"', $html );
+	}
+
+	/**
+	 * Test that no update form is rendered without a pending security update.
+	 */
+	public function test_task_action_form_absent_without_pending_update() {
+		\set_site_transient( 'update_core', (object) [ 'updates' => [] ] );
+
+		$actions = $this->task_provider->add_task_actions( [], [] );
+		$html    = \implode( ' ', \array_column( $actions, 'html' ) );
+
+		$this->assertStringNotContainsString( 'do-core-upgrade', $html );
+		$this->assertStringContainsString( 'Go to the Updates page', $html );
+	}
+
+	/**
 	 * Add a published task from another provider.
 	 *
 	 * @return void
