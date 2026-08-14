@@ -9,6 +9,7 @@ namespace Progress_Planner\Utils;
 
 use Progress_Planner\Base;
 use Progress_Planner\Admin\Widgets\Activity_Scores;
+use Progress_Planner\Utils\Security_Update_Monitor;
 
 /**
  * System_Status class.
@@ -25,6 +26,17 @@ class System_Status {
 
 		// Get the number of pending updates.
 		$data['pending_updates'] = \wp_get_update_data()['counts']['total'];
+
+		// Pending WordPress core security update, if any.
+		$security_update          = Security_Update_Monitor::get_pending_security_update();
+		$data['security_updates'] = [
+			'pending'              => null !== $security_update,
+			'installed_version'    => null !== $security_update
+				? $security_update['installed']
+				: Security_Update_Monitor::get_effective_installed_version(),
+			'offered_version'      => null !== $security_update ? $security_update['offered'] : null,
+			'last_alerted_version' => (string) \get_site_option( Security_Update_Monitor::ALERTED_VERSION_OPTION, '' ),
+		];
 
 		// Get number of content from any public post-type, published in the past week.
 		$data['weekly_posts'] = \count(

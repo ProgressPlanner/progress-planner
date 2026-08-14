@@ -22,6 +22,7 @@ use Progress_Planner\Suggested_Tasks\Providers\Rename_Uncategorized_Category;
 use Progress_Planner\Suggested_Tasks\Providers\Permalink_Structure;
 use Progress_Planner\Suggested_Tasks\Providers\Php_Version;
 use Progress_Planner\Suggested_Tasks\Providers\Search_Engine_Visibility;
+use Progress_Planner\Suggested_Tasks\Providers\Security_Update;
 use Progress_Planner\Suggested_Tasks\Tasks_Interface;
 use Progress_Planner\Suggested_Tasks\Providers\Integrations\Yoast\Add_Yoast_Providers;
 use Progress_Planner\Suggested_Tasks\Providers\Integrations\AIOSEO\Add_AIOSEO_Providers;
@@ -64,6 +65,7 @@ class Tasks_Manager {
 			new Content_Create(),
 			new Content_Review(),
 			new Core_Update(),
+			new Security_Update(),
 			new Blog_Description(),
 			new Debug_Display(),
 			new Disable_Comments(),

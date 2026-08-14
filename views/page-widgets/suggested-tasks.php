@@ -23,15 +23,21 @@ if ( ! \defined( 'ABSPATH' ) ) {
 		);
 		?>
 	</h2>
-	<p class="prpl-suggested-tasks-widget-description">
-		<?php
-		\printf(
-			/* translators: %s: Ravi's name. */
-			\esc_html__( 'Complete a task from %s’s Recommendations to improve your site and earn points toward this month’s badge!', 'progress-planner' ),
-			\esc_html( \progress_planner()->get_ui__branding()->get_ravi_name() )
-		);
-		?>
-	</p>
+	<?php if ( \progress_planner()->get_utils__security_update_monitor()->is_security_lockdown_active() && \current_user_can( 'update_core' ) ) : ?>
+		<p class="prpl-suggested-tasks-widget-description prpl-suggested-tasks-security-lockdown">
+			<?php \esc_html_e( 'A critical WordPress security update is available. Install it as soon as possible — other recommendations will return once your site is secure.', 'progress-planner' ); ?>
+		</p>
+	<?php else : ?>
+		<p class="prpl-suggested-tasks-widget-description">
+			<?php
+			\printf(
+				/* translators: %s: Ravi's name. */
+				\esc_html__( 'Complete a task from %s’s Recommendations to improve your site and earn points toward this month’s badge!', 'progress-planner' ),
+				\esc_html( \progress_planner()->get_ui__branding()->get_ravi_name() )
+			);
+			?>
+		</p>
+	<?php endif; ?>
 
 	<ul style="display:none"></ul>
 	<ul id="prpl-suggested-tasks-list" class="prpl-suggested-tasks-list"></ul>

@@ -20,6 +20,7 @@ use Progress_Planner\Utils\Deprecations;
  * @method \Progress_Planner\Rest\Tasks get_rest__tasks()
  * @method \Progress_Planner\Todo get_todo()
  * @method \Progress_Planner\Utils\Onboard get_utils__onboard()
+ * @method \Progress_Planner\Utils\Security_Update_Monitor get_utils__security_update_monitor()
  * @method \Progress_Planner\Utils\Playground get_utils__playground()
  * @method \Progress_Planner\Admin\Page get_admin__page()
  * @method \Progress_Planner\Admin\Tour get_admin__tour()
@@ -119,6 +120,9 @@ class Base {
 		}
 
 		$this->get_suggested_tasks();
+
+		// Watches for core security releases; must run on front-end/cron requests too.
+		$this->get_utils__security_update_monitor();
 
 		$this->get_admin__editor();
 
