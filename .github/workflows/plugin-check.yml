@@ -33,11 +33,26 @@ jobs:
         #
         # Pinned to v3.1.0 deliberately: newest release accepting wp-cli ^2.
         # v3.2.x requires ^2.13, which has no stable release (latest is 2.12.0).
-        # `unset` rather than setting them to '': wp-cli configures the token
-        # whenever getenv() returns a string, and an empty string still is one.
-        # Unsetting makes getenv() return false so the token is never written.
+        # Unsetting the env vars alone is NOT enough: setup-php also persists
+        # the token into Composer's global auth config on the runner, and that
+        # file survives any env change. Remove the stored credential too, then
+        # unset both env sources so nothing rewrites it.
         - name: Install latest version of dist-archive-command
           run: |
+            # Diagnostics: show where a token is stored before we strip it.
+            echo "::group::composer auth locations"
+            echo "COMPOSER_AUTH set: ${COMPOSER_AUTH:+yes}"
+            echo "GITHUB_TOKEN set: ${GITHUB_TOKEN:+yes}"
+            for f in "$(composer config --global home 2>/dev/null)/auth.json" \
+                     "$HOME/.wp-cli/packages/auth.json" \
+                     "$HOME/.wp-cli/packages/composer.json"; do
+              [ -f "$f" ] && echo "present: $f" && grep -l "github-oauth" "$f" 2>/dev/null || true
+            done
+            echo "::endgroup::"
+
+            composer config --global --unset github-oauth.github.com || true
+            rm -f "$(composer config --global home 2>/dev/null)/auth.json" || true
+            rm -f "$HOME/.wp-cli/packages/auth.json" || true
             unset GITHUB_TOKEN COMPOSER_AUTH
             wp package install wp-cli/dist-archive-command:v3.1.0
 
