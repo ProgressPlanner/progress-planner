@@ -16,16 +16,17 @@ jobs:
             coverage: none
             tools: wp-cli
 
-        # dist-archive-command is a PUBLIC package, so this install needs no
-        # GitHub auth at all. Both env vars below are cleared because Composer
-        # intermittently rejects the ephemeral Actions token with "Your github
-        # oauth token for github.com contains invalid characters" — it depends
-        # on the characters in the token minted for that particular run, so the
-        # job fails at random (see composer#12076). wp-cli reads GITHUB_TOKEN
-        # itself, and setup-php separately exports the same token via
-        # COMPOSER_AUTH; clearing only one of the two leaves the other to
-        # reintroduce the bad token, which is why earlier single-var attempts
-        # appeared to work and then regressed.
+        # setup-php stores the ephemeral Actions token in ~/.composer/auth.json
+        # as a github-oauth credential. Composer rejects that token whenever it
+        # happens to contain a character its validator dislikes ("Your github
+        # oauth token for github.com contains invalid characters",
+        # composer#12076), so this step failed on roughly half of all runs
+        # depending on the token minted for that run.
+        #
+        # dist-archive-command is a PUBLIC package and needs no auth, so the
+        # fix is to delete the stored credential before installing. Clearing
+        # the env vars alone does NOT work — they are already empty here, and
+        # the credential lives on disk (verified in run 31784727273).
         #
         # Do NOT switch to the WP-CLI nightly to dodge this: it reports as
         # wp-cli 3.0.0-alpha, and every released dist-archive-command requires
@@ -33,27 +34,9 @@ jobs:
         #
         # Pinned to v3.1.0 deliberately: newest release accepting wp-cli ^2.
         # v3.2.x requires ^2.13, which has no stable release (latest is 2.12.0).
-        # Unsetting the env vars alone is NOT enough: setup-php also persists
-        # the token into Composer's global auth config on the runner, and that
-        # file survives any env change. Remove the stored credential too, then
-        # unset both env sources so nothing rewrites it.
         - name: Install latest version of dist-archive-command
           run: |
-            # Diagnostics: show where a token is stored before we strip it.
-            echo "::group::composer auth locations"
-            echo "COMPOSER_AUTH set: ${COMPOSER_AUTH:+yes}"
-            echo "GITHUB_TOKEN set: ${GITHUB_TOKEN:+yes}"
-            for f in "$(composer config --global home 2>/dev/null)/auth.json" \
-                     "$HOME/.wp-cli/packages/auth.json" \
-                     "$HOME/.wp-cli/packages/composer.json"; do
-              [ -f "$f" ] && echo "present: $f" && grep -l "github-oauth" "$f" 2>/dev/null || true
-            done
-            echo "::endgroup::"
-
-            composer config --global --unset github-oauth.github.com || true
-            rm -f "$(composer config --global home 2>/dev/null)/auth.json" || true
-            rm -f "$HOME/.wp-cli/packages/auth.json" || true
-            unset GITHUB_TOKEN COMPOSER_AUTH
+            rm -f "$(composer config --global home 2>/dev/null)/auth.json"
             wp package install wp-cli/dist-archive-command:v3.1.0
 
         - name: Build plugin
