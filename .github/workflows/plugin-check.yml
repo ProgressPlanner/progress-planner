@@ -16,6 +16,17 @@ jobs:
             coverage: none
             tools: wp-cli
 
+        # The stable WP-CLI phar bundles an old Composer that rejects the new
+        # GitHub Actions token format (ghs_<id>_<base64url-JWT>, contains
+        # hyphens) with "contains invalid characters" — see
+        # https://github.com/composer/composer/issues/12076. setup-php exports
+        # the token via COMPOSER_AUTH, so clearing GITHUB_TOKEN does not help;
+        # the nightly build bundles a Composer with relaxed token validation.
+        - name: Update WP-CLI to nightly
+          # setup-php installs the wp-cli phar to a root-owned path, so the
+          # in-place update needs sudo to overwrite it.
+          run: sudo -E $(which wp) cli update --nightly --yes
+
         - name: Install latest version of dist-archive-command
           run: wp package install wp-cli/dist-archive-command:v3.1.0
 
@@ -25,8 +36,13 @@ jobs:
             mkdir build
             unzip ${{ github.event.repository.name }}.zip -d build
 
+        # v1.1.7 fixed the wp-env silent-startup failure ("Environment not
+        # initialized. Run `wp-env start` first.") that broke this job on newer
+        # runner images; v1.1.9 fixes a bundle regression in v1.1.8. Because
+        # that fix landed upstream, @wordpress/env needs no version pin here.
+        # https://github.com/WordPress/plugin-check-action/pull/590
         - name: Run plugin check
-          uses: wordpress/plugin-check-action@v1.1.5
+          uses: wordpress/plugin-check-action@v1.1.9
           with:
             build-dir: './build/${{ github.event.repository.name }}'
             exclude-checks: |
