@@ -122,9 +122,19 @@ class Security_Update_Monitor_Test extends \WP_UnitTestCase {
 		$monitor = new Security_Update_Monitor();
 		$monitor->maybe_alert( $this->get_security_transient() );
 
+		// On multisite only super admins can update core; on single site, all update_core users.
 		$expected_recipients = [];
-		foreach ( \get_users( [ 'capability' => 'update_core' ] ) as $user ) {
-			$expected_recipients[] = $user->user_email;
+		if ( \is_multisite() ) {
+			foreach ( \get_super_admins() as $login ) {
+				$user = \get_user_by( 'login', $login );
+				if ( $user ) {
+					$expected_recipients[] = $user->user_email;
+				}
+			}
+		} else {
+			foreach ( \get_users( [ 'capability' => 'update_core' ] ) as $user ) {
+				$expected_recipients[] = $user->user_email;
+			}
 		}
 		\sort( $expected_recipients );
 
@@ -134,7 +144,9 @@ class Security_Update_Monitor_Test extends \WP_UnitTestCase {
 		$this->assertNotEmpty( $expected_recipients );
 		$this->assertSame( $expected_recipients, $actual_recipients );
 		$this->assertNotContains( \get_user_by( 'id', $editor_id )->user_email, $actual_recipients );
-		$this->assertContains( \get_user_by( 'id', $admin_id )->user_email, $actual_recipients );
+		if ( ! \is_multisite() ) {
+			$this->assertContains( \get_user_by( 'id', $admin_id )->user_email, $actual_recipients );
+		}
 
 		// Second call with the same offered version must not send again.
 		$mails->calls = [];
