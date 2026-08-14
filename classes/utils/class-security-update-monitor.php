@@ -82,9 +82,10 @@ class Security_Update_Monitor {
 
 		try {
 			$this->send_admin_email( $update['installed'], $update['offered'] );
-			$this->send_saas_ping( $update['installed'], $update['offered'] );
 
 			// Mark as alerted even if sending failed, to avoid alert storms on every request.
+			// The subscriber email is sent by progressplanner.com, which watches the
+			// wordpress.org releases feed and reads this site's version via get-stats.
 			\update_site_option( self::ALERTED_VERSION_OPTION, $update['offered'] );
 		} finally {
 			\delete_option( self::LOCK_OPTION );
@@ -157,38 +158,6 @@ This alert was sent by the Progress Planner plugin.',
 		}
 
 		return \array_values( \array_unique( $emails ) );
-	}
-
-	/**
-	 * Notify the Progress Planner SaaS so it can email the registered subscriber.
-	 *
-	 * @param string $installed The installed version.
-	 * @param string $offered   The offered version.
-	 *
-	 * @return void
-	 */
-	private function send_saas_ping( $installed, $offered ) {
-		$license_key = \get_option( 'progress_planner_license_key' );
-		if ( ! $license_key || 'no-license' === $license_key ) {
-			return;
-		}
-
-		$onboard = \progress_planner()->get_utils__onboard();
-
-		// Fire-and-forget: the SaaS emails the registered subscriber.
-		\wp_remote_post(
-			$onboard->get_remote_url( 'security-update-alert' ),
-			[
-				'timeout' => 10,
-				'body'    => [
-					'license_key'       => $license_key,
-					'site'              => \set_url_scheme( \site_url() ),
-					'installed_version' => $installed,
-					'offered_version'   => $offered,
-					'nonce'             => $onboard->get_remote_nonce(),
-				],
-			]
-		);
 	}
 
 	/**

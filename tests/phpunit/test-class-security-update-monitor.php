@@ -161,36 +161,10 @@ class Security_Update_Monitor_Test extends \WP_UnitTestCase {
 	}
 
 	/**
-	 * Test that maybe_alert pings the SaaS when a license key is present.
+	 * Test that maybe_alert makes no HTTP requests (subscriber email is feed-driven, SaaS-side).
 	 */
-	public function test_maybe_alert_pings_saas_when_license_key_present() {
+	public function test_maybe_alert_makes_no_http_requests() {
 		\update_option( 'progress_planner_license_key', 'test-license-key' );
-		$this->capture_mails();
-		$requests = $this->capture_http_requests();
-
-		( new Security_Update_Monitor() )->maybe_alert( $this->get_security_transient() );
-
-		$alert_requests = \array_values(
-			\array_filter(
-				$requests->calls,
-				static function ( $request ) {
-					return false !== \strpos( $request['url'], 'security-update-alert' );
-				}
-			)
-		);
-
-		$this->assertCount( 1, $alert_requests );
-		$this->assertSame( 'test-license-key', $alert_requests[0]['body']['license_key'] );
-		$this->assertSame( $this->get_offered_version(), $alert_requests[0]['body']['offered_version'] );
-		$this->assertArrayHasKey( 'installed_version', $alert_requests[0]['body'] );
-		$this->assertArrayHasKey( 'site', $alert_requests[0]['body'] );
-	}
-
-	/**
-	 * Test that the SaaS ping is skipped without a license key.
-	 */
-	public function test_maybe_alert_skips_ping_without_license_key() {
-		\delete_option( 'progress_planner_license_key' );
 		$this->capture_mails();
 		$requests = $this->capture_http_requests();
 
@@ -285,18 +259,6 @@ class Security_Update_Monitor_Test extends \WP_UnitTestCase {
 		\add_filter(
 			'pre_http_request',
 			static function ( $pre, $args, $url ) use ( $recorder ) {
-				if ( false !== \strpos( $url, 'get-nonce' ) ) {
-					return [
-						'headers'  => [],
-						'response' => [
-							'code'    => 200,
-							'message' => 'OK',
-						],
-						'body'     => (string) \wp_json_encode( [ 'nonce' => 'remote-nonce' ] ),
-						'cookies'  => [],
-					];
-				}
-
 				$recorder->calls[] = [
 					'url'  => $url,
 					'body' => isset( $args['body'] ) ? $args['body'] : [],
