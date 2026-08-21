@@ -736,7 +736,7 @@ abstract class Tasks implements Tasks_Interface {
 		if ( $this->get_external_link_url() ) {
 			$actions[] = [
 				'priority' => 40,
-				'html'     => '<a class="prpl-tooltip-action-text" href="' . \esc_attr( $this->get_external_link_url() ) . '" target="_blank">' . \esc_html__( 'Why is this important?', 'progress-planner' ) . '</a>',
+				'html'     => '<a class="prpl-tooltip-action-text" href="' . \esc_url( $this->get_external_link_url() ) . '" target="_blank">' . \esc_html__( 'Why is this important?', 'progress-planner' ) . '</a>',
 			];
 		} elseif ( isset( $data['content']['rendered'] ) && $data['content']['rendered'] !== '' && ! $this instanceof Tasks_Interactive ) {
 			$actions[] = [
