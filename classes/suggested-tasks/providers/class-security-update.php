@@ -142,7 +142,7 @@ class Security_Update extends Tasks {
 
 		return '' === $version
 			? ! $this->should_add_task()
-			: \version_compare( Security_Update_Monitor::get_effective_installed_version(), $version, '>=' );
+			: \version_compare( Security_Update_Monitor::get_installed_version(), $version, '>=' );
 	}
 
 	/**
@@ -172,7 +172,7 @@ class Security_Update extends Tasks {
 		}
 
 		// Already installed: keep the task so evaluation can celebrate it.
-		if ( \version_compare( Security_Update_Monitor::get_effective_installed_version(), $version, '>=' ) ) {
+		if ( \version_compare( Security_Update_Monitor::get_installed_version(), $version, '>=' ) ) {
 			return true;
 		}
 
@@ -204,7 +204,7 @@ class Security_Update extends Tasks {
 
 			// Keep the task for the current offer, and completed-but-not-yet-celebrated tasks.
 			if ( $task_id === $current_task_id
-				|| ( '' !== $version && \version_compare( Security_Update_Monitor::get_effective_installed_version(), $version, '>=' ) )
+				|| ( '' !== $version && \version_compare( Security_Update_Monitor::get_installed_version(), $version, '>=' ) )
 			) {
 				continue;
 			}

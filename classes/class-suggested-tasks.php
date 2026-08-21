@@ -153,9 +153,11 @@ class Suggested_Tasks {
 	/**
 	 * If done via automatic updates, the "core update" task should be marked as "trashed" (and skip "pending" status).
 	 *
+	 * @param array $update_results The results of all attempted updates, keyed by type (core, plugin, theme, translation).
+	 *
 	 * @return void
 	 */
-	public function on_automatic_updates_complete(): void {
+	public function on_automatic_updates_complete( $update_results = [] ): void {
 		$providers = [
 			// The repetitive update-core task only counts within the current week.
 			'update-core'     => [ 'date_query' => [ [ 'after' => 'this Monday' ] ] ],
@@ -163,8 +165,15 @@ class Suggested_Tasks {
 			'security-update' => [],
 		];
 
+		// The hook also fires after plugin/theme-only runs; the security task is only
+		// completed when core itself was updated. Evaluation covers every other path.
+		if ( empty( $update_results['core'] ) ) {
+			unset( $providers['security-update'] );
+		}
+
 		foreach ( $providers as $provider_id => $extra_args ) {
-			$pending_tasks = \progress_planner()->get_suggested_tasks_db()->get(
+			// get_tasks_by() translates provider_id into the taxonomy query; get() would drop it.
+			$pending_tasks = \progress_planner()->get_suggested_tasks_db()->get_tasks_by(
 				\array_merge(
 					[
 						'numberposts' => 1,

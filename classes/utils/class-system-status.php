@@ -33,7 +33,7 @@ class System_Status {
 			'pending'              => null !== $security_update,
 			'installed_version'    => null !== $security_update
 				? $security_update['installed']
-				: Security_Update_Monitor::get_effective_installed_version(),
+				: Security_Update_Monitor::get_installed_version(),
 			'offered_version'      => null !== $security_update ? $security_update['offered'] : null,
 			'last_alerted_version' => (string) \get_site_option( Security_Update_Monitor::ALERTED_VERSION_OPTION, '' ),
 		];

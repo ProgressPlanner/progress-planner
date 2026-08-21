@@ -42,15 +42,30 @@ class Security_Update_Provider_Test extends \WP_UnitTestCase {
 	 * @return void
 	 */
 	protected function complete_task() {
-		// Simulate the update being installed: the refreshed transient reports the
-		// new version as installed and no longer offers an upgrade.
-		\set_site_transient(
-			'update_core',
-			(object) [
-				'updates'         => [],
-				'version_checked' => $this->get_offered_version(),
-			]
+		// Simulate the update being installed: the running version becomes the
+		// offered one (via the installed-version filter) and the refreshed
+		// transient no longer offers an upgrade.
+		$offered = $this->get_offered_version();
+		\add_filter(
+			'progress_planner_installed_wp_version',
+			static function () use ( $offered ) {
+				return $offered;
+			}
 		);
+		\set_site_transient( 'update_core', (object) [ 'updates' => [] ] );
+	}
+
+	/**
+	 * Test that installing the update completes the task through evaluation.
+	 */
+	public function test_task_completes_after_update_is_installed() {
+		$this->task_provider->get_tasks_to_inject();
+		$this->complete_task();
+
+		$completed = \progress_planner()->get_suggested_tasks()->get_tasks_manager()->evaluate_tasks();
+
+		$this->assertCount( 1, $completed );
+		$this->assertSame( $this->task_provider_id, $completed[0]->get_provider_id() );
 	}
 
 	/**
@@ -157,7 +172,6 @@ class Security_Update_Provider_Test extends \WP_UnitTestCase {
 		$this->assertCount( 1, $tasks );
 
 		$this->task_provider->get_tasks_to_inject();
-		\wp_cache_flush();
 
 		$tasks = \progress_planner()->get_suggested_tasks()->get_tasks_in_rest_format( [ 'post_status' => 'publish' ] );
 
@@ -181,7 +195,6 @@ class Security_Update_Provider_Test extends \WP_UnitTestCase {
 		);
 		\progress_planner()->get_suggested_tasks_db()->update_recommendation( $other_task_id, [ 'post_status' => 'pending' ] );
 		$this->task_provider->get_tasks_to_inject();
-		\wp_cache_flush();
 
 		$tasks = \progress_planner()->get_suggested_tasks()->get_tasks_in_rest_format( [ 'post_status' => 'pending' ] );
 
@@ -221,10 +234,82 @@ class Security_Update_Provider_Test extends \WP_UnitTestCase {
 	}
 
 	/**
-	 * Test that automatic core updates complete the security task without celebration.
+	 * Test that automatic core updates complete the security task without celebration,
+	 * leaving other providers' tasks untouched.
 	 */
 	public function test_automatic_update_completes_security_task() {
 		$this->task_provider->get_tasks_to_inject();
+		$this->add_other_task();
+
+		$security_tasks = (array) \progress_planner()->get_suggested_tasks_db()->get_tasks_by(
+			[
+				'post_status' => 'publish',
+				'provider'    => $this->task_provider_id,
+			]
+		);
+		$other_tasks    = (array) \progress_planner()->get_suggested_tasks_db()->get_tasks_by(
+			[
+				'post_status' => 'publish',
+				'provider'    => 'core-blogdescription',
+			]
+		);
+		$this->assertCount( 1, $security_tasks );
+		$this->assertCount( 1, $other_tasks );
+
+		\progress_planner()->get_suggested_tasks()->on_automatic_updates_complete( [ 'core' => [ (object) [ 'result' => true ] ] ] );
+
+		$this->assertSame( 'trash', \get_post_status( $security_tasks[0]->ID ) );
+		$this->assertSame( 'publish', \get_post_status( $other_tasks[0]->ID ) );
+	}
+
+	/**
+	 * Test that plugin/theme-only automatic updates do not complete the security task.
+	 */
+	public function test_plugin_only_automatic_update_does_not_complete_security_task() {
+		$this->task_provider->get_tasks_to_inject();
+
+		$security_tasks = (array) \progress_planner()->get_suggested_tasks_db()->get_tasks_by(
+			[
+				'post_status' => 'publish',
+				'provider'    => $this->task_provider_id,
+			]
+		);
+		$this->assertCount( 1, $security_tasks );
+
+		\progress_planner()->get_suggested_tasks()->on_automatic_updates_complete( [ 'plugin' => [ (object) [ 'result' => true ] ] ] );
+
+		$this->assertSame( 'publish', \get_post_status( $security_tasks[0]->ID ) );
+	}
+
+	/**
+	 * Test that automatic updates never touch other providers' tasks when no
+	 * security task exists (regression: provider filter must reach the query).
+	 */
+	public function test_automatic_update_leaves_other_tasks_alone_without_security_task() {
+		\set_site_transient( 'update_core', (object) [ 'updates' => [] ] );
+		$this->add_other_task();
+
+		$other_tasks = (array) \progress_planner()->get_suggested_tasks_db()->get_tasks_by(
+			[
+				'post_status' => 'publish',
+				'provider'    => 'core-blogdescription',
+			]
+		);
+		$this->assertCount( 1, $other_tasks );
+
+		\progress_planner()->get_suggested_tasks()->on_automatic_updates_complete( [ 'core' => [ (object) [ 'result' => true ] ] ] );
+
+		$this->assertSame( 'publish', \get_post_status( $other_tasks[0]->ID ) );
+	}
+
+	/**
+	 * Test that the lockdown lifts as soon as the task is trashed, with no manual cache flush.
+	 */
+	public function test_lockdown_lifts_when_task_is_trashed() {
+		$this->task_provider->get_tasks_to_inject();
+		$monitor = \progress_planner()->get_utils__security_update_monitor();
+
+		$this->assertTrue( $monitor->is_security_lockdown_active() );
 
 		$tasks = (array) \progress_planner()->get_suggested_tasks_db()->get_tasks_by(
 			[
@@ -232,11 +317,9 @@ class Security_Update_Provider_Test extends \WP_UnitTestCase {
 				'provider'    => $this->task_provider_id,
 			]
 		);
-		$this->assertCount( 1, $tasks );
+		\progress_planner()->get_suggested_tasks_db()->update_recommendation( $tasks[0]->ID, [ 'post_status' => 'trash' ] );
 
-		\progress_planner()->get_suggested_tasks()->on_automatic_updates_complete();
-
-		$this->assertSame( 'trash', \get_post_status( $tasks[0]->ID ) );
+		$this->assertFalse( $monitor->is_security_lockdown_active() );
 	}
 
 	/**
@@ -319,7 +402,6 @@ class Security_Update_Provider_Test extends \WP_UnitTestCase {
 				'url'         => \admin_url( 'options-general.php' ),
 			]
 		);
-		\wp_cache_flush();
 	}
 
 	/**

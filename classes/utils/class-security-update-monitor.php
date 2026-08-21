@@ -72,12 +72,17 @@ class Security_Update_Monitor {
 		}
 
 		// Cron and a concurrent admin pageview can both fire this; take a short-lived lock.
-		if ( ! \add_option( self::LOCK_OPTION, \time(), '', false ) ) {
-			$lock_time = (int) \get_option( self::LOCK_OPTION );
+		// Network options, like the alerted-version option, so single- and multisite behave alike.
+		if ( ! \add_site_option( self::LOCK_OPTION, \time() ) ) {
+			$lock_time = (int) \get_site_option( self::LOCK_OPTION );
 			if ( $lock_time > \time() - 30 ) {
 				return;
 			}
-			\update_option( self::LOCK_OPTION, \time(), false );
+
+			// Stale lock (crashed process): clear it and bail. Proceeding here would let two
+			// concurrent requests both send; the next trigger takes a fresh lock atomically.
+			\delete_site_option( self::LOCK_OPTION );
+			return;
 		}
 
 		try {
@@ -88,7 +93,7 @@ class Security_Update_Monitor {
 			// wordpress.org releases feed and reads this site's version via get-stats.
 			\update_site_option( self::ALERTED_VERSION_OPTION, $update['offered'] );
 		} finally {
-			\delete_option( self::LOCK_OPTION );
+			\delete_site_option( self::LOCK_OPTION );
 		}
 	}
 
@@ -173,10 +178,16 @@ class Security_Update_Monitor {
 			return \array_values( \array_unique( $emails ) );
 		}
 
+		// Only the addresses are needed; this can run on a front-end cron request.
 		$emails = [];
-		foreach ( \get_users( [ 'capability' => 'update_core' ] ) as $user ) {
-			if ( $user instanceof \WP_User ) {
-				$emails[] = $user->user_email;
+		foreach ( \get_users(
+			[
+				'capability' => 'update_core',
+				'fields'     => 'user_email',
+			]
+		) as $email ) {
+			if ( \is_string( $email ) && '' !== $email ) {
+				$emails[] = $email;
 			}
 		}
 
@@ -306,41 +317,24 @@ class Security_Update_Monitor {
 	}
 
 	/**
-	 * Get the effective installed WordPress version.
-	 *
-	 * Returns the higher of the running version and the version recorded by the
-	 * last update check (the transient's version_checked), so a just-installed
-	 * update is recognized as soon as the update check has run.
-	 *
-	 * @return string
-	 */
-	public static function get_effective_installed_version() {
-		$installed = self::get_installed_version();
-		$transient = \get_site_transient( 'update_core' );
-
-		if ( \is_object( $transient )
-			&& isset( $transient->version_checked )
-			&& \is_string( $transient->version_checked )
-			&& \version_compare( $transient->version_checked, $installed, '>' )
-		) {
-			return $transient->version_checked;
-		}
-
-		return $installed;
-	}
-
-	/**
 	 * Get the installed WordPress version.
 	 *
 	 * @return string
 	 */
-	private static function get_installed_version() {
+	public static function get_installed_version() {
 		// wp_get_wp_version() exists since WP 6.7; the plugin supports 6.6.
-		if ( \function_exists( 'wp_get_wp_version' ) ) {
-			return \wp_get_wp_version();
-		}
+		$version = \function_exists( 'wp_get_wp_version' )
+			? \wp_get_wp_version()
+			: ( isset( $GLOBALS['wp_version'] ) && \is_string( $GLOBALS['wp_version'] ) ? $GLOBALS['wp_version'] : '' );
 
-		return isset( $GLOBALS['wp_version'] ) && \is_string( $GLOBALS['wp_version'] ) ? $GLOBALS['wp_version'] : '';
+		/**
+		 * Filter the WordPress version the security-update detection treats as installed.
+		 *
+		 * Intended for debugging and testing (e.g. simulating a security release).
+		 *
+		 * @param string $version The running WordPress version.
+		 */
+		return (string) \apply_filters( 'progress_planner_installed_wp_version', $version );
 	}
 
 	/**

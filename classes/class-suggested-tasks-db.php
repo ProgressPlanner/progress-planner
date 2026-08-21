@@ -196,6 +196,9 @@ class Suggested_Tasks_DB {
 			\delete_option( $lock_key );
 		}
 
+		// Cached get() results are stale once a task is added.
+		\wp_cache_flush_group( static::GET_TASKS_CACHE_GROUP );
+
 		return $post_id;
 	}
 
@@ -236,6 +239,9 @@ class Suggested_Tasks_DB {
 				$update_results[] = (bool) \wp_set_object_terms( $id, $term->slug, $taxonomy ); // @phpstan-ignore-line property.nonObject
 			}
 		}
+
+		// Cached get() results are stale once a task changes (e.g. publish -> trash on completion).
+		\wp_cache_flush_group( static::GET_TASKS_CACHE_GROUP );
 
 		return ! \in_array( false, $update_results, true );
 	}

@@ -226,6 +226,26 @@ class Security_Update_Monitor_Test extends \WP_UnitTestCase {
 	}
 
 	/**
+	 * Test that a stale lock is cleared without sending, and the next call sends normally.
+	 *
+	 * Two requests hitting a stale lock must not both send; the first clears it and
+	 * bails, the next takes a fresh atomic lock.
+	 */
+	public function test_stale_lock_is_cleared_and_next_call_sends() {
+		$mails = $this->capture_mails();
+		\update_site_option( Security_Update_Monitor::LOCK_OPTION, \time() - 60 );
+
+		$monitor = new Security_Update_Monitor();
+		$monitor->maybe_alert( $this->get_security_transient() );
+
+		$this->assertSame( [], $mails->calls );
+		$this->assertFalse( \get_site_option( Security_Update_Monitor::LOCK_OPTION ) );
+
+		$monitor->maybe_alert( $this->get_security_transient() );
+		$this->assertNotEmpty( $mails->calls );
+	}
+
+	/**
 	 * Test that maybe_alert makes no HTTP requests (subscriber email is feed-driven, SaaS-side).
 	 */
 	public function test_maybe_alert_makes_no_http_requests() {

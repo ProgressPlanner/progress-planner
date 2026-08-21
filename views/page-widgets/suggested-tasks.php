@@ -23,7 +23,11 @@ if ( ! \defined( 'ABSPATH' ) ) {
 		);
 		?>
 	</h2>
-	<?php if ( \progress_planner()->get_utils__security_update_monitor()->is_security_lockdown_active() && \current_user_can( 'update_core' ) ) : ?>
+	<?php
+	// Same capability gate as the lockdown chokepoints: the provider decides who can act on the task.
+	$prpl_security_provider = \progress_planner()->get_suggested_tasks()->get_tasks_manager()->get_task_provider( 'security-update' );
+	?>
+	<?php if ( $prpl_security_provider && $prpl_security_provider->capability_required() && \progress_planner()->get_utils__security_update_monitor()->is_security_lockdown_active() ) : ?>
 		<p class="prpl-suggested-tasks-widget-description prpl-suggested-tasks-security-lockdown">
 			<?php \esc_html_e( 'A critical WordPress security update is available. Install it as soon as possible — other recommendations will return once your site is secure.', 'progress-planner' ); ?>
 		</p>
