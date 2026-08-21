@@ -453,6 +453,25 @@ class Remove_Terms_Without_Posts extends Tasks_Interactive {
 			\wp_send_json_error( [ 'message' => \esc_html__( 'Term not found.', 'progress-planner' ) ] );
 		}
 
+		// Only public taxonomies are tracked by this task, mirroring the check in
+		// maybe_remove_irrelevant_tasks().
+		$taxonomy_object = \get_taxonomy( $taxonomy );
+		if ( ! $taxonomy_object || ! $taxonomy_object->public ) {
+			\wp_send_json_error( [ 'message' => \esc_html__( 'You do not have permission to delete terms.', 'progress-planner' ) ] );
+		}
+
+		// Bind the request to a task that actually suggested this term, so this
+		// handler cannot be repurposed to delete arbitrary terms.
+		if ( ! $this->has_task_for_term( $term_id, $taxonomy ) ) {
+			\wp_send_json_error( [ 'message' => \esc_html__( 'You do not have permission to delete terms.', 'progress-planner' ) ] );
+		}
+
+		// Re-check the post count at deletion time: the term may have gained posts
+		// after the task was created.
+		if ( $term->count > self::MIN_POSTS ) {
+			\wp_send_json_error( [ 'message' => \esc_html__( 'This term is not empty and cannot be deleted.', 'progress-planner' ) ] );
+		}
+
 		// Delete the term.
 		$result = \wp_delete_term( $term_id, $taxonomy );
 
@@ -461,5 +480,25 @@ class Remove_Terms_Without_Posts extends Tasks_Interactive {
 		}
 
 		\wp_send_json_success( [ 'message' => \esc_html__( 'Term deleted successfully.', 'progress-planner' ) ] );
+	}
+
+	/**
+	 * Check whether a task from this provider targets the given term.
+	 *
+	 * @param int    $term_id  The term ID.
+	 * @param string $taxonomy The taxonomy.
+	 *
+	 * @return bool
+	 */
+	protected function has_task_for_term( $term_id, $taxonomy ) {
+		foreach ( \progress_planner()->get_suggested_tasks_db()->get_tasks_by( [ 'provider_id' => $this->get_provider_id() ] ) as $task ) {
+			if ( (int) $task->target_term_id === (int) $term_id
+				&& (string) $task->target_taxonomy === (string) $taxonomy
+			) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 }
