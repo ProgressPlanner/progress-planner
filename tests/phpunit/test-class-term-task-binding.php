@@ -58,7 +58,7 @@ class Term_Task_Binding_Test extends \WP_Ajax_UnitTestCase {
 		}
 
 		// The handlers read from $_POST; check_ajax_referer reads $_REQUEST.
-		$_POST = $_REQUEST;
+		$_POST = $_REQUEST; // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- nonce verified via check_ajax_referer in the handlers.
 	}
 
 	/**
