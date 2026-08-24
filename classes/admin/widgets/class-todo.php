@@ -27,6 +27,19 @@ final class ToDo extends Widget {
 	protected $width = 2;
 
 	/**
+	 * Enqueue styles.
+	 *
+	 * @return void
+	 */
+	public function enqueue_styles() {
+		parent::enqueue_styles();
+		\wp_add_inline_style(
+			"progress-planner/page-widgets/{$this->id}",
+			':root { --prpl-icon-url: url("' . \progress_planner()->get_ui__branding()->get_admin_menu_icon() . '"); }'
+		);
+	}
+
+	/**
 	 * Print the widget content.
 	 *
 	 * @return void

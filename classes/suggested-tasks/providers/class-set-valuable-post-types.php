@@ -81,7 +81,7 @@ class Set_Valuable_Post_Types extends Tasks_Interactive {
 		\update_option( 'progress_planner_public_post_types', $public_post_types );
 
 		// Exit if post type was removed, or it is not public anymore, since the user will not to able to make different selection.
-		if ( count( $public_post_types ) < count( $previosly_set_public_post_types ) ) {
+		if ( \count( $public_post_types ) < \count( $previosly_set_public_post_types ) ) {
 			return;
 		}
 
@@ -180,8 +180,8 @@ class Set_Valuable_Post_Types extends Tasks_Interactive {
 		}
 
 		$post_types = \wp_unslash( $_POST['prpl-post-types-include'] ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- array elements are sanitized below.
-		$post_types = explode( ',', $post_types );
-		$post_types = array_map( 'sanitize_text_field', $post_types );
+		$post_types = \explode( ',', $post_types );
+		$post_types = \array_map( 'sanitize_text_field', $post_types );
 
 		\progress_planner()->get_admin__page_settings()->save_post_types( $post_types );
 

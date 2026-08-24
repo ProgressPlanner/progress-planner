@@ -138,12 +138,13 @@ class Page_Settings {
 	}
 
 	/**
-	 * Save the settings.
+	 * Save the redirect on login setting.
 	 *
 	 * @param bool $redirect_on_login Whether to redirect on login.
+	 *
 	 * @return void
 	 */
-	public function save_settings( $redirect_on_login ) {
+	public function save_redirect_on_login( $redirect_on_login = false ) {
 		\update_user_meta( \get_current_user_id(), 'prpl_redirect_on_login', $redirect_on_login );
 	}
 

@@ -7,7 +7,7 @@
 
 ?>
 <div id="prpl-dashboard-widget-todo-header">
-	<img src="<?php echo \esc_attr( \constant( 'PROGRESS_PLANNER_URL' ) . '/assets/images/icon_progress_planner.svg' ); ?>" style="width:2.5em;" alt="" />
+	<span style="display:inline-flex;width:2.5em;height:2.5em;"><?php echo \progress_planner()->get_ui__branding()->get_admin_menu_icon( true ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- SVG markup. ?></span>
 	<p><?php \esc_html_e( 'Keep track of all your tasks and make sure your site is up-to-date!', 'progress-planner' ); ?></p>
 </div>
 <?php
