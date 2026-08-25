@@ -25,17 +25,9 @@ class Editor {
 	 * @return void
 	 */
 	public function enqueue_editor_script() {
-		// Bail early when we're on the site-editor.php page.
-		$request = \filter_input( INPUT_SERVER, 'REQUEST_URI' );
-		if ( ! $request && isset( $_SERVER['REQUEST_URI'] ) ) {
-			$request = \sanitize_text_field( \wp_unslash( $_SERVER['REQUEST_URI'] ) );
-		}
-		if ( $request && \str_contains( $request, 'site-editor.php' ) ) {
-			return;
-		}
-
-		// Only load on Page edit screen and if the user can edit others posts.
-		if ( 'page' !== \get_post_type() || ! \current_user_can( 'edit_others_posts' ) ) {
+		// Assigning a page-type is an editorial decision, so require the capability
+		// to edit others' posts. Authors editing their own posts don't get the sidebar.
+		if ( ! \current_user_can( 'edit_others_posts' ) ) {
 			return;
 		}
 
@@ -61,9 +53,10 @@ class Editor {
 			[
 				'name' => 'progressPlannerEditor',
 				'data' => [
-					'lessons'         => \progress_planner()->get_lessons()->get_items(),
-					'pageTypes'       => $page_types,
-					'defaultPageType' => $prpl_preselected_page_type,
+					'lessons'          => \progress_planner()->get_lessons()->get_items(),
+					'pageTypes'        => $page_types,
+					'defaultPageType'  => $prpl_preselected_page_type,
+					'adminMenuIconSvg' => \progress_planner()->get_ui__branding()->get_admin_menu_icon( true ),
 				],
 			]
 		);

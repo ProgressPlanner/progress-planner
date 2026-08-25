@@ -22,6 +22,13 @@ final class Branding {
 	];
 
 	/**
+	 * Style handles that have already received the branding inline CSS this request.
+	 *
+	 * @var array<string, bool>
+	 */
+	private static $inline_css_attached = [];
+
+	/**
 	 * Constructor.
 	 */
 	public function __construct() {
@@ -125,33 +132,65 @@ final class Branding {
 	}
 
 	/**
+	 * Attach the branding custom CSS to a registered/enqueued stylesheet.
+	 *
+	 * Idempotent per handle within a single request, so callers do not need to
+	 * track whether the CSS has already been added.
+	 *
+	 * @param string $handle The style handle to attach the inline CSS to.
+	 *
+	 * @return void
+	 */
+	public function enqueue_inline_css( string $handle ): void {
+		if ( isset( self::$inline_css_attached[ $handle ] ) ) {
+			return;
+		}
+		self::$inline_css_attached[ $handle ] = true;
+
+		$css = $this->get_custom_css();
+		if ( '' === $css ) {
+			return;
+		}
+
+		\wp_add_inline_style( $handle, $css );
+	}
+
+	/**
 	 * Get the admin-menu icon.
 	 *
-	 * @return string
+	 * @param bool $raw Whether to return raw SVG markup (true) or base64 data URI (false).
+	 *
+	 * @return string SVG markup or base64-encoded data URI.
 	 */
-	public function get_admin_menu_icon(): string {
-		$icon = 'data:image/svg+xml;base64,PHN2ZyByb2xlPSJpbWciIGFyaWEtaGlkZGVuPSJ0cnVlIiBmb2N1c2FibGU9ImZhbHNlIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzNjggNTAwIj48cGF0aCBmaWxsPSIjMzgyOTZkIiBkPSJNMjE3LjQ2IDE3Mi45YzMuMjEuMTIgNS45NyAxLjc0IDcuNzMgNC4xNS0xLjg3LTEwLjI0LTEwLjY0LTE4LjE3LTIxLjQ4LTE4LjU2LTEyLjUyLS40NS0yMy4wMyA5LjMzLTIzLjQ4IDIxLjg1LS40NSAxMi41MiA5LjMzIDIzLjAzIDIxLjg1IDIzLjQ4IDkuNC4zNCAxNy42Ny01LjEgMjEuNC0xMy4xMy0xLjgzIDEuNTEtNC4xOCAyLjQyLTYuNzQgMi4zMy01LjU1LS4yLTkuODktNC44Ni05LjY5LTEwLjQxLjItNS41NSA0Ljg2LTkuODkgMTAuNDEtOS42OVpNMjQxLjUxIDMwNS44NGMuNTggMS45MiAxLjEzIDMuODYgMS43MyA1Ljc3IDE0LjA0IDQ0Ljk3IDMzLjk0IDg4Ljc1IDU2LjQyIDEyNC4yN2w2Ny43NS0xMzAuMDRoLTEyNS45Wk0yOTcuOTYgMjA1Ljk3YzEyLjEyLTQuNSAyMy41NC03LjE4IDMzLjY0LTguOTYtMjIuNTEtMjIuMjctNjEuMjQtMjcuMDYtNjEuNDctMjcuMDkgMS4yNyA2LjE3LjU4IDE1LjgtMi40NCAyNi40Ni0zLjMgMTEuNjYtOS4zOCAyNC41NC0xOC43IDM1LjQ4LTMuNDUgNC4wNi03LjM2IDcuODMtMTEuNzMgMTEuMTloLjA3di0uMDFjLjE2LjYyLjM4IDEuMi41OCAxLjc5IDIuNzQgOC4yNyA4LjYxIDEzLjc0IDE0LjkzIDE3LjE0IDYuNDggMy40OSAxMy4zNyA0LjgzIDE3LjY4IDQuODMgNi40IDAgMTEuODgtMy43OSAxNC40My05LjIyLjk3LTIuMDYgMS41NS00LjMzIDEuNTUtNi43NiAwLTMuODUtMS40Mi03LjM0LTMuNjktMTAuMS0xLjkyLTIuMzMtNC40Ni00LjA4LTcuMzktNS4wM2w0NC44Mi04LjY1Yy02LjYzLTYuMTItMTQuNzItMTEuNTktMjIuNzMtMTYuMjMtMS45Ny0xLjE0LTEuNjktNC4wNS40NS00Ljg0WiIvPjxwYXRoIGZpbGw9IiNmYWEzMTAiIGQ9Ik0yODEuMzcgNDU4LjM3Yy0yNS43OS0zOC44NC00OC42OC04OC4wNC02NC40NS0xMzguNTQtMS40NS00LjYzLTIuODMtOS4zMS00LjE3LTEzLjk5LTEuMTItMy45NC0yLjIyLTcuODgtMy4yNS0xMS44LTIuMDktNy45Mi05LjI4LTEzLjQ2LTE3LjQ4LTEzLjQ2aC0yNy45NWMtOC4yIDAtMTUuMzkgNS41My0xNy40OCAxMy40NS0yLjI4IDguNjUtNC43OCAxNy4zMi03LjQyIDI1Ljc5LTE1Ljc3IDUwLjUtMzguNjUgOTkuNy02NC40NSAxMzguNTQtNC4wMSA2LjAzLTEuNzggMTEuNjMtLjY0IDEzLjc2IDIuNCA0LjQ3IDYuODYgNy4xNCAxMS45NCA3LjE0aDY2LjAxbDMuOTcgNi45MmM0LjU0IDcuOSAxMi45OSAxMi44MSAyMi4wNSAxMi44MXMxNy41MS00LjkxIDIyLjA2LTEyLjgxbDMuOTgtNi45Mmg2NmMzLjIyIDAgNi4xOS0xLjA4IDguNTUtMy4wMiAxLjM1LTEuMTEgMi41MS0yLjQ5IDMuMzgtNC4xMy41Ny0xLjA3IDEuNDItMy4wMiAxLjYxLTUuNDYuMTktMi40MS0uMjYtNS4zMS0yLjI1LTguMzFaIi8+PHBhdGggZmlsbD0iIzM4Mjk2ZCIgZD0iTTI5NS43IDc2LjA2Yy03LjU0LTEyLjA1LTMyLjM4IDEtNTkuNTQgMi44Ni0xNS4wNCAxLjAzLTM3LjA1LTExMC42My03MS43Ny01Ni45OS0zOS41NiA2MS4xLTc5LjEyLTQ0LjY4LTg4LjY2LTE1LjgzLTIxLjExIDQzLjI3IDI1LjE1IDg0LjYxIDI1LjE1IDg0LjYxcy0xMi44NCA3LjkyLTIwLjYzIDEzLjkzYy01LjQ3IDQuMTctMTAuODIgOC42NS0xNi4wMyAxMy41MS0yMC40NSAxOS4wMy0zNi4wNCA0MC4zMi00Ni43NyA2My44NkM2LjcyIDIwNS41NSAxLjExIDIyOS41OS42MiAyNTQuMTVjLS40OSAyNC41NiA0LjAxIDQ5LjEgMTMuNTQgNzMuNjMgOS41MiAyNC41MyAyNC4xNyA0Ny40MiA0My45NSA2OC42OCA0LjAyIDQuMzIgOC4xMiA4LjQxIDEyLjMxIDEyLjMgNC4xLTYuMzEgNy45Ny0xMi43NCAxMS42NC0xOS4yNiA0LjM5LTcuOCA4LjUtMTUuNzIgMTIuMjUtMjMuNzgtLjMzLS4zNS0uNjYtLjY5LS45OS0xLjAzLS4xNy0uMTgtLjM0LS4zNS0uNTEtLjUzLTE1LjUzLTE2LjY5LTI3LjE3LTM0LjU5LTM0LjkzLTUzLjcyLTcuNzctMTkuMTMtMTEuNS0zOC4yNS0xMS4yLTU3LjM2LjI5LTE5LjEgNC40Ny0zNy42OCAxMi41My01NS43MiA4LjA2LTE4LjA1IDIwLjAyLTM0LjQ1IDM1LjktNDkuMjIgMTMuOTktMTMuMDIgMjguODQtMjIuODMgNDQuNTUtMjkuNDEgMTUuNy02LjU5IDMxLjYzLTkuOTggNDcuNzYtMTAuMTggOS4wNS0uMTEgMTkuMTEgMS4xNSAyOS41MSA0LjUgMTAuMzIgNC4yNyAxOS4yMiA5LjQ0IDI2LjYzIDE1LjM1IDEwLjE5IDguMTMgMTcuNjEgMTcuNjUgMjIuMjIgMjguMSAxLjkxIDQuMzIgMy4zNyA4LjggNC4zMiAxMy40MSAxNi4yNy0yOC4yNyAzNi43NS03NS45NiAyNS41Ny05My44M1oiLz48L3N2Zz4=';
-
+	public function get_admin_menu_icon( bool $raw = false ): string {
 		$admin_menu_icon_id = empty( $this->get_api_data() ) || empty( $this->get_api_data()['admin_menu_icon'] )
 			? ''
 			: $this->get_api_data()['admin_menu_icon'];
 
+		// Default SVG with brand colors (purple #38296d and orange #faa310).
+		$svg = '<svg role="img" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 368 500"><path fill="#38296d" d="M217.46 172.9c3.21.12 5.97 1.74 7.73 4.15-1.87-10.24-10.64-18.17-21.48-18.56-12.52-.45-23.03 9.33-23.48 21.85-.45 12.52 9.33 23.03 21.85 23.48 9.4.34 17.67-5.1 21.4-13.13-1.83 1.51-4.18 2.42-6.74 2.33-5.55-.2-9.89-4.86-9.69-10.41.2-5.55 4.86-9.89 10.41-9.69ZM241.51 305.84c.58 1.92 1.13 3.86 1.73 5.77 14.04 44.97 33.94 88.75 56.42 124.27l67.75-130.04h-125.9ZM297.96 205.97c12.12-4.5 23.54-7.18 33.64-8.96-22.51-22.27-61.24-27.06-61.47-27.09 1.27 6.17.58 15.8-2.44 26.46-3.3 11.66-9.38 24.54-18.7 35.48-3.45 4.06-7.36 7.83-11.73 11.19h.07v-.01c.16.62.38 1.2.58 1.79 2.74 8.27 8.61 13.74 14.93 17.14 6.48 3.49 13.37 4.83 17.68 4.83 6.4 0 11.88-3.79 14.43-9.22.97-2.06 1.55-4.33 1.55-6.76 0-3.85-1.42-7.34-3.69-10.1-1.92-2.33-4.46-4.08-7.39-5.03l44.82-8.65c-6.63-6.12-14.72-11.59-22.73-16.23-1.97-1.14-1.69-4.05.45-4.84Z"/><path fill="#faa310" d="M281.37 458.37c-25.79-38.84-48.68-88.04-64.45-138.54-1.45-4.63-2.83-9.31-4.17-13.99-1.12-3.94-2.22-7.88-3.25-11.8-2.09-7.92-9.28-13.46-17.48-13.46h-27.95c-8.2 0-15.39 5.53-17.48 13.45-2.28 8.65-4.78 17.32-7.42 25.79-15.77 50.5-38.65 99.7-64.45 138.54-4.01 6.03-1.78 11.63-.64 13.76 2.4 4.47 6.86 7.14 11.94 7.14h66.01l3.97 6.92c4.54 7.9 12.99 12.81 22.05 12.81s17.51-4.91 22.06-12.81l3.98-6.92h66c3.22 0 6.19-1.08 8.55-3.02 1.35-1.11 2.51-2.49 3.38-4.13.57-1.07 1.42-3.02 1.61-5.46.19-2.41-.26-5.31-2.25-8.31Z"/><path fill="#38296d" d="M295.7 76.06c-7.54-12.05-32.38 1-59.54 2.86-15.04 1.03-37.05-110.63-71.77-56.99-39.56 61.1-79.12-44.68-88.66-15.83-21.11 43.27 25.15 84.61 25.15 84.61s-12.84 7.92-20.63 13.93c-5.47 4.17-10.82 8.65-16.03 13.51-20.45 19.03-36.04 40.32-46.77 63.86C6.72 205.55 1.11 229.59.62 254.15c-.49 24.56 4.01 49.1 13.54 73.63 9.52 24.53 24.17 47.42 43.95 68.68 4.02 4.32 8.12 8.41 12.31 12.3 4.1-6.31 7.97-12.74 11.64-19.26 4.39-7.8 8.5-15.72 12.25-23.78-.33-.35-.66-.69-.99-1.03-.17-.18-.34-.35-.51-.53-15.53-16.69-27.17-34.59-34.93-53.72-7.77-19.13-11.5-38.25-11.2-57.36.29-19.1 4.47-37.68 12.53-55.72 8.06-18.05 20.02-34.45 35.9-49.22 13.99-13.02 28.84-22.83 44.55-29.41 15.7-6.59 31.63-9.98 47.76-10.18 9.05-.11 19.11 1.15 29.51 4.5 10.32 4.27 19.22 9.44 26.63 15.35 10.19 8.13 17.61 17.65 22.22 28.1 1.91 4.32 3.37 8.8 4.32 13.41 16.27-28.27 36.75-75.96 25.57-93.83Z"/></svg>';
+
 		if ( $admin_menu_icon_id ) {
-			// Get the logo URL.
+			// Get the icon URL from the API.
 			$response = $this->get_remote_data( \progress_planner()->get_remote_server_root_url() . '/wp-json/wp/v2/media/' . $admin_menu_icon_id );
 			if ( $response ) {
 				$media = \json_decode( $response, true );
 				if ( \is_array( $media ) && \array_key_exists( 'source_url', $media ) ) {
-					// Get the content of the image.
+					// Get the content of the SVG.
 					$content = $this->get_remote_data( $media['source_url'] );
 					if ( $content ) {
-						$icon = 'data:image/svg+xml;base64,' . \base64_encode( $content ); // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_encode
+						$svg = $content;
 					}
 				}
 			}
 		}
 
-		return $icon;
+		if ( $raw ) {
+			return $svg;
+		}
+
+		// phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_encode
+		return 'data:image/svg+xml;base64,' . \base64_encode( $svg );
 	}
 
 	/**
@@ -174,6 +213,19 @@ final class Branding {
 		return empty( $this->get_api_data() ) || ! isset( $this->get_api_data()['admin_submenu_name'] )
 			? $this->get_admin_menu_name()
 			: $this->get_api_data()['admin_submenu_name'];
+	}
+
+	/**
+	 * Get the admin-submenu position.
+	 *
+	 * @return int|null
+	 */
+	public function get_admin_submenu_position(): mixed {
+		if ( $this->get_branding_id() !== 0 && $this->get_branding_id() !== 4958 ) {
+			return -1000;
+		}
+
+		return null;
 	}
 
 	/**

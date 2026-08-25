@@ -67,6 +67,9 @@ class Suggested_Tasks {
 		// Filter the REST API response.
 		\add_filter( 'rest_prepare_prpl_recommendations', [ $this, 'rest_prepare_recommendation' ], 10, 2 );
 
+		// Sanitize the recommendation title on insert/update via the REST API, to prevent stored XSS.
+		\add_filter( 'rest_pre_insert_prpl_recommendations', [ $this, 'rest_sanitize_recommendation' ], 10, 2 );
+
 		\add_filter( 'wp_trash_post_days', [ $this, 'change_trashed_posts_lifetime' ], 10, 2 );
 	}
 
@@ -100,12 +103,25 @@ class Suggested_Tasks {
 	 * @return void
 	 */
 	public function insert_activity( string $task_id ): void {
+		/**
+		 * Filter the activity category for a completed task.
+		 *
+		 * Allows customizing the category used when recording task completion activities.
+		 * For example, onboarding tasks may use 'onboarding_task' instead of 'suggested_task'
+		 * to exclude them from monthly badge calculations.
+		 *
+		 * @param string $category The activity category (default: 'suggested_task').
+		 * @param string $task_id  The task ID being completed.
+		 */
+		$category = \apply_filters( 'progress_planner_task_activity_category', 'suggested_task', $task_id );
+
 		// Insert an activity.
-		$activity          = new Suggested_Task_Activity();
-		$activity->type    = 'completed';
-		$activity->data_id = (string) $task_id;
-		$activity->date    = new \DateTime();
-		$activity->user_id = \get_current_user_id();
+		$activity           = new Suggested_Task_Activity();
+		$activity->category = $category;
+		$activity->type     = 'completed';
+		$activity->data_id  = (string) $task_id;
+		$activity->date     = new \DateTime();
+		$activity->user_id  = \get_current_user_id();
 		$activity->save();
 
 		// Allow other classes to react to the completion of a suggested task.
@@ -213,40 +229,19 @@ class Suggested_Tasks {
 			return;
 		}
 
-		// Mark task as completed and delete the token.
-		$this->mark_task_as_completed( $task_id, $user_id );
-	}
-
-	/**
-	 * Complete a task.
-	 *
-	 * @param string   $task_id The task ID.
-	 * @param int|null $user_id Optional. The user ID for token deletion. If provided, the token will be deleted.
-	 * @param bool     $skip_celebration Optional. Whether to skip the celebration.
-	 *
-	 * @return bool
-	 */
-	public function mark_task_as_completed( $task_id, $user_id = null, $skip_celebration = false ) {
 		if ( ! $this->was_task_completed( $task_id ) ) {
 			$task = \progress_planner()->get_suggested_tasks_db()->get_post( $task_id );
 
 			if ( $task ) {
-				$post_status = $skip_celebration ? 'trash' : 'pending';
-				\progress_planner()->get_suggested_tasks_db()->update_recommendation( $task->ID, [ 'post_status' => $post_status ] );
+				\progress_planner()->get_suggested_tasks_db()->update_recommendation( $task->ID, [ 'post_status' => 'pending' ] );
 
 				// Insert an activity.
 				$this->insert_activity( $task_id );
 
-				// Delete the token after successful use (one-time use) if user_id is provided.
-				if ( $user_id ) {
-					$this->delete_task_completion_token( $task_id, $user_id );
-				}
-
-				return true;
+				// Delete the token after successful use (one-time use).
+				$this->delete_task_completion_token( $task_id, $user_id );
 			}
 		}
-
-		return false;
 	}
 
 	/**
@@ -511,6 +506,28 @@ class Suggested_Tasks {
 		}
 
 		return $args;
+	}
+
+	/**
+	 * Sanitize a recommendation before it is inserted or updated via the REST API.
+	 *
+	 * Recommendation titles are plain text (they are rendered unescaped in JS
+	 * templates such as views/js-templates/suggested-task.html), so we strip any
+	 * HTML tags here to prevent stored XSS. This runs regardless of the user's
+	 * `unfiltered_html` capability, which WordPress would otherwise honor for the
+	 * post title.
+	 *
+	 * @param \stdClass        $prepared_post An object representing a single post prepared for inserting or updating the database.
+	 * @param \WP_REST_Request $request       The request object.
+	 *
+	 * @return \stdClass The sanitized post object.
+	 */
+	public function rest_sanitize_recommendation( $prepared_post, $request ) { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.FoundAfterLastUsed
+		if ( isset( $prepared_post->post_title ) ) {
+			$prepared_post->post_title = \sanitize_text_field( \wp_strip_all_tags( $prepared_post->post_title ) );
+		}
+
+		return $prepared_post;
 	}
 
 	/**
