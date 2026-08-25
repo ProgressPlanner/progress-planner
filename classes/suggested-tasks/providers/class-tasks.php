@@ -268,7 +268,7 @@ abstract class Tasks implements Tasks_Interface {
 	 * Get the task ID.
 	 *
 	 * Generates a unique task ID by combining the provider ID with optional task-specific data.
-	 * For repetitive tasks, includes the current year-week (YW format) to create weekly instances.
+	 * For repetitive tasks, includes the current year-week (oW format) to create weekly instances.
 	 *
 	 * Example task IDs:
 	 * - Non-repetitive: "update-core"
@@ -783,15 +783,6 @@ abstract class Tasks implements Tasks_Interface {
 	}
 
 	/**
-	 * Get the task action label.
-	 *
-	 * @return string
-	 */
-	public function get_task_action_label() {
-		return \__( 'Do it', 'progress-planner' );
-	}
-
-	/**
 	 * Check if the task has activity.
 	 *
 	 * @param string $task_id The task ID.
@@ -811,17 +802,5 @@ abstract class Tasks implements Tasks_Interface {
 		);
 
 		return ! empty( $activity );
-	}
-
-	/**
-	 * Complete the task.
-	 *
-	 * @param array  $args The task data.
-	 * @param string $task_id The task ID.
-	 *
-	 * @return bool
-	 */
-	public function complete_task( $args = [], $task_id = '' ) {
-		return false;
 	}
 }

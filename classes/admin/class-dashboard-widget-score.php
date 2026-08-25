@@ -27,7 +27,7 @@ class Dashboard_Widget_Score extends Dashboard_Widget {
 	 * @return string
 	 */
 	protected function get_title() {
-		return \esc_html__( 'Progress Planner', 'progress-planner' );
+		return \esc_html( \progress_planner()->get_ui__branding()->get_admin_menu_name() );
 	}
 
 	/**

@@ -189,6 +189,15 @@ class Security_Test extends \WP_UnitTestCase {
 			public function evaluate() {
 				return false;
 			}
+
+			/**
+			 * Check if the task condition is satisfied.
+			 *
+			 * @return bool
+			 */
+			public function should_add_task() {
+				return true;
+			}
 		};
 
 		// Set initial value.
@@ -273,6 +282,15 @@ class Security_Test extends \WP_UnitTestCase {
 			public function evaluate() {
 				return false;
 			}
+
+			/**
+			 * Check if the task condition is satisfied.
+			 *
+			 * @return bool
+			 */
+			public function should_add_task() {
+				return true;
+			}
 		};
 
 		// Test without nonce.
@@ -334,6 +352,15 @@ class Security_Test extends \WP_UnitTestCase {
 			public function evaluate() {
 				return false;
 			}
+
+			/**
+			 * Check if the task condition is satisfied.
+			 *
+			 * @return bool
+			 */
+			public function should_add_task() {
+				return true;
+			}
 		};
 
 		$_POST['nonce']        = \wp_create_nonce( 'progress_planner' );
@@ -393,6 +420,15 @@ class Security_Test extends \WP_UnitTestCase {
 			 */
 			public function evaluate() {
 				return false;
+			}
+
+			/**
+			 * Check if the task condition is satisfied.
+			 *
+			 * @return bool
+			 */
+			public function should_add_task() {
+				return true;
 			}
 		};
 
@@ -469,6 +505,15 @@ class Security_Test extends \WP_UnitTestCase {
 			 */
 			public function evaluate() {
 				return false;
+			}
+
+			/**
+			 * Check if the task condition is satisfied.
+			 *
+			 * @return bool
+			 */
+			public function should_add_task() {
+				return true;
 			}
 		};
 
@@ -548,6 +593,15 @@ class Security_Test extends \WP_UnitTestCase {
 			public function evaluate() {
 				return false;
 			}
+
+			/**
+			 * Check if the task condition is satisfied.
+			 *
+			 * @return bool
+			 */
+			public function should_add_task() {
+				return true;
+			}
 		};
 
 		// Test updating a whitelisted option (should SUCCEED).
@@ -621,6 +675,15 @@ class Security_Test extends \WP_UnitTestCase {
 			public function evaluate() {
 				return false;
 			}
+
+			/**
+			 * Check if the task condition is satisfied.
+			 *
+			 * @return bool
+			 */
+			public function should_add_task() {
+				return true;
+			}
 		};
 
 		// Test updating the custom whitelisted option (should SUCCEED).
@@ -686,6 +749,15 @@ class Security_Test extends \WP_UnitTestCase {
 			 */
 			public function evaluate() {
 				return false;
+			}
+
+			/**
+			 * Check if the task condition is satisfied.
+			 *
+			 * @return bool
+			 */
+			public function should_add_task() {
+				return true;
 			}
 		};
 
