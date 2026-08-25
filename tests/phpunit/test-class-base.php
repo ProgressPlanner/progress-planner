@@ -215,7 +215,7 @@ class Base_Test extends \WP_UnitTestCase {
 		$this->assertFalse( $result );
 
 		// Set the current user to a user with the manage_options capability.
-		wp_set_current_user( 1 );
+		\wp_set_current_user( 1 );
 
 		// Option is set, and the user has the manage_options capability.
 		$result = $this->base_instance->is_debug_mode_enabled();
@@ -228,7 +228,7 @@ class Base_Test extends \WP_UnitTestCase {
 		$this->assertIsBool( $result );
 
 		// Unset the current user.
-		wp_set_current_user( 0 );
+		\wp_set_current_user( 0 );
 	}
 }
 

@@ -1,14 +1,11 @@
 .components-button {
 
-	svg.progress-planner-icon {
+	.progress-planner-icon {
+		color: #38296d;
 
-		#path1,
-		#path3 {
-			fill: #38296d !important;
-		}
-
-		#path2 {
-			fill: #faa310 !important;
+		svg {
+			width: 100%;
+			height: 100%;
 		}
 	}
 
@@ -22,11 +19,11 @@
 			background: #38296d !important;
 		}
 
-		svg.progress-planner-icon {
+		.progress-planner-icon {
+			color: #fff;
 
-			#path1,
-			#path3 {
-				fill: #fff !important;
+			svg path {
+				fill: #fff;
 			}
 		}
 	}

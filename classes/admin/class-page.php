@@ -13,13 +13,6 @@ namespace Progress_Planner\Admin;
 class Page {
 
 	/**
-	 * Whether the branding inline styles have been added.
-	 *
-	 * @var boolean
-	 */
-	protected static $branding_inline_styles_added = false;
-
-	/**
 	 * Constructor.
 	 */
 	public function __construct() {
@@ -104,7 +97,8 @@ class Page {
 			'manage_options',
 			$page_identifier,
 			'__return_empty_string',
-			\progress_planner()->get_ui__branding()->get_admin_menu_icon()
+			\progress_planner()->get_ui__branding()->get_admin_menu_icon(),
+			\progress_planner()->get_ui__branding()->get_admin_submenu_position()
 		);
 
 		\add_submenu_page(
@@ -260,7 +254,7 @@ class Page {
 					'tasks'           => $tasks_details,
 					'totalPoints'     => $total_points,
 					'completedPoints' => $completed_points,
-					'base_url'        => \constant( 'PROGRESS_PLANNER_URL' ),
+					'iconUrl'         => \progress_planner()->get_ui__branding()->get_admin_menu_icon(),
 					'l10n'            => [
 						/* translators: %d: The number of points. */
 						'fixThisIssue' => \esc_html__( 'Fix this issue to get %d point(s) in Progress Planner', 'progress-planner' ),
@@ -284,16 +278,22 @@ class Page {
 
 		\progress_planner()->get_admin__enqueue()->enqueue_style( 'progress-planner/variables-color' );
 		\progress_planner()->get_admin__enqueue()->enqueue_style( 'progress-planner/admin' );
-		if ( ! static::$branding_inline_styles_added ) {
-			\wp_add_inline_style( 'progress-planner/admin', \progress_planner()->get_ui__branding()->get_custom_css() );
-			static::$branding_inline_styles_added = true;
-		}
+		\progress_planner()->get_ui__branding()->enqueue_inline_css( 'progress-planner/admin' );
 		\progress_planner()->get_admin__enqueue()->enqueue_style( 'progress-planner/web-components/prpl-tooltip' );
 		\progress_planner()->get_admin__enqueue()->enqueue_style( 'progress-planner/web-components/prpl-install-plugin' );
 
 		if ( 'toplevel_page_progress-planner' === $current_screen->id ) {
 			// Enqueue ugprading (onboarding) tasks styles, these are needed both when privacy policy is accepted and when it is not.
 			\progress_planner()->get_admin__enqueue()->enqueue_style( 'progress-planner/upgrade-tasks' );
+		}
+
+		$prpl_privacy_policy_accepted = \progress_planner()->is_privacy_policy_accepted();
+		if ( ! $prpl_privacy_policy_accepted ) {
+			// Enqueue welcome styles.
+			\progress_planner()->get_admin__enqueue()->enqueue_style( 'progress-planner/welcome' );
+
+			// Enqueue onboarding styles.
+			\progress_planner()->get_admin__enqueue()->enqueue_style( 'progress-planner/onboard' );
 		}
 	}
 

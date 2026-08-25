@@ -83,7 +83,19 @@ class Badges {
 	 * @return \Progress_Planner\Badges\Badge[]
 	 */
 	public function get_badges( $context ) {
-		return isset( $this->$context ) ? $this->$context : [];
+		// phpcs:ignore Generic.Commenting.DocComment.MissingShort -- Inline @var for PHPStan.
+		/** @var \Progress_Planner\Badges\Badge[] $badges */
+		$badges = isset( $this->$context ) ? $this->$context : [];
+
+		/**
+		 * Filter the badges for a context.
+		 *
+		 * @param \Progress_Planner\Badges\Badge[] $badges  The badges.
+		 * @param string                           $context The badges context.
+		 *
+		 * @return \Progress_Planner\Badges\Badge[]
+		 */
+		return \apply_filters( 'progress_planner_badges', $badges, $context );
 	}
 
 	/**
@@ -101,7 +113,18 @@ class Badges {
 				}
 			}
 		}
-		return null;
+
+		/**
+		 * Filter for retrieving a single badge by ID.
+		 *
+		 * Allows external plugins to provide custom badges.
+		 *
+		 * @param \Progress_Planner\Badges\Badge|null $badge    The badge object or null.
+		 * @param string                              $badge_id The badge ID.
+		 *
+		 * @return \Progress_Planner\Badges\Badge|null
+		 */
+		return \apply_filters( 'progress_planner_get_badge', null, $badge_id );
 	}
 
 	/**
@@ -183,6 +206,8 @@ class Badges {
 		// Get the settings for badges (stores completion dates).
 		$settings = \progress_planner()->get_settings()->get( 'badges', [] );
 
+		// phpcs:ignore Generic.Commenting.DocComment.MissingShort -- Inline @var for PHPStan.
+		/** @var string|null $latest_date */
 		$latest_date = null;
 
 		// Loop through all badge contexts to find the most recently completed badge.
@@ -204,19 +229,29 @@ class Badges {
 				if ( null === $latest_date ) {
 					$this->latest_completed_badge = $badge;
 					if ( isset( $settings[ $badge->get_id() ]['date'] ) ) {
-						$latest_date = $settings[ $badge->get_id() ]['date'];
+						$latest_date = (string) $settings[ $badge->get_id() ]['date'];
 					}
 					continue;
 				}
 
 				// Compare completion dates as Unix timestamps to find the most recent.
 				// Using >= ensures that if multiple badges complete simultaneously, the last one processed wins.
-				if ( \DateTime::createFromFormat( 'Y-m-d H:i:s', $settings[ $badge->get_id() ]['date'] )->format( 'U' ) >= \DateTime::createFromFormat( 'Y-m-d H:i:s', $latest_date )->format( 'U' ) ) {
-					$latest_date                  = $settings[ $badge->get_id() ]['date'];
+				if ( \DateTime::createFromFormat( 'Y-m-d H:i:s', (string) $settings[ $badge->get_id() ]['date'] )->format( 'U' ) >= \DateTime::createFromFormat( 'Y-m-d H:i:s', $latest_date )->format( 'U' ) ) {
+					$latest_date                  = (string) $settings[ $badge->get_id() ]['date'];
 					$this->latest_completed_badge = $badge;
 				}
 			}
 		}
+
+		/**
+		 * Filter the latest completed badge.
+		 *
+		 * @param \Progress_Planner\Badges\Badge|null $badge       The latest completed badge.
+		 * @param string|null                         $latest_date The latest completion date.
+		 *
+		 * @return \Progress_Planner\Badges\Badge|null
+		 */
+		$this->latest_completed_badge = \apply_filters( 'progress_planner_latest_completed_badge', $this->latest_completed_badge, $latest_date );
 
 		return $this->latest_completed_badge;
 	}
