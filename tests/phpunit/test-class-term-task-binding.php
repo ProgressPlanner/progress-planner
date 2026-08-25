@@ -218,13 +218,16 @@ class Term_Task_Binding_Test extends \WP_Ajax_UnitTestCase {
 	/**
 	 * A suggested term that has since gained posts is not deleted.
 	 *
+	 * This exercises the post-count re-check specifically, so the posts are
+	 * attached *before* the task row is written. Creating the task first would
+	 * mean no matching task exists by the time the handler runs, and the request
+	 * would be stopped by the binding check without ever reaching the count
+	 * re-check this test is for.
+	 *
 	 * @return void
 	 */
 	public function test_delete_rejects_suggested_term_that_gained_posts() {
 		$term_id = $this->factory->term->create( [ 'taxonomy' => 'category' ] );
-
-		$provider = new Remove_Terms_Without_Posts();
-		$this->create_task_for_term( $provider, $term_id, 'category' );
 
 		// Give the term enough posts to exceed MIN_POSTS.
 		foreach ( [ 1, 2 ] as $ignored ) {
@@ -232,10 +235,19 @@ class Term_Task_Binding_Test extends \WP_Ajax_UnitTestCase {
 			\wp_set_object_terms( $post_id, [ $term_id ], 'category', true );
 		}
 
+		// Then record the task, mirroring a task created before the posts landed.
+		$provider = new Remove_Terms_Without_Posts();
+		$this->create_task_for_term( $provider, $term_id, 'category' );
+
 		$this->set_request( $term_id, 'category' );
 		$response = $this->get_response( $provider );
 
 		$this->assertFalse( $response['success'], 'A term with posts should not be deleted.' );
+		$this->assertSame(
+			'This term is not empty and cannot be deleted.',
+			$response['data']['message'],
+			'The rejection should come from the post-count re-check, not another guard.'
+		);
 		$this->assertFalse( \is_wp_error( \get_term( $term_id, 'category' ) ), 'Term should not have been deleted.' );
 	}
 }
