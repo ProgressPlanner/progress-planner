@@ -55,7 +55,6 @@ use Progress_Planner\Utils\Deprecations;
  * @method \Progress_Planner\Admin\Widgets\Challenge get_admin__widgets__challenge()
  * @method \Progress_Planner\Admin\Widgets\Activity_Scores get_admin__widgets__activity_scores()
  * @method \Progress_Planner\Utils\Date get_utils__date()
- * @method \Progress_Planner\Onboard_Wizard get_onboard_wizard()
  */
 class Base {
 
@@ -198,9 +197,6 @@ class Base {
 
 		// Init the enqueue class.
 		$this->get_admin__enqueue()->init();
-
-		// TODO: Decide when this needs to be initialized.
-		$this->get_onboard_wizard();
 	}
 
 	/**

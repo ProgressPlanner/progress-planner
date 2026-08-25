@@ -104,14 +104,26 @@ class Plugin_Upgrade_Tasks {
 	public function maybe_add_onboarding_tasks() {
 		$onboard_task_provider_ids = \apply_filters( 'prpl_onboarding_task_providers', [] );
 
-		// Privacy policy is not accepted, so it's a fresh install.
-		$fresh_install = ! \progress_planner()->is_privacy_policy_accepted();
+		// Check if task providers option exists. If not, it's either a fresh install or upgrading from v1.0.4 or older.
+		$old_task_providers        = \get_option( 'progress_planner_previous_version_task_providers', [] );
+		$task_providers_option_set = false !== \get_option( 'progress_planner_previous_version_task_providers', false );
 
-		// Check if task providers option exists, it will not on fresh installs and v1.0.4 and older.
-		$old_task_providers = \get_option( 'progress_planner_previous_version_task_providers', [] );
+		// Fresh install detection:
+		// - Option doesn't exist AND privacy policy not yet accepted (standalone fresh install)
+		// - Option doesn't exist AND running as branded/hosted version (pp-hosts fresh install, privacy auto-accepted)
+		// In these cases, save current providers as baseline without showing upgrade popover.
+		if ( ! $task_providers_option_set ) {
+			$is_branded_version        = \defined( 'PROGRESS_PLANNER_BRANDING_ID' );
+			$is_privacy_policy_pending = ! \progress_planner()->is_privacy_policy_accepted();
 
-		// We're upgrading from v1.0.4 or older, set the old task providers to what we had before the upgrade.
-		if ( ! $fresh_install && empty( $old_task_providers ) ) {
+			if ( $is_branded_version || $is_privacy_policy_pending ) {
+				// Fresh install - save current providers as baseline and skip upgrade popover.
+				\update_option( 'progress_planner_previous_version_task_providers', \array_unique( $onboard_task_provider_ids ), SORT_REGULAR );
+				return;
+			}
+
+			// Upgrading from v1.0.4 or older (standalone, privacy accepted but no task providers option).
+			// Set baseline to what existed before the upgrade.
 			$old_task_providers = [
 				'core-blogdescription',
 				'wp-debug-display',
