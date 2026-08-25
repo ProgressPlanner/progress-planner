@@ -214,11 +214,27 @@ class Enqueue {
 					$delay_celebration = \progress_planner()->get_plugin_upgrade_tasks()->should_show_upgrade_popover();
 				}
 
-				// Get tasks from task providers.
+				// Get the providers available for the user.
+				$include_providers            = [];
+				$providers_available_for_user = \progress_planner()->get_suggested_tasks()->get_tasks_manager()->get_task_providers_available_for_user();
+				foreach ( $providers_available_for_user as $provider ) {
+					// Skip user provider.
+					if ( 'user' === $provider->get_provider_id() ) {
+						continue;
+					}
+					$include_providers[] = $provider->get_provider_id();
+				}
+
+				// Check if user wants to see all recommendations.
+				$show_all_recommendations = isset( $_GET['prpl_show_all_recommendations'] ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+				$tasks_per_page           = $show_all_recommendations ? -1 : \Progress_Planner\Admin\Widgets\Suggested_Tasks::get_per_page();
+
+				// Get tasks from task providers (limited to 5 by default, or unlimited if showing all).
 				$tasks = \progress_planner()->get_suggested_tasks()->get_tasks_in_rest_format(
 					[
 						'post_status'      => 'publish',
-						'exclude_provider' => [ 'user' ],
+						'posts_per_page'   => $tasks_per_page,
+						'include_provider' => $include_providers, // User provider is already excluded.
 					]
 				);
 				// Get pending celebration tasks.
@@ -226,7 +242,7 @@ class Enqueue {
 					[
 						'post_status'      => 'pending',
 						'posts_per_page'   => 100,
-						'exclude_provider' => [ 'user' ],
+						'include_provider' => $include_providers, // User provider is already excluded.
 					]
 				);
 
@@ -241,18 +257,19 @@ class Enqueue {
 				$localize_data = [
 					'name' => 'prplSuggestedTask',
 					'data' => [
-						'nonce'               => \wp_create_nonce( 'progress_planner' ),
-						'assets'              => [
+						'nonce'            => \wp_create_nonce( 'progress_planner' ),
+						'assets'           => [
 							'infoIcon'   => \constant( 'PROGRESS_PLANNER_URL' ) . '/assets/images/icon_info.svg',
 							'snoozeIcon' => \constant( 'PROGRESS_PLANNER_URL' ) . '/assets/images/icon_snooze.svg',
 						],
-						'tasks'               => [
+						'tasks'            => [
 							'pendingTasks'            => $tasks,
 							'pendingCelebrationTasks' => $pending_celebration_tasks,
-							'userTasks'               => isset( $user_tasks['user'] ) ? $user_tasks['user'] : [],
+							'userTasks'               => $user_tasks,
 						],
-						'maxItemsPerCategory' => \progress_planner()->get_suggested_tasks()->get_max_items_per_category(),
-						'delayCelebration'    => $delay_celebration,
+						'delayCelebration' => $delay_celebration,
+						'tasksPerPage'     => $tasks_per_page,
+						'perPageDefault'   => \Progress_Planner\Admin\Widgets\Suggested_Tasks::get_per_page(),
 					],
 				];
 				break;
@@ -284,7 +301,7 @@ class Enqueue {
 				$localize_data = [
 					'name' => 'prplCelebrate',
 					'data' => [
-						'raviIconUrl'     => \constant( 'PROGRESS_PLANNER_URL' ) . '/assets/images/icon_progress_planner.svg',
+						'raviIconUrl'     => \progress_planner()->get_ui__branding()->get_admin_menu_icon(),
 						'confettiOptions' => $confetti_options,
 					],
 				];
@@ -354,7 +371,11 @@ class Enqueue {
 			'nextBtnText'                  => \esc_html__( 'Next &rarr;', 'progress-planner' ),
 			'prevBtnText'                  => \esc_html__( '&larr; Previous', 'progress-planner' ),
 			'pageType'                     => \esc_html__( 'Page type', 'progress-planner' ),
-			'progressPlannerSidebar'       => \esc_html__( 'Progress Planner Sidebar', 'progress-planner' ),
+			'progressPlannerSidebar'       => \sprintf(
+				/* translators: %s: The plugin name. */
+				\esc_html__( '%s Sidebar', 'progress-planner' ),
+				\progress_planner()->get_ui__branding()->get_admin_menu_name()
+			),
 			'progressText'                 => \sprintf(
 				/* translators: %1$s: The current step number. %2$s: The total number of steps. */
 				\esc_html__( 'Step %1$s of %2$s', 'progress-planner' ),
@@ -381,6 +402,17 @@ class Enqueue {
 			'installed'                    => \esc_html__( 'Installed', 'progress-planner' ),
 			'activating'                   => \esc_html__( 'Activating...', 'progress-planner' ),
 			'activated'                    => \esc_html__( 'Activated', 'progress-planner' ),
+			'somethingWentWrong'           => \esc_html__( 'Something went wrong.', 'progress-planner' ),
+			'showAllRecommendations'       => \esc_html__( 'Show all recommendations', 'progress-planner' ),
+			'showFewerRecommendations'     => \esc_html__( 'Show fewer recommendations', 'progress-planner' ),
+			'loadingTasks'                 => \esc_html__( 'Loading tasks...', 'progress-planner' ),
+			'taskAddedSuccessfully'        => \esc_html__( 'Task added successfully', 'progress-planner' ),
+			'tasksDeleted'                 => \esc_html__( 'Completed tasks deleted', 'progress-planner' ),
+			'taskDeleted'                  => \esc_html__( 'Completed task deleted', 'progress-planner' ),
+			'moveUp'                       => \esc_html__( 'Move up', 'progress-planner' ),
+			'moveDown'                     => \esc_html__( 'Move down', 'progress-planner' ),
+			/* translators: %d: The number of points. */
+			'fixThisIssue'                 => \esc_html__( 'Fix this issue for %d points', 'progress-planner' ),
 		];
 	}
 
@@ -397,8 +429,8 @@ class Enqueue {
 			return;
 		}
 
-		// Inject the script only on the Progress Planner Dashboard, Progress Planner Settings and the WordPress dashboard pages.
-		if ( 'toplevel_page_progress-planner' !== $screen->id && 'progress-planner_page_progress-planner-settings' !== $screen->id && 'dashboard' !== $screen->id ) {
+		// Inject the script only on the Progress Planner Dashboard and the WordPress dashboard pages.
+		if ( 'toplevel_page_progress-planner' !== $screen->id && 'dashboard' !== $screen->id ) {
 			return;
 		}
 		?>

@@ -1,0 +1,10 @@
+# Auth state
+auth.json
+
+# Test artifacts
+test-results/
+playwright-report/
+*.png
+
+# Old backup files (can be removed once migration is verified)
+_old/

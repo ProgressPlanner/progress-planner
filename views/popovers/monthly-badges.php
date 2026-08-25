@@ -39,7 +39,7 @@ if ( ! \defined( 'ABSPATH' ) ) {
 	<div class="prpl-popover-column">
 		<?php
 		$prpl_badges_groups = [
-			'content'     => \__( 'Writing badges', 'progress-planner' ),
+			'content'     => \__( 'Content badges', 'progress-planner' ),
 			'maintenance' => \__( 'Streak badges', 'progress-planner' ),
 		];
 		?>
@@ -70,5 +70,6 @@ if ( ! \defined( 'ABSPATH' ) ) {
 				</div>
 			</div>
 		<?php endforeach; ?>
+		<?php \do_action( 'progress_planner_popover_after_badge_groups' ); ?>
 	</div>
 </div>

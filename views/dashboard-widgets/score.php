@@ -23,23 +23,28 @@ $prpl_badge = Monthly::get_instance_from_id( Monthly::get_badge_id_from_date( ne
 			data-badge-id="<?php echo \esc_attr( $prpl_badge->get_id() ); ?>"
 			data-badge-name="<?php echo \esc_attr( $prpl_badge->get_name() ); ?>"
 		>
-			<progress max="<?php echo (int) Monthly::TARGET_POINTS; ?>" value="<?php echo (float) \progress_planner()->get_admin__widgets__monthly_badges()->get_score()['target_score']; ?>">
-				<prpl-badge
-					complete="true"
-					badge-id="<?php echo \esc_attr( $prpl_badge->get_id() ); ?>"
-					badge-name="<?php echo \esc_attr( $prpl_badge->get_name() ); ?>"
-					branding-id="<?php echo (int) \progress_planner()->get_ui__branding()->get_branding_id(); ?>"
-				></prpl-badge>
-			</progress>
+			<prpl-badge
+				complete="true"
+				badge-id="<?php echo \esc_attr( $prpl_badge->get_id() ); ?>"
+				badge-name="<?php echo \esc_attr( $prpl_badge->get_name() ); ?>"
+				branding-id="<?php echo (int) \progress_planner()->get_ui__branding()->get_branding_id(); ?>"
+			></prpl-badge>
 		</prpl-gauge>
 		<?php \esc_html_e( 'Monthly badge', 'progress-planner' ); ?>
 	</div>
 
 	<div>
-		<prpl-gauge background="#fff" color="<?php echo \esc_attr( \progress_planner()->get_admin__widgets__activity_scores()->get_gauge_color( \progress_planner()->get_admin__widgets__activity_scores()->get_score() ) ); ?>" contentFontSize="var(--prpl-font-size-5xl)" contentPadding="var(--prpl-padding)" marginBottom="0">
-			<progress max="100" value="<?php echo (float) \progress_planner()->get_admin__widgets__activity_scores()->get_score(); ?>">
-				<?php echo \esc_html( \progress_planner()->get_admin__widgets__activity_scores()->get_score() ); ?>
-			</progress>
+		<prpl-gauge
+			background="#fff"
+			color="<?php echo \esc_attr( \progress_planner()->get_admin__widgets__activity_scores()->get_gauge_color( \progress_planner()->get_admin__widgets__activity_scores()->get_score() ) ); ?>"
+			color2="<?php echo \esc_attr( \progress_planner()->get_admin__widgets__activity_scores()->get_gauge_color( \progress_planner()->get_admin__widgets__activity_scores()->get_score() ) ); ?>"
+			contentFontSize="var(--prpl-font-size-5xl)"
+			contentPadding="var(--prpl-padding)"
+			marginBottom="0"
+			data-max="100"
+			data-value="<?php echo (float) \progress_planner()->get_admin__widgets__activity_scores()->get_score(); ?>"
+		>
+			<?php echo \esc_html( \progress_planner()->get_admin__widgets__activity_scores()->get_score() ); ?>
 		</prpl-gauge>
 		<?php \esc_html_e( 'Website activity score', 'progress-planner' ); ?>
 	</div>
@@ -64,7 +69,7 @@ $prpl_badge = Monthly::get_instance_from_id( Monthly::get_badge_id_from_date( ne
 
 <?php if ( \current_user_can( 'manage_options' ) ) : ?>
 	<div class="prpl-dashboard-widget-footer">
-		<img src="<?php echo \esc_attr( \constant( 'PROGRESS_PLANNER_URL' ) . '/assets/images/icon_progress_planner.svg' ); ?>" style="width:1.85em;" alt="" />
+		<span style="display:inline-flex;width:1.85em;height:1.85em;"><?php echo \progress_planner()->get_ui__branding()->get_admin_menu_icon( true ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- SVG markup. ?></span>
 		<div>
 			<?php $prpl_pending_celebration_tasks = \progress_planner()->get_suggested_tasks_db()->get_tasks_by( [ 'post_status' => 'pending' ] ); ?>
 			<?php if ( $prpl_pending_celebration_tasks ) : ?>

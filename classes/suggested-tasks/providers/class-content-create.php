@@ -22,13 +22,6 @@ class Content_Create extends Tasks {
 	protected const PROVIDER_ID = 'create-post';
 
 	/**
-	 * The provider category.
-	 *
-	 * @var string
-	 */
-	protected const CATEGORY = 'content-new';
-
-	/**
 	 * The capability required to perform the task.
 	 *
 	 * @var string
@@ -116,7 +109,7 @@ class Content_Create extends Tasks {
 		}
 
 		// Add tasks if there are no posts published this week.
-		return \gmdate( 'YW' ) !== \gmdate( 'YW', \strtotime( $last_published_post_data['post_date'] ) );
+		return \gmdate( 'oW' ) !== \gmdate( 'oW', \strtotime( $last_published_post_data['post_date'] ) );
 	}
 
 	/**

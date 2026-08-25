@@ -27,7 +27,7 @@ class Dashboard_Widget_Score extends Dashboard_Widget {
 	 * @return string
 	 */
 	protected function get_title() {
-		return \esc_html__( 'Progress Planner', 'progress-planner' );
+		return \esc_html( \progress_planner()->get_ui__branding()->get_admin_menu_name() );
 	}
 
 	/**
@@ -49,6 +49,18 @@ class Dashboard_Widget_Score extends Dashboard_Widget {
 		\progress_planner()->get_admin__enqueue()->enqueue_style( "progress-planner/dashboard-widgets/{$this->id}" );
 
 		\progress_planner()->get_admin__enqueue()->enqueue_script( 'external-link-accessibility-helper' );
+
+		// Majoriry of the tasks are now interactive, we need a global object to handle the AJAX requests.
+		\progress_planner()->get_admin__enqueue()->enqueue_script(
+			'recommendations/interactive-task',
+			[
+				'name' => 'progressPlanner',
+				'data' => [
+					'ajaxUrl' => \admin_url( 'admin-ajax.php' ),
+					'nonce'   => \wp_create_nonce( 'progress_planner' ),
+				],
+			]
+		);
 
 		\progress_planner()->the_view( "dashboard-widgets/{$this->id}.php" );
 	}

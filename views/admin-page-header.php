@@ -18,14 +18,14 @@ if ( ! \defined( 'ABSPATH' ) ) {
 	</div>
 
 	<div class="prpl-header-right">
-		<button class="prpl-info-icon" id="prpl-start-tour-icon-button" onclick="prplStartTour()">
+		<button class="prpl-info-icon" id="prpl-start-tour-icon-button">
 			<?php \progress_planner()->the_asset( 'images/icon_tour.svg' ); ?>
-			<span class="screen-reader-text"><?php \esc_html_e( 'Start tour', 'progress-planner' ); ?>
+			<span class="screen-reader-text"><?php \esc_html_e( 'Start tour', 'progress-planner' ); ?></span>
 		</button>
 		<?php
 
 		// Render the subscribe form button and popover if the license key is not set.
-		if ( 'no-license' === \get_option( 'progress_planner_license_key', 'no-license' ) ) {
+		if ( 'no-license' === \progress_planner()->get_license_key() ) {
 			\progress_planner()->get_ui__popover()->the_popover( 'subscribe-form' )->render_button(
 				'',
 				\progress_planner()->get_asset( 'images/register_icon.svg' ) . '<span class="screen-reader-text">' . \esc_html__( 'Subscribe', 'progress-planner' ) . '</span>'

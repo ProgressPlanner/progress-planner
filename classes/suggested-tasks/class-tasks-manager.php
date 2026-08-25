@@ -11,7 +11,6 @@ use Progress_Planner\Suggested_Tasks\Providers\Core_Update;
 use Progress_Planner\Suggested_Tasks\Providers\Content_Create;
 use Progress_Planner\Suggested_Tasks\Providers\Content_Review;
 use Progress_Planner\Suggested_Tasks\Providers\Blog_Description;
-use Progress_Planner\Suggested_Tasks\Providers\Settings_Saved;
 use Progress_Planner\Suggested_Tasks\Providers\Debug_Display;
 use Progress_Planner\Suggested_Tasks\Providers\Disable_Comments;
 use Progress_Planner\Suggested_Tasks\Providers\Disable_Comment_Pagination;
@@ -25,6 +24,7 @@ use Progress_Planner\Suggested_Tasks\Providers\Php_Version;
 use Progress_Planner\Suggested_Tasks\Providers\Search_Engine_Visibility;
 use Progress_Planner\Suggested_Tasks\Tasks_Interface;
 use Progress_Planner\Suggested_Tasks\Providers\Integrations\Yoast\Add_Yoast_Providers;
+use Progress_Planner\Suggested_Tasks\Providers\Integrations\AIOSEO\Add_AIOSEO_Providers;
 use Progress_Planner\Suggested_Tasks\Providers\User as User_Tasks;
 use Progress_Planner\Suggested_Tasks\Providers\Email_Sending;
 use Progress_Planner\Suggested_Tasks\Providers\Set_Valuable_Post_Types;
@@ -32,10 +32,16 @@ use Progress_Planner\Suggested_Tasks\Providers\Select_Locale;
 use Progress_Planner\Suggested_Tasks\Providers\Fewer_Tags;
 use Progress_Planner\Suggested_Tasks\Providers\Remove_Terms_Without_Posts;
 use Progress_Planner\Suggested_Tasks\Providers\Update_Term_Description;
+use Progress_Planner\Suggested_Tasks\Providers\Reduce_Autoloaded_Options;
 use Progress_Planner\Suggested_Tasks\Providers\Unpublished_Content;
 use Progress_Planner\Suggested_Tasks\Providers\Collaborator;
 use Progress_Planner\Suggested_Tasks\Providers\Select_Timezone;
 use Progress_Planner\Suggested_Tasks\Providers\Set_Date_Format;
+use Progress_Planner\Suggested_Tasks\Providers\SEO_Plugin;
+use Progress_Planner\Suggested_Tasks\Providers\Improve_Pdf_Handling;
+use Progress_Planner\Suggested_Tasks\Providers\Set_Page_About;
+use Progress_Planner\Suggested_Tasks\Providers\Set_Page_FAQ;
+use Progress_Planner\Suggested_Tasks\Providers\Set_Page_Contact;
 
 /**
  * Tasks_Manager class.
@@ -59,7 +65,6 @@ class Tasks_Manager {
 			new Content_Review(),
 			new Core_Update(),
 			new Blog_Description(),
-			new Settings_Saved(),
 			new Debug_Display(),
 			new Disable_Comments(),
 			new Disable_Comment_Pagination(),
@@ -71,6 +76,7 @@ class Tasks_Manager {
 			new Permalink_Structure(),
 			new Php_Version(),
 			new Search_Engine_Visibility(),
+			new Reduce_Autoloaded_Options(),
 			new User_Tasks(),
 			new Email_Sending(),
 			new Set_Valuable_Post_Types(),
@@ -82,6 +88,11 @@ class Tasks_Manager {
 			new Collaborator(),
 			new Select_Timezone(),
 			new Set_Date_Format(),
+			new SEO_Plugin(),
+			new Improve_Pdf_Handling(),
+			new Set_Page_About(),
+			new Set_Page_FAQ(),
+			new Set_Page_Contact(),
 		];
 
 		// Add the plugin integration.
@@ -98,13 +109,16 @@ class Tasks_Manager {
 	}
 
 	/**
-	 * Add the Yoast task if the plugin is active.
+	 * Add the plugin integrations if the plugins are active.
 	 *
 	 * @return void
 	 */
 	public function add_plugin_integration() {
 		// Yoast SEO integration.
 		new Add_Yoast_Providers();
+
+		// All in One SEO integration.
+		new Add_AIOSEO_Providers();
 	}
 
 	/**
@@ -191,6 +205,20 @@ class Tasks_Manager {
 	}
 
 	/**
+	 * Get the user available task providers, based on the capability required and the user role.
+	 *
+	 * @return array
+	 */
+	public function get_task_providers_available_for_user() {
+		return \array_filter(
+			$this->task_providers,
+			function ( $task_provider ) {
+				return $task_provider->capability_required();
+			}
+		);
+	}
+
+	/**
 	 * Get a task provider by its ID.
 	 *
 	 * @param string $provider_id The provider ID.
@@ -262,7 +290,7 @@ class Tasks_Manager {
 			return false;
 		}
 
-		return $task_provider->evaluate_task( $task->task_id );
+		return $task_provider->evaluate_task( \progress_planner()->get_suggested_tasks()->get_task_id_from_slug( $task->post_name ) );
 	}
 
 	/**
@@ -287,7 +315,7 @@ class Tasks_Manager {
 			$task_provider = $this->get_task_provider( $task->get_provider_id() );
 
 			// Should we delete the task? Delete tasks which don't have a task provider or repetitive tasks which were created in the previous week.
-			if ( ! $task_provider || ( $task_provider->is_repetitive() && ( ! $task->date || \gmdate( 'YW' ) !== (string) $task->date ) ) ) {
+			if ( ! $task_provider || ( $task_provider->is_repetitive() && ( ! $task->date || \gmdate( 'oW' ) !== (string) $task->date ) ) ) {
 				\progress_planner()->get_suggested_tasks_db()->delete_recommendation( $task->ID );
 			}
 		}
@@ -318,7 +346,7 @@ class Tasks_Manager {
 		$task_provider = $this->get_task_provider( $task->get_provider_id() );
 
 		// Delete tasks which don't have a task provider or repetitive tasks which were created in the previous week.
-		if ( ! $task_provider || ( $task_provider->is_repetitive() && ( ! $task->date || \gmdate( 'YW' ) !== (string) $task->date ) ) ) {
+		if ( ! $task_provider || ( $task_provider->is_repetitive() && ( ! $task->date || \gmdate( 'oW' ) !== (string) $task->date ) ) ) {
 			\progress_planner()->get_suggested_tasks_db()->delete_recommendation( $task->ID );
 		}
 

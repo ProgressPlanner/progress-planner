@@ -128,28 +128,61 @@ class Maintenance {
 	 * @return void
 	 */
 	protected function create_maintenance_activity( $type ) {
+		// Bail if the class doesn't exist (can happen during plugin updates).
+		if ( ! \class_exists( Activities_Maintenance::class ) ) {
+			return;
+		}
+
 		$activity       = new Activities_Maintenance();
 		$activity->type = $type;
 		$activity->save();
 	}
 
 	/**
-	 * Get the type of the update.
+	 * Get the type of the update from WordPress upgrade_* action options.
 	 *
-	 * @param array $options The options.
+	 * WordPress passes different type values depending on what was updated:
+	 * - 'plugin': Single plugin update via upgrader_process_complete
+	 * - 'theme': Single theme update
+	 * - 'core': WordPress core update
+	 * - 'translation': Language pack update
 	 *
-	 * @return string
+	 * Returns 'unknown' when:
+	 * - The type field is missing from options (shouldn't happen in normal operation)
+	 * - Hook is called incorrectly without proper options
+	 *
+	 * @param array $options {
+	 *     Options array from WordPress upgrader_process_complete action.
+	 *
+	 *     @type string $type   The type of update: 'plugin', 'theme', 'core', 'translation'.
+	 *     @type string $action The action performed: 'update', 'install'.
+	 * }
+	 *
+	 * @return string The update type ('plugin', 'theme', 'core', 'translation', or 'unknown').
 	 */
 	protected function get_update_type( $options ) {
 		return isset( $options['type'] ) ? $options['type'] : 'unknown';
 	}
 
 	/**
-	 * Get the type of the install.
+	 * Get the type of the install from WordPress install action options.
 	 *
-	 * @param array $options The options.
+	 * WordPress passes different type values depending on what was installed:
+	 * - 'plugin': New plugin installation
+	 * - 'theme': New theme installation
 	 *
-	 * @return string
+	 * Returns 'unknown' when:
+	 * - The type field is missing from options
+	 * - Installation fails or is interrupted
+	 *
+	 * @param array $options {
+	 *     Options array from WordPress upgrader_process_complete action.
+	 *
+	 *     @type string $type   The type of installation: 'plugin' or 'theme'.
+	 *     @type string $action The action performed: 'install'.
+	 * }
+	 *
+	 * @return string The install type ('plugin', 'theme', or 'unknown').
 	 */
 	protected function get_install_type( $options ) {
 		return isset( $options['type'] ) ? $options['type'] : 'unknown';

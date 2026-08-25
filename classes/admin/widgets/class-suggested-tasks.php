@@ -13,6 +13,33 @@ namespace Progress_Planner\Admin\Widgets;
 final class Suggested_Tasks extends Widget {
 
 	/**
+	 * Default number of tasks to show per page.
+	 *
+	 * @var int
+	 */
+	public const PER_PAGE_DEFAULT = 5;
+
+	/**
+	 * Number of tasks to show per page on the WP Dashboard.
+	 *
+	 * @var int
+	 */
+	public const PER_PAGE_DASHBOARD = 3;
+
+	/**
+	 * Get the number of tasks to show per page based on the current screen.
+	 *
+	 * @return int
+	 */
+	public static function get_per_page() {
+		$screen = \get_current_screen();
+		if ( $screen && 'dashboard' === $screen->id ) {
+			return self::PER_PAGE_DASHBOARD;
+		}
+		return self::PER_PAGE_DEFAULT;
+	}
+
+	/**
 	 * The widget ID.
 	 *
 	 * @var string

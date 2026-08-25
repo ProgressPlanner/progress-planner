@@ -33,6 +33,7 @@ if ( ! \defined( 'ABSPATH' ) ) {
 		<?php \progress_planner()->the_view( 'popovers/parts/badge-streak-progressbar.php', [ 'prpl_context' => 'content' ] ); ?>
 	</div>
 </div>
+<?php \do_action( 'progress_planner_popover_after_streak_sections' ); ?>
 <div class="footer">
 	<div class="string-freeze-explain">
 		<h2><?php \esc_html_e( 'Streak freeze', 'progress-planner' ); ?></h2>

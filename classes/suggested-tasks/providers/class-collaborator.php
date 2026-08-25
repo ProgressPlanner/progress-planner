@@ -20,13 +20,6 @@ class Collaborator extends Tasks {
 	protected const IS_ONBOARDING_TASK = false;
 
 	/**
-	 * The provider category.
-	 *
-	 * @var string
-	 */
-	protected const CATEGORY = 'collaborator';
-
-	/**
 	 * The provider ID.
 	 *
 	 * @var string
@@ -94,7 +87,6 @@ class Collaborator extends Tasks {
 					'title'             => '',
 					'parent'            => 0,
 					'provider_id'       => $this->get_provider_id(),
-					'category'          => $this->get_provider_category(),
 					'priority'          => 'medium',
 					'points'            => 0,
 					'url'               => '',

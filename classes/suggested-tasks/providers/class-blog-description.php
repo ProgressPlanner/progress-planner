@@ -41,6 +41,13 @@ class Blog_Description extends Tasks_Interactive {
 	protected const EXTERNAL_LINK_URL = 'https://prpl.fyi/set-tagline';
 
 	/**
+	 * The task priority.
+	 *
+	 * @var int
+	 */
+	protected $priority = 2;
+
+	/**
 	 * Get the task title.
 	 *
 	 * @return string
@@ -113,13 +120,14 @@ class Blog_Description extends Tasks_Interactive {
 				type="text"
 				id="blogdescription"
 				value="<?php echo \esc_attr( \get_bloginfo( 'description' ) ); ?>"
-				class="regular-text"
 				placeholder="<?php \esc_html_e( 'A catchy phrase to describe your website', 'progress-planner' ); ?>"
 			>
 		</label>
-		<button type="submit" class="prpl-button prpl-button-primary" disabled>
-			<?php \esc_html_e( 'Save', 'progress-planner' ); ?>
-		</button>
+		<div class="prpl-steps-nav-wrapper">
+			<button type="submit" class="prpl-button prpl-button-primary" disabled>
+				<?php \esc_html_e( 'Save', 'progress-planner' ); ?>
+			</button>
+		</div>
 		<?php
 	}
 

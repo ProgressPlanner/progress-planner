@@ -8,11 +8,14 @@
 namespace Progress_Planner\Suggested_Tasks\Providers\Integrations\Yoast;
 
 use Progress_Planner\Suggested_Tasks\Data_Collector\Archive_Format as Archive_Format_Data_Collector;
+use Progress_Planner\Suggested_Tasks\Providers\Traits\Task_Action_Builder;
 
 /**
  * Add task for Yoast SEO: disable the format archives.
  */
-class Archive_Format extends Yoast_Provider {
+class Archive_Format extends Yoast_Interactive_Provider {
+
+	use Task_Action_Builder;
 
 	/**
 	 * The provider ID.
@@ -20,6 +23,13 @@ class Archive_Format extends Yoast_Provider {
 	 * @var string
 	 */
 	protected const PROVIDER_ID = 'yoast-format-archive';
+
+	/**
+	 * The popover ID.
+	 *
+	 * @var string
+	 */
+	const POPOVER_ID = 'yoast-format-archive';
 
 	/**
 	 * The minimum number of posts with a post format to add the task.
@@ -102,6 +112,26 @@ class Archive_Format extends Yoast_Provider {
 	}
 
 	/**
+	 * Get the popover instructions.
+	 *
+	 * @return void
+	 */
+	public function print_popover_instructions() {
+		echo '<p>';
+		\esc_html_e( 'WordPress creates separate archives for each post format (standard, aside, gallery, etc.). Most sites don\'t use post formats, making these archives unnecessary. Disabling them reduces crawl waste and potential duplicate content.', 'progress-planner' );
+		echo '</p>';
+	}
+
+	/**
+	 * Print the popover input field for the form.
+	 *
+	 * @return void
+	 */
+	public function print_popover_form_contents() {
+		$this->print_submit_button( \__( 'Disable', 'progress-planner' ) );
+	}
+
+	/**
 	 * Add task actions specific to this task.
 	 *
 	 * @param array $data    The task data.
@@ -110,11 +140,6 @@ class Archive_Format extends Yoast_Provider {
 	 * @return array
 	 */
 	public function add_task_actions( $data = [], $actions = [] ) {
-		$actions[] = [
-			'priority' => 10,
-			'html'     => '<a class="prpl-tooltip-action-text" href="' . \admin_url( 'admin.php?page=wpseo_page_settings#/format-archives' ) . '" target="_self">' . \esc_html__( 'Disable', 'progress-planner' ) . '</a>',
-		];
-
-		return $actions;
+		return $this->add_popover_action( $actions, \__( 'Disable', 'progress-planner' ) );
 	}
 }

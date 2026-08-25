@@ -101,3 +101,8 @@ function prplStartTour() {
 			.replace( 'show-tour=true', '' )
 	);
 }
+
+// Add event listener for tour button.
+document
+	.getElementById( 'prpl-start-tour-icon-button' )
+	?.addEventListener( 'click', prplStartTour );
