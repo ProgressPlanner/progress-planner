@@ -66,8 +66,8 @@ class Add_Yoast_Providers {
 			[
 				'name' => 'progressPlannerYoastFocusElement',
 				'data' => [
-					'tasks'    => $focus_tasks,
-					'base_url' => \constant( 'PROGRESS_PLANNER_URL' ),
+					'tasks'   => $focus_tasks,
+					'iconUrl' => \progress_planner()->get_ui__branding()->get_admin_menu_icon(),
 				],
 			]
 		);
