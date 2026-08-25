@@ -382,4 +382,31 @@ class Content_Review_Test extends \WP_UnitTestCase {
 		$notes_after = $this->content_review->get_notes( $this->test_post_id, 'all' );
 		$this->assertCount( 0, $notes_after );
 	}
+
+	/**
+	 * Test that the notes-sidebar script is only enqueued when reviewing with open notes.
+	 *
+	 * @return void
+	 */
+	public function test_maybe_enqueue_notes_sidebar_script() {
+		$handle = 'progress-planner/review-post-notes';
+
+		// Without the URL parameter, nothing is enqueued.
+		$this->content_review->maybe_enqueue_notes_sidebar_script();
+		$this->assertFalse( \wp_script_is( $handle, 'enqueued' ) );
+
+		$_GET['prpl_inject_notes'] = '1';
+		$_GET['post']              = (string) $this->test_post_id;
+
+		// With the URL parameter but no open notes, nothing is enqueued.
+		$this->content_review->maybe_enqueue_notes_sidebar_script();
+		$this->assertFalse( \wp_script_is( $handle, 'enqueued' ) );
+
+		// With the URL parameter and an open note, the script is enqueued.
+		$this->content_review->create_note( $this->test_post_id, Content_Review::NOTE_PREFIX . ' Test note' );
+		$this->content_review->maybe_enqueue_notes_sidebar_script();
+		$this->assertTrue( \wp_script_is( $handle, 'enqueued' ) );
+
+		unset( $_GET['prpl_inject_notes'], $_GET['post'] );
+	}
 }

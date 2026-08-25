@@ -129,6 +129,7 @@ class Content_Review extends Tasks {
 			\add_action( 'load-post.php', [ $this, 'maybe_inject_notes' ] );
 			\add_filter( 'pre_get_avatar_data', [ $this, 'filter_note_avatar' ], 10, 2 );
 			\add_action( 'admin_head', [ $this, 'add_note_avatar_styles' ] );
+			\add_action( 'enqueue_block_editor_assets', [ $this, 'maybe_enqueue_notes_sidebar_script' ] );
 		}
 	}
 
@@ -152,6 +153,32 @@ class Content_Review extends Tasks {
 		// Inject all note types.
 		$this->inject_image_review_notes( $post_id );
 		$this->inject_link_review_notes( $post_id );
+	}
+
+	/**
+	 * Enqueue the script that auto-opens the Notes sidebar,
+	 * when a post is opened via the "Review with Notes" action.
+	 *
+	 * @return void
+	 */
+	public function maybe_enqueue_notes_sidebar_script() {
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- No action taken, just opening the notes sidebar.
+		if ( ! isset( $_GET['prpl_inject_notes'] ) ) {
+			return;
+		}
+
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$post_id = isset( $_GET['post'] ) ? (int) $_GET['post'] : 0;
+		if ( ! $post_id || ! \current_user_can( 'edit_post', $post_id ) ) {
+			return;
+		}
+
+		// Bail if there are no open notes to show.
+		if ( empty( $this->get_notes( $post_id, 'open' ) ) ) {
+			return;
+		}
+
+		\progress_planner()->get_admin__enqueue()->enqueue_script( 'review-post-notes' );
 	}
 
 	/**
