@@ -119,8 +119,7 @@ class Crawl_Settings_Feed_Comments extends AIOSEO_Interactive_Provider {
 	 * @return void
 	 */
 	public function handle_interactive_task_specific_submit() {
-		$this->verify_aioseo_active_or_fail();
-		$this->verify_nonce_or_fail();
+		$this->verify_aioseo_ajax_security();
 
 		// Global comment feed.
 		if ( \aioseo()->options->searchAppearance->advanced->crawlCleanup->feeds->globalComments ) { // @phpstan-ignore-line

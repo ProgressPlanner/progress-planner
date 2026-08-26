@@ -17,19 +17,12 @@ class Content_Helpers {
 	/**
 	 * Get an array of post-types names for the stats.
 	 *
+	 * @deprecated 1.9.2 Use \progress_planner()->get_settings()->get_post_types_names() instead.
+	 *
 	 * @return string[]
 	 */
 	public function get_post_types_names() {
-		static $include_post_types;
-		if ( isset( $include_post_types ) && ! empty( $include_post_types ) ) {
-			return $include_post_types;
-		}
-		$default            = [ 'post', 'page' ];
-		$include_post_types = \array_filter(
-			\progress_planner()->get_settings()->get( [ 'include_post_types' ], $default ),
-			fn( $post_type ) => $post_type && \post_type_exists( $post_type ) && \is_post_type_viewable( $post_type )
-		);
-		return empty( $include_post_types ) ? $default : \array_values( $include_post_types );
+		return \progress_planner()->get_settings()->get_post_types_names();
 	}
 
 	/**
