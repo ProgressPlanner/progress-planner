@@ -28,6 +28,33 @@ class Integration {
 
 		// Enqueue MCP server script.
 		\add_action( 'admin_enqueue_scripts', [ $this, 'enqueue_scripts' ] );
+
+		// Announce ourselves to Angie's app.
+		\add_filter( 'angie_mcp_plugins', [ $this, 'register_with_angie' ] );
+	}
+
+	/**
+	 * Add Progress Planner to Angie's list of MCP-capable plugins.
+	 *
+	 * Angie 1.1.12 collects this list through the `angie_mcp_plugins` filter and
+	 * passes it to its app as `window.angieConfig.plugins`. Without an entry
+	 * here the app never looks for our MCP server, so the script enqueued in
+	 * enqueue_scripts() registers into nothing.
+	 *
+	 * Angie's app is loaded from a remote bundle, so whether it does anything
+	 * useful with a third-party key is not verifiable from this codebase --
+	 * every other entry in that list (elementor, woocommerce, angie-acf-mcp) is
+	 * published by Elementor. Treat this as unconfirmed until tested against a
+	 * live Angie account.
+	 *
+	 * @param array $plugins The plugins Angie knows about.
+	 *
+	 * @return array
+	 */
+	public function register_with_angie( $plugins ) {
+		$plugins['progress-planner'] = [];
+
+		return $plugins;
 	}
 
 	/**
