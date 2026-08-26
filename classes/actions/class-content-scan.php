@@ -70,7 +70,7 @@ class Content_Scan extends Content {
 			[
 				'posts_per_page' => static::SCAN_POSTS_PER_PAGE,
 				'paged'          => $current_page,
-				'post_type'      => $content_helpers->get_post_types_names(),
+				'post_type'      => \progress_planner()->get_settings()->get_post_types_names(),
 				'post_status'    => 'publish',
 			]
 		);
@@ -102,7 +102,7 @@ class Content_Scan extends Content {
 
 		// Get the total number of posts.
 		$total_posts_count = 0;
-		foreach ( $content_helpers->get_post_types_names() as $post_type ) {
+		foreach ( \progress_planner()->get_settings()->get_post_types_names() as $post_type ) {
 			$total_posts_count += \wp_count_posts( $post_type )->publish;
 		}
 		// Calculate the total pages to scan.
