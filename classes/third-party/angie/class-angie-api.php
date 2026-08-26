@@ -171,18 +171,21 @@ class Angie_API extends Base {
 			foreach ( $tasks as $task ) {
 				$task_data = $task->get_data();
 
-				// Skip tasks which are not handled by Angie.
-				if ( ! \in_array( $task_data['task_id'], $angie_tasks, true ) ) {
-					continue;
-				}
-
+				// Every recommendation is listed, not just the few Angie can apply
+				// itself: this endpoint answers "what are my tasks", and hiding the
+				// rest made Angie report no tasks at all on a site whose open
+				// recommendations happened to be ones it cannot complete.
+				// `can_complete` tells it which ones it can act on; complete_task()
+				// enforces the same list, so listing more does not widen what Angie
+				// is able to change.
 				$tasks_to_return[] = [
-					'id'          => $task_data['task_id'],
-					'title'       => $task_data['post_title'],
-					'description' => $task_data['post_content'] ?? '',
-					'url'         => $task_data['url'] ?? '',
-					'priority'    => $task_data['priority'] ?? 0,
-					'status'      => 'publish' === $task_data['post_status'] ? 'active' : 'completed',
+					'id'           => $task_data['task_id'],
+					'title'        => $task_data['post_title'],
+					'description'  => $task_data['post_content'] ?? '',
+					'url'          => $task_data['url'] ?? '',
+					'priority'     => $task_data['priority'] ?? 0,
+					'status'       => 'publish' === $task_data['post_status'] ? 'active' : 'completed',
+					'can_complete' => \in_array( $task_data['task_id'], $angie_tasks, true ),
 				];
 			}
 
@@ -267,21 +270,34 @@ class Angie_API extends Base {
 
 			$angie_tasks_map = $this->get_angie_tasks_map();
 
-			// Special handling for tasks which are handled by Angie.
-			if ( isset( $angie_tasks_map[ $task_id ] ) ) {
-				$setting = $angie_tasks_map[ $task_id ];
-				if ( ! \is_string( $setting ) ) {
-					return new \WP_Error(
-						'invalid_task_config',
-						\__( 'Invalid task configuration.', 'progress-planner' ),
-						[ 'status' => 500 ]
-					);
-				}
+			// Refuse tasks Angie has no handler for rather than celebrating them.
+			// Marking a task complete without doing the work it describes would
+			// leave the user believing their site had been changed when it had
+			// not, so say so instead.
+			if ( ! isset( $angie_tasks_map[ $task_id ] ) ) {
+				return new \WP_Error(
+					'task_not_completable',
+					\sprintf(
+						/* translators: %s: task ID */
+						\__( 'The "%s" recommendation cannot be completed automatically. Please complete it in Progress Planner.', 'progress-planner' ),
+						$task_id
+					),
+					[ 'status' => 400 ]
+				);
+			}
 
-				$updated = $this->update_task_setting( $setting, $value );
-				if ( \is_wp_error( $updated ) ) {
-					return $updated;
-				}
+			$setting = $angie_tasks_map[ $task_id ];
+			if ( ! \is_string( $setting ) ) {
+				return new \WP_Error(
+					'invalid_task_config',
+					\__( 'Invalid task configuration.', 'progress-planner' ),
+					[ 'status' => 500 ]
+				);
+			}
+
+			$updated = $this->update_task_setting( $setting, $value );
+			if ( \is_wp_error( $updated ) ) {
+				return $updated;
 			}
 
 			// Mark task as completed (celebrate).

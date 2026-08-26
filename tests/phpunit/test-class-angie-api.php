@@ -207,17 +207,27 @@ class Angie_API_Test extends \WP_UnitTestCase {
 		$data = $response->get_data();
 
 		$this->assertTrue( $data['success'] );
-		$this->assertEquals( 1, $data['count'] );
-		$this->assertCount( 1, $data['tasks'] );
-		$this->assertEquals( 'core-blogdescription', $data['tasks'][0]['id'] );
+
+		// Both are listed; can_complete is what distinguishes them.
+		$by_id = \array_column( $data['tasks'], 'can_complete', 'id' );
+
+		$this->assertArrayHasKey( 'core-blogdescription', $by_id );
+		$this->assertArrayHasKey( 'some-other-task', $by_id );
+		$this->assertTrue( $by_id['core-blogdescription'], 'Angie can complete this one.' );
+		$this->assertFalse( $by_id['some-other-task'], 'Angie has no handler for this one.' );
 	}
 
 	/**
-	 * Test get_active_tasks filters non-Angie tasks.
+	 * Tasks Angie cannot complete are still listed.
+	 *
+	 * This is the case that made Angie report "you have no active tasks" on a
+	 * site with plenty of them: the endpoint used to return only the handful it
+	 * could apply itself, so a site whose open recommendations happened to be
+	 * other kinds looked empty.
 	 *
 	 * @return void
 	 */
-	public function test_get_active_tasks_filters_non_angie_tasks() {
+	public function test_get_active_tasks_lists_tasks_angie_cannot_complete() {
 		// Create multiple non-Angie tasks.
 		\progress_planner()->get_suggested_tasks_db()->add(
 			[
@@ -243,8 +253,50 @@ class Angie_API_Test extends \WP_UnitTestCase {
 		$data     = $response->get_data();
 
 		$this->assertTrue( $data['success'] );
-		$this->assertEquals( 0, $data['count'] );
-		$this->assertEmpty( $data['tasks'] );
+		$this->assertEquals( 2, $data['count'], 'Both tasks should be listed.' );
+
+		foreach ( $data['tasks'] as $task ) {
+			$this->assertFalse( $task['can_complete'], 'Neither is completable by Angie.' );
+		}
+	}
+
+	/**
+	 * A task Angie has no handler for is refused, not celebrated.
+	 *
+	 * Previously the handler fell through to $task->celebrate() for any task
+	 * whose ID was not in the map, so Angie would report success and mark the
+	 * recommendation done without having changed anything on the site.
+	 *
+	 * @return void
+	 */
+	public function test_complete_task_refuses_a_task_it_cannot_handle() {
+		\progress_planner()->get_suggested_tasks_db()->add(
+			[
+				'post_title'  => 'Some Other Task',
+				'task_id'     => 'some-other-task',
+				'provider_id' => 'some-other-task',
+				'category'    => 'other',
+				'post_status' => 'publish',
+			]
+		);
+
+		$request = new WP_REST_Request( 'POST', '/progress-planner/v1/angie/recommendations' );
+		$request->set_param( 'task_id', 'some-other-task' );
+		$request->set_param( 'value', 'anything' );
+
+		$response = $this->angie_api->complete_task( $request );
+
+		$this->assertInstanceOf( \WP_Error::class, $response );
+		$this->assertEquals( 'task_not_completable', $response->get_error_code() );
+
+		// And the recommendation is still open.
+		$still_open = \progress_planner()->get_suggested_tasks_db()->get_tasks_by(
+			[
+				'post_status' => 'publish',
+				'provider_id' => 'some-other-task',
+			]
+		);
+		$this->assertCount( 1, $still_open, 'The task must not have been marked complete.' );
 	}
 
 	/**
