@@ -166,7 +166,7 @@ class Content {
 		// Bail if the post is not included in the post-types we're tracking.
 		if ( ! \in_array(
 			$post->post_type,
-			$content_helpers->get_post_types_names(),
+			\progress_planner()->get_settings()->get_post_types_names(),
 			true
 		) ) {
 			return true;

@@ -1,10 +1,10 @@
-/* global prplL10n, LicenseGenerator */
+/* global progressPlanner, progressPlannerAjaxRequest, progressPlannerSaveLicenseKey, prplL10n */
 /*
  * Settings
  *
  * A script to handle the settings page.
  *
- * Dependencies: progress-planner/l10n, progress-planner/license-generator
+ * Dependencies: progress-planner/ajax-request, progress-planner/onboard, wp-util, progress-planner/l10n
  */
 
 // Submit the email.
@@ -22,23 +22,47 @@ if ( !! settingsLicenseForm ) {
 			data[ key ] = value;
 		}
 
-		document.getElementById( 'submit-license-key' ).disabled = true;
-		document.getElementById( 'submit-license-key' ).innerHTML =
-			prplL10n( 'subscribing' );
+		progressPlannerAjaxRequest( {
+			url: progressPlanner.onboardNonceURL,
+			data,
+		} )
+			.then( ( response ) => {
+				if ( 'ok' === response.status ) {
+					// Add the nonce to our data object.
+					data.nonce = response.nonce;
 
-		LicenseGenerator.generateLicense( data )
-			.then( () => {
-				document.getElementById( 'submit-license-key' ).innerHTML =
-					prplL10n( 'subscribed' );
+					// Make the request to the API.
+					progressPlannerAjaxRequest( {
+						url: progressPlanner.onboardAPIUrl,
+						data,
+					} )
+						.then( ( apiResponse ) => {
+							// Make a local request to save the response data.
+							progressPlannerSaveLicenseKey(
+								apiResponse.license_key
+							);
 
-				// Timeout so the license key is saved.
-				setTimeout( () => {
-					// Reload the page.
-					window.location.reload();
-				}, 500 );
+							document.getElementById(
+								'submit-license-key'
+							).innerHTML = prplL10n( 'subscribed' );
+
+							// Timeout so the license key is saved.
+							setTimeout( () => {
+								// Reload the page.
+								window.location.reload();
+							}, 500 );
+						} )
+						.catch( ( error ) => {
+							console.warn( error );
+						} );
+				}
 			} )
 			.catch( ( error ) => {
 				console.warn( error );
 			} );
+
+		document.getElementById( 'submit-license-key' ).disabled = true;
+		document.getElementById( 'submit-license-key' ).innerHTML =
+			prplL10n( 'subscribing' );
 	} );
 }

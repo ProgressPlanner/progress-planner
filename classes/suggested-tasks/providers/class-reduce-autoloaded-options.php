@@ -151,8 +151,8 @@ class Reduce_Autoloaded_Options extends Tasks_Interactive {
 				require_once ABSPATH . 'wp-admin/includes/plugin.php';
 			}
 
-			$plugins                = get_plugins();
-			$this->is_plugin_active = isset( $plugins[ $this->plugin_path ] ) && is_plugin_active( $this->plugin_path );
+			$plugins                = \get_plugins();
+			$this->is_plugin_active = isset( $plugins[ $this->plugin_path ] ) && \is_plugin_active( $this->plugin_path );
 		}
 
 		return $this->is_plugin_active;
@@ -168,7 +168,7 @@ class Reduce_Autoloaded_Options extends Tasks_Interactive {
 
 		if ( null === $this->autoloaded_options_count ) {
 			$autoload_values = \wp_autoload_values_to_autoload();
-			$placeholders    = implode( ',', array_fill( 0, count( $autoload_values ), '%s' ) );
+			$placeholders    = \implode( ',', \array_fill( 0, \count( $autoload_values ), '%s' ) );
 
 			// phpcs:disable WordPress.DB
 			$this->autoloaded_options_count = $wpdb->get_var(

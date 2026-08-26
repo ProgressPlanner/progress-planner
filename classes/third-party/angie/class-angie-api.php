@@ -269,17 +269,18 @@ class Angie_API extends Base {
 
 			// Special handling for tasks which are handled by Angie.
 			if ( isset( $angie_tasks_map[ $task_id ] ) ) {
-				$task_provider = \progress_planner()->get_suggested_tasks()->get_tasks_manager()->get_task_provider( $task_id ); // @phpstan-ignore-line method.nonObject
-				if ( $task_provider ) {
-					$param_name = $angie_tasks_map[ $task_id ];
-					if ( ! \is_string( $param_name ) ) {
-						return new \WP_Error(
-							'invalid_task_config',
-							\__( 'Invalid task configuration.', 'progress-planner' ),
-							[ 'status' => 500 ]
-						);
-					}
-					$task_provider->complete_task( [ $param_name => $value ], $task_id );
+				$setting = $angie_tasks_map[ $task_id ];
+				if ( ! \is_string( $setting ) ) {
+					return new \WP_Error(
+						'invalid_task_config',
+						\__( 'Invalid task configuration.', 'progress-planner' ),
+						[ 'status' => 500 ]
+					);
+				}
+
+				$updated = $this->update_task_setting( $setting, $value );
+				if ( \is_wp_error( $updated ) ) {
+					return $updated;
 				}
 			}
 
@@ -413,14 +414,122 @@ class Angie_API extends Base {
 	/**
 	 * Get the Angie tasks map.
 	 *
-	 * @return array The Angie tasks map, keyed by task ID, value is the argument name for the complete_task method.
+	 * @return array The Angie tasks map, keyed by task ID, value is the option the task updates.
 	 */
 	protected function get_angie_tasks_map() {
 		return [
 			'core-blogdescription' => 'blogdescription',
 			// 'core-siteicon'        => 'post_id', -- Seems like Angie can't upload media.
-			'select-locale'        => 'language',
-			'select-timezone'      => 'timezone',
+			'select-locale'        => 'WPLANG',
+			'select-timezone'      => 'timezone_string',
 		];
+	}
+
+	/**
+	 * Update the option behind a task.
+	 *
+	 * The interactive task providers apply their settings through
+	 * handle_interactive_task_submit(), which reads $_POST and terminates with
+	 * wp_send_json_*(). That contract cannot be reused from a REST callback,
+	 * which has to return a response, so the update is performed here instead.
+	 *
+	 * The provider's option whitelist is reused rather than bypassed, so this
+	 * endpoint can only write options the interactive tasks could already write.
+	 *
+	 * @param string $setting The option to update.
+	 * @param mixed  $value   The value to set.
+	 *
+	 * @return true|\WP_Error True on success, WP_Error on failure.
+	 */
+	protected function update_task_setting( $setting, $value ) {
+		if ( ! \is_scalar( $value ) ) {
+			return new \WP_Error(
+				'invalid_value',
+				\__( 'The value must be a scalar.', 'progress-planner' ),
+				[ 'status' => 400 ]
+			);
+		}
+
+		$value = \sanitize_text_field( (string) $value );
+
+		if ( '' === $value ) {
+			return new \WP_Error(
+				'invalid_value',
+				\__( 'The value cannot be empty.', 'progress-planner' ),
+				[ 'status' => 400 ]
+			);
+		}
+
+		/** This filter is documented in classes/suggested-tasks/providers/class-tasks-interactive.php */
+		$allowed_options = \apply_filters(
+			'progress_planner_interactive_task_allowed_options',
+			[
+				'blogdescription',
+				'default_comment_status',
+				'default_ping_status',
+				'timezone_string',
+				'WPLANG',
+				'date_format',
+				'time_format',
+				'default_pingback_flag',
+				'comment_registration',
+				'close_comments_for_old_posts',
+				'thread_comments',
+				'comments_per_page',
+				'comment_order',
+				'page_comments',
+			]
+		);
+
+		if ( ! \in_array( $setting, $allowed_options, true ) ) {
+			return new \WP_Error(
+				'invalid_setting',
+				\__( 'Invalid setting. This option cannot be updated through Angie.', 'progress-planner' ),
+				[ 'status' => 400 ]
+			);
+		}
+
+		// The timezone is stored across two options: a named zone in
+		// timezone_string, or a numeric offset in gmt_offset, never both.
+		if ( 'timezone_string' === $setting ) {
+			return $this->update_timezone( $value );
+		}
+
+		\update_option( $setting, $value );
+
+		return true;
+	}
+
+	/**
+	 * Update the site timezone.
+	 *
+	 * Mirrors the mapping in Select_Timezone: a "UTC+2"-style value is stored as
+	 * a numeric gmt_offset, a named zone as a timezone_string, and the other
+	 * option is cleared so the two cannot disagree.
+	 *
+	 * @param string $timezone The timezone to set.
+	 *
+	 * @return true|\WP_Error True on success, WP_Error if the timezone is not recognised.
+	 */
+	protected function update_timezone( $timezone ) {
+		if ( \preg_match( '/^UTC[+-]/', $timezone ) ) {
+			\update_option( 'gmt_offset', \preg_replace( '/UTC\+?/', '', $timezone ) );
+			\update_option( 'timezone_string', '' );
+
+			return true;
+		}
+
+		if ( \in_array( $timezone, \timezone_identifiers_list( \DateTimeZone::ALL_WITH_BC ), true ) ) {
+			\update_option( 'timezone_string', $timezone );
+			\update_option( 'gmt_offset', '' );
+
+			return true;
+		}
+
+		return new \WP_Error(
+			'invalid_timezone',
+			\__( 'Invalid timezone.', 'progress-planner' ),
+			[ 'status' => 400 ]
+		);
 	}
 }

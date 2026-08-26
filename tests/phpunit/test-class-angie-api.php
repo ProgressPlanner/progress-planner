@@ -872,8 +872,138 @@ class Angie_API_Test extends \WP_UnitTestCase {
 		$this->assertArrayHasKey( 'core-blogdescription', $map );
 		$this->assertArrayHasKey( 'select-locale', $map );
 		$this->assertArrayHasKey( 'select-timezone', $map );
+		// The map holds the option each task writes, and every one of them must
+		// be on the interactive-task whitelist -- this endpoint is not allowed to
+		// reach options the interactive tasks themselves could not update.
 		$this->assertEquals( 'blogdescription', $map['core-blogdescription'] );
-		$this->assertEquals( 'language', $map['select-locale'] );
-		$this->assertEquals( 'timezone', $map['select-timezone'] );
+		$this->assertEquals( 'WPLANG', $map['select-locale'] );
+		$this->assertEquals( 'timezone_string', $map['select-timezone'] );
+
+		$allowed = \apply_filters(
+			'progress_planner_interactive_task_allowed_options',
+			[ 'blogdescription', 'timezone_string', 'WPLANG' ]
+		);
+
+		foreach ( $map as $task_id => $setting ) {
+			$this->assertContains(
+				$setting,
+				$allowed,
+				\sprintf( 'The option for "%s" must be on the interactive-task whitelist.', $task_id )
+			);
+		}
+	}
+
+	/**
+	 * An option that is not on the whitelist is rejected.
+	 *
+	 * @return void
+	 */
+	public function test_update_task_setting_rejects_options_off_the_whitelist() {
+		$method = $this->get_accessible_method( 'update_task_setting' );
+
+		$result = $method->invoke( $this->angie_api, 'admin_email', 'attacker@example.com' );
+
+		$this->assertInstanceOf( \WP_Error::class, $result );
+		$this->assertEquals( 'invalid_setting', $result->get_error_code() );
+	}
+
+	/**
+	 * A whitelisted option is written.
+	 *
+	 * @return void
+	 */
+	public function test_update_task_setting_writes_whitelisted_options() {
+		$method = $this->get_accessible_method( 'update_task_setting' );
+
+		$this->assertTrue( $method->invoke( $this->angie_api, 'blogdescription', 'A new tagline' ) );
+		$this->assertEquals( 'A new tagline', \get_option( 'blogdescription' ) );
+	}
+
+	/**
+	 * A non-scalar or empty value is rejected before anything is written.
+	 *
+	 * @return void
+	 */
+	public function test_update_task_setting_rejects_unusable_values() {
+		$method = $this->get_accessible_method( 'update_task_setting' );
+
+		\update_option( 'blogdescription', 'Unchanged' );
+
+		$array_result = $method->invoke( $this->angie_api, 'blogdescription', [ 'not', 'scalar' ] );
+		$this->assertInstanceOf( \WP_Error::class, $array_result );
+		$this->assertEquals( 'invalid_value', $array_result->get_error_code() );
+
+		$empty_result = $method->invoke( $this->angie_api, 'blogdescription', '' );
+		$this->assertInstanceOf( \WP_Error::class, $empty_result );
+		$this->assertEquals( 'invalid_value', $empty_result->get_error_code() );
+
+		$this->assertEquals( 'Unchanged', \get_option( 'blogdescription' ), 'Nothing should have been written.' );
+	}
+
+	/**
+	 * A named timezone is stored in timezone_string.
+	 *
+	 * The stale offset is not asserted to be empty: WordPress core recomputes
+	 * gmt_offset from timezone_string whenever the latter is set, so after
+	 * selecting Europe/Amsterdam the offset reads back as that zone's current
+	 * offset rather than the '' this code writes. What matters is that the
+	 * previous, unrelated offset does not survive.
+	 *
+	 * @return void
+	 */
+	public function test_named_timezone_is_stored_as_a_timezone_string() {
+		$method = $this->get_accessible_method( 'update_task_setting' );
+
+		\update_option( 'gmt_offset', '5' );
+
+		$this->assertTrue( $method->invoke( $this->angie_api, 'timezone_string', 'Europe/Amsterdam' ) );
+		$this->assertEquals( 'Europe/Amsterdam', \get_option( 'timezone_string' ) );
+		$this->assertNotEquals( '5', \get_option( 'gmt_offset' ), 'The previous offset must not survive.' );
+	}
+
+	/**
+	 * A UTC offset is stored in gmt_offset, clearing timezone_string.
+	 *
+	 * @return void
+	 */
+	public function test_utc_offset_is_stored_as_a_gmt_offset() {
+		$method = $this->get_accessible_method( 'update_task_setting' );
+
+		\update_option( 'timezone_string', 'Europe/Amsterdam' );
+
+		$this->assertTrue( $method->invoke( $this->angie_api, 'timezone_string', 'UTC+2' ) );
+		$this->assertEquals( '2', \get_option( 'gmt_offset' ) );
+		$this->assertEquals( '', \get_option( 'timezone_string' ), 'An offset must clear the named zone.' );
+	}
+
+	/**
+	 * An unrecognised timezone is rejected and nothing is written.
+	 *
+	 * @return void
+	 */
+	public function test_invalid_timezone_is_rejected() {
+		$method = $this->get_accessible_method( 'update_task_setting' );
+
+		\update_option( 'timezone_string', 'Europe/Amsterdam' );
+
+		$result = $method->invoke( $this->angie_api, 'timezone_string', 'Mars/Olympus_Mons' );
+
+		$this->assertInstanceOf( \WP_Error::class, $result );
+		$this->assertEquals( 'invalid_timezone', $result->get_error_code() );
+		$this->assertEquals( 'Europe/Amsterdam', \get_option( 'timezone_string' ), 'Nothing should have been written.' );
+	}
+
+	/**
+	 * Get an accessible ReflectionMethod for a protected method.
+	 *
+	 * @param string $name The method name.
+	 *
+	 * @return \ReflectionMethod
+	 */
+	protected function get_accessible_method( $name ) {
+		$method = ( new \ReflectionClass( $this->angie_api ) )->getMethod( $name );
+		$method->setAccessible( true );
+
+		return $method;
 	}
 }
