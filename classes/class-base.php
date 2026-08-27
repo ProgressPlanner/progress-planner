@@ -110,6 +110,7 @@ class Base {
 		if ( \is_admin() && \current_user_can( 'edit_others_posts' ) ) {
 			$this->get_admin__page();
 			$this->get_admin__tour();
+			$this->get_admin__sunset_notice();
 
 			// Dont add the widget if the privacy policy is not accepted.
 			if ( true === $this->is_privacy_policy_accepted() ) {
