@@ -61,13 +61,14 @@ class Sunset_Notice_Test extends \WP_UnitTestCase {
 	}
 
 	/**
-	 * Test that the message contains the learn-more link.
+	 * Test that the message is not empty and contains no links.
 	 *
 	 * @return void
 	 */
-	public function test_message_contains_learn_more_link() {
+	public function test_message_has_no_links() {
 		$notice = new Sunset_Notice();
-		$this->assertStringContainsString( Sunset_Notice::LEARN_MORE_URL, $notice->get_message() );
+		$this->assertNotEmpty( $notice->get_message() );
+		$this->assertStringNotContainsString( '<a ', $notice->get_message() );
 	}
 
 	/**
@@ -89,7 +90,7 @@ class Sunset_Notice_Test extends \WP_UnitTestCase {
 
 		$this->assertStringContainsString( 'plugin-update-tr', $output );
 		$this->assertStringContainsString( 'notice-warning', $output );
-		$this->assertStringContainsString( Sunset_Notice::LEARN_MORE_URL, $output );
+		$this->assertStringContainsString( Sunset_Notice::CERTIFICATE_ACTION, $output );
 	}
 
 	/**

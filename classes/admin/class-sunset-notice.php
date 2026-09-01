@@ -17,13 +17,6 @@ namespace Progress_Planner\Admin;
 class Sunset_Notice {
 
 	/**
-	 * The URL with more information about the end of support.
-	 *
-	 * @var string
-	 */
-	const LEARN_MORE_URL = 'https://prpl.fyi/sunset';
-
-	/**
 	 * The admin-post action for the certificate page.
 	 *
 	 * @var string
@@ -72,17 +65,10 @@ class Sunset_Notice {
 	/**
 	 * Get the notice message, shared by both surfaces.
 	 *
-	 * Contains an anchor tag, so it should be escaped with `wp_kses_post` on output.
-	 *
 	 * @return string
 	 */
 	public function get_message() {
-		return \sprintf(
-			/* translators: %1$s: opening <a> tag, %2$s: closing </a> tag. */
-			\esc_html__( 'Support and updates for the free Progress Planner plugin are ending. We are incredibly grateful for your support over the years — thank you for improving your website with us! %1$sLearn more about what this means for your site%2$s.', 'progress-planner' ),
-			'<a href="' . \esc_url( self::LEARN_MORE_URL ) . '" target="_blank" rel="noopener">',
-			'</a>'
-		);
+		return \esc_html__( 'Support and updates for the free Progress Planner plugin are ending. We are incredibly grateful for your support over the years — thank you for improving your website with us!', 'progress-planner' );
 	}
 
 	/**
