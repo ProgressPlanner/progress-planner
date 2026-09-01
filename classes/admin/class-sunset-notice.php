@@ -68,7 +68,7 @@ class Sunset_Notice {
 	 * @return string
 	 */
 	public function get_message() {
-		return \esc_html__( 'Support and updates for the free Progress Planner plugin are ending. We are incredibly grateful for your support over the years — thank you for improving your website with us!', 'progress-planner' );
+		return \esc_html__( 'Support and updates for the free Progress Planner plugin have ended. We are incredibly grateful for your support over the years — thank you for improving your website with us!', 'progress-planner' );
 	}
 
 	/**
