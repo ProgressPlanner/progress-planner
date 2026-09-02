@@ -29,9 +29,14 @@ abstract class Dashboard_Widget {
 	/**
 	 * The capability required to see the widget.
 	 *
+	 * Editors and up: the widget renders the suggested-tasks experience, whose
+	 * task list is itself filtered per-user by each provider's capability, and
+	 * many tasks (content, terms) are available at the 'edit_others_posts' level.
+	 * Admin-only tasks and their actions remain gated by their own capabilities.
+	 *
 	 * @var string
 	 */
-	protected $capability = 'manage_options';
+	protected $capability = 'edit_others_posts';
 
 	/**
 	 * Add the dashboard widget.
