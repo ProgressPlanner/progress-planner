@@ -4,7 +4,7 @@ Tags: planning, maintenance, writing, blogging
 Requires at least: 6.7
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 1.9.1
+Stable tag: 1.10.0
 License: GPL3+
 License URI: https://www.gnu.org/licenses/gpl-3.0.en.html
 
@@ -82,6 +82,29 @@ https://youtu.be/e1bmxZYyXFY
 7. Get a weekly email with stats on how well you're doing on your site!
 
 == Changelog ==
+
+= 1.10.0 =
+
+Enhancements:
+
+* A brand-new onboarding experience for people setting up Progress Planner.
+* The Settings page is now handled through interactive tasks, in line with the rest of the plugin.
+* Recognize SureRank as an SEO plugin.
+* Show 3 suggested tasks on the WordPress Dashboard widget, and up to 5 on the Progress Planner page.
+* Added 2026 monthly badge names.
+* Strengthened capability and permission checks across the plugin.
+* Various performance improvements and code clean-up.
+
+Maintenance:
+
+* Confirmed compatibility with WordPress 7.1.
+
+Bugs we fixed:
+
+* Fix a year/week boundary calculation that could affect activity scoring.
+* Fix past badge points calculations.
+* Fix interactive task form re-submission after an error, and improve task completion checks.
+* Add safeguards to prevent fatal errors during plugin updates.
 
 = 1.9.1 =
 
