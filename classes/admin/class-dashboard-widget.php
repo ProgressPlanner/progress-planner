@@ -27,11 +27,24 @@ abstract class Dashboard_Widget {
 	}
 
 	/**
+	 * The capability required to see the widget.
+	 *
+	 * @var string
+	 */
+	protected $capability = 'manage_options';
+
+	/**
 	 * Add the dashboard widget.
 	 *
 	 * @return void
 	 */
 	public function add_dashboard_widget() {
+		// The widgets render admin UI and localize a nonce for the plugin's AJAX
+		// actions, so they must not be registered for users who can't use them.
+		if ( ! \current_user_can( $this->capability ) ) {
+			return;
+		}
+
 		\wp_add_dashboard_widget(
 			"progress_planner_dashboard_widget_{$this->id}",
 			$this->get_title(),
