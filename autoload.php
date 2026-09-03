@@ -5,6 +5,11 @@
  * @package Progress_Planner
  */
 
+// Exit if accessed directly.
+if ( ! \defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 use Progress_Planner\Utils\Deprecations;
 
 // Require the Deprecations class.
