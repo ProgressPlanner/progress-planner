@@ -5,12 +5,12 @@
  * @package Progress_Planner
  */
 
+use Progress_Planner\Utils\Deprecations;
+
 // Exit if accessed directly.
 if ( ! \defined( 'ABSPATH' ) ) {
 	exit;
 }
-
-use Progress_Planner\Utils\Deprecations;
 
 // Require the Deprecations class.
 require_once __DIR__ . '/classes/utils/class-deprecations.php';
