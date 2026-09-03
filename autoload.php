@@ -7,11 +7,6 @@
 
 use Progress_Planner\Utils\Deprecations;
 
-// Exit if accessed directly.
-if ( ! \defined( 'ABSPATH' ) ) {
-	exit;
-}
-
 // Require the Deprecations class.
 require_once __DIR__ . '/classes/utils/class-deprecations.php';
 
