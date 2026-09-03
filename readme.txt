@@ -95,6 +95,11 @@ Enhancements:
 * Strengthened capability and permission checks across the plugin.
 * Various performance improvements and code clean-up.
 
+Added these recommendations from Ravi:
+
+* Reduce the number of autoloaded options.
+* Set your About, Contact and FAQ pages.
+
 Maintenance:
 
 * Confirmed compatibility with WordPress 7.1.
