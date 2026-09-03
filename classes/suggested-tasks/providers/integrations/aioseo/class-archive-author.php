@@ -8,11 +8,16 @@
 namespace Progress_Planner\Suggested_Tasks\Providers\Integrations\AIOSEO;
 
 use Progress_Planner\Suggested_Tasks\Data_Collector\Post_Author;
+use Progress_Planner\Suggested_Tasks\Providers\Traits\Task_Action_Builder;
+use Progress_Planner\Suggested_Tasks\Providers\Traits\Ajax_Security_AIOSEO;
 
 /**
  * Add task for All in One SEO: disable the author archive.
  */
 class Archive_Author extends AIOSEO_Interactive_Provider {
+
+	use Task_Action_Builder;
+	use Ajax_Security_AIOSEO;
 
 	/**
 	 * The minimum number of posts with a post format to add the task.
@@ -148,19 +153,12 @@ class Archive_Author extends AIOSEO_Interactive_Provider {
 	 * @return void
 	 */
 	public function handle_interactive_task_specific_submit() {
-		if ( ! \function_exists( 'aioseo' ) ) {
-			\wp_send_json_error( [ 'message' => \esc_html__( 'AIOSEO is not active.', 'progress-planner' ) ] );
-		}
+		$this->verify_aioseo_ajax_security();
 
-		// Check the nonce.
-		if ( ! \check_ajax_referer( 'progress_planner', 'nonce', false ) ) {
-			\wp_send_json_error( [ 'message' => \esc_html__( 'Invalid nonce.', 'progress-planner' ) ] );
-		}
-
-		\aioseo()->options->searchAppearance->archives->author->show = false;
+		\aioseo()->options->searchAppearance->archives->author->show = false; // @phpstan-ignore-line
 
 		// Update the option.
-		\aioseo()->options->save();
+		\aioseo()->options->save(); // @phpstan-ignore-line
 
 		\wp_send_json_success( [ 'message' => \esc_html__( 'Setting updated.', 'progress-planner' ) ] );
 	}
@@ -174,11 +172,6 @@ class Archive_Author extends AIOSEO_Interactive_Provider {
 	 * @return array
 	 */
 	public function add_task_actions( $data = [], $actions = [] ) {
-		$actions[] = [
-			'priority' => 10,
-			'html'     => '<a href="#" class="prpl-tooltip-action-text" onclick="document.getElementById(\'prpl-popover-' . \esc_attr( static::POPOVER_ID ) . '\')?.showPopover();return false;">' . \esc_html__( 'Noindex', 'progress-planner' ) . '</a>',
-		];
-
-		return $actions;
+		return $this->add_popover_action( $actions, \__( 'Noindex', 'progress-planner' ) );
 	}
 }

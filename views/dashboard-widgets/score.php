@@ -5,6 +5,11 @@
  * @package Progress_Planner
  */
 
+// Exit if accessed directly.
+if ( ! \defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 use Progress_Planner\Badges\Monthly;
 
 $prpl_badge = Monthly::get_instance_from_id( Monthly::get_badge_id_from_date( new \DateTime() ) );
@@ -69,7 +74,7 @@ $prpl_badge = Monthly::get_instance_from_id( Monthly::get_badge_id_from_date( ne
 
 <?php if ( \current_user_can( 'manage_options' ) ) : ?>
 	<div class="prpl-dashboard-widget-footer">
-		<img src="<?php echo \esc_attr( \constant( 'PROGRESS_PLANNER_URL' ) . '/assets/images/icon_progress_planner.svg' ); ?>" style="width:1.85em;" alt="" />
+		<span style="display:inline-flex;width:1.85em;height:1.85em;"><?php echo \progress_planner()->get_ui__branding()->get_admin_menu_icon( true ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- SVG markup. ?></span>
 		<div>
 			<?php $prpl_pending_celebration_tasks = \progress_planner()->get_suggested_tasks_db()->get_tasks_by( [ 'post_status' => 'pending' ] ); ?>
 			<?php if ( $prpl_pending_celebration_tasks ) : ?>

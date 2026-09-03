@@ -51,7 +51,7 @@ use Progress_Planner\Utils\Deprecations;
  * @method \Progress_Planner\UI\Popover get_ui__popover()
  * @method \Progress_Planner\Admin\Widgets\Content_Activity get_admin__widgets__content_activity()
  * @method \Progress_Planner\UI\Chart get_ui__chart()
- * @method \Progress_Planner\Activities\Content_Helpers get_activities__content_helpers()
+ * @method \Progress_Planner\Activities\Content_Helpers|null get_activities__content_helpers()
  * @method \Progress_Planner\Admin\Widgets\Challenge get_admin__widgets__challenge()
  * @method \Progress_Planner\Admin\Widgets\Activity_Scores get_admin__widgets__activity_scores()
  * @method \Progress_Planner\Utils\Date get_utils__date()
@@ -96,6 +96,14 @@ class Base {
 
 		if ( \defined( '\IS_PLAYGROUND_PREVIEW' ) && \constant( '\IS_PLAYGROUND_PREVIEW' ) === true ) {
 			$this->get_utils__playground();
+		}
+
+		$prpl_license_key = $this->get_license_key();
+		if ( ! $prpl_license_key && 0 !== (int) \progress_planner()->get_ui__branding()->get_branding_id() ) {
+			$prpl_license_key = \progress_planner()->get_utils__onboard()->make_remote_onboarding_request();
+			if ( '' !== $prpl_license_key ) {
+				\update_option( 'progress_planner_license_key', $prpl_license_key, false );
+			}
 		}
 
 		// Basic classes.
@@ -160,11 +168,6 @@ class Base {
 		// Plugin installer.
 		$this->get_plugin_installer();
 
-		/**
-		 * Redirect on login.
-		 */
-		\add_action( 'wp_login', [ $this, 'redirect_on_login' ], 10, 2 );
-
 		if ( \defined( 'WP_CLI' ) && \WP_CLI ) {
 			$this->get_wp_cli__get_stats_command();
 			$this->get_wp_cli__task_command();
@@ -175,45 +178,86 @@ class Base {
 	}
 
 	/**
-	 * Magic method to get properties.
-	 * We use this to avoid a lot of code duplication.
+	 * Magic method to dynamically instantiate and cache plugin classes.
 	 *
-	 * Use a double underscore to separate namespaces:
-	 * - get_foo() will return an instance of Progress_Planner\Foo.
-	 * - get_foo_bar() will return an instance of Progress_Planner\Foo_Bar.
-	 * - get_foo_bar__baz() will return an instance of Progress_Planner\Foo_Bar\Baz.
+	 * This method enables lazy-loading of plugin classes using a simple naming convention,
+	 * reducing code duplication and improving performance by instantiating classes only when needed.
 	 *
-	 * @param string $name The name of the property.
-	 * @param array  $arguments The arguments passed to the class constructor.
+	 * Naming convention and transformation rules:
+	 * - Method names must start with 'get_'
+	 * - Single underscore (_) = word boundary, becomes uppercase in class name
+	 * - Double underscore (__) = namespace separator, becomes backslash (\)
 	 *
-	 * @return mixed
+	 * Examples:
+	 * ```
+	 * get_settings()                      → Progress_Planner\Settings
+	 * get_admin__page()                   → Progress_Planner\Admin\Page
+	 * get_activities__query()             → Progress_Planner\Activities\Query
+	 * get_suggested_tasks_db()            → Progress_Planner\Suggested_Tasks_Db
+	 * get_admin__widgets__todo()          → Progress_Planner\Admin\Widgets\Todo
+	 * ```
+	 *
+	 * Transformation process:
+	 * 1. Remove 'get_' prefix from method name
+	 * 2. Split on '__' to separate namespace parts
+	 * 3. For each part, split on '_', uppercase first letter of each word, rejoin
+	 * 4. Join namespace parts with '\' and prepend 'Progress_Planner\'
+	 *
+	 * Caching:
+	 * - Once instantiated, classes are cached in $this->cached array
+	 * - Subsequent calls return the cached instance (singleton pattern per class)
+	 * - Cache key is the method name without 'get_' prefix
+	 *
+	 * Backwards compatibility:
+	 * - Deprecated method names are mapped in Deprecations::BASE_METHODS
+	 * - Triggers WordPress deprecation notice and redirects to new method
+	 *
+	 * @param string $name      The method name being called (e.g., 'get_admin__page').
+	 * @param array  $arguments Arguments passed to the method (forwarded to class constructor).
+	 *
+	 * @return object|null The instantiated class, cached instance, or null if method doesn't start with 'get_'.
 	 */
 	public function __call( $name, $arguments ) {
+		// Only handle methods starting with 'get_'.
 		if ( 0 !== \strpos( $name, 'get_' ) ) {
-			return;
+			return null;
 		}
+
+		// Extract cache key by removing 'get_' prefix.
 		$cache_name = \substr( $name, 4 );
+
+		// Return cached instance if already instantiated (singleton pattern).
 		if ( isset( $this->cached[ $cache_name ] ) ) {
 			return $this->cached[ $cache_name ];
 		}
 
+		// Transform method name to fully qualified class name.
+		// Step 1: Split on '__' to get namespace parts (e.g., 'admin__page' → ['admin', 'page']).
 		$class_name = \implode( '\\', \explode( '__', $cache_name ) );
+		// Step 2: Split each part on '_', capitalize words, and rejoin.
+		// e.g., 'suggested_tasks_db' → 'Suggested_Tasks_Db'.
+		// Then prepend namespace: 'Progress_Planner\Suggested_Tasks_Db'.
 		$class_name = 'Progress_Planner\\' . \implode( '_', \array_map( 'ucfirst', \explode( '_', $class_name ) ) );
+
+		// Instantiate the class if it exists.
 		if ( \class_exists( $class_name ) ) {
 			$this->cached[ $cache_name ] = new $class_name( $arguments );
 			return $this->cached[ $cache_name ];
 		}
 
-		// Backwards-compatibility.
+		// Handle deprecated method names for backwards compatibility.
 		if ( isset( Deprecations::BASE_METHODS[ $name ] ) ) {
-			// Deprecated method.
+			// Trigger WordPress deprecation notice.
 			\_deprecated_function(
 				\esc_html( $name ),
-				\esc_html( Deprecations::BASE_METHODS[ $name ][1] ),
-				\esc_html( Deprecations::BASE_METHODS[ $name ][0] )
+				\esc_html( Deprecations::BASE_METHODS[ $name ][1] ), // Version deprecated.
+				\esc_html( Deprecations::BASE_METHODS[ $name ][0] )  // Replacement method.
 			);
+			// Call the replacement method.
 			return $this->{Deprecations::BASE_METHODS[ $name ][0]}();
 		}
+
+		return null;
 	}
 
 	/**
@@ -260,7 +304,16 @@ class Base {
 	 * @return bool
 	 */
 	public function is_privacy_policy_accepted() {
-		return false !== \get_option( 'progress_planner_license_key', false );
+		return false !== $this->get_license_key();
+	}
+
+	/**
+	 * Get the license key.
+	 *
+	 * @return string|false
+	 */
+	public function get_license_key() {
+		return \get_option( 'progress_planner_license_key', false );
 	}
 
 	/**
@@ -363,6 +416,7 @@ class Base {
 				if ( $get_contents ) {
 					return (string) \ob_get_clean();
 				}
+				break; // Exit the loop after the first file is found, covers the case when $get_contents is false.
 			}
 		}
 		return '';
@@ -457,34 +511,6 @@ class Base {
 	}
 
 	/**
-	 * Redirect on login.
-	 *
-	 * @param string   $user_login The user login.
-	 * @param \WP_User $user The user object.
-	 *
-	 * @return void
-	 */
-	public function redirect_on_login( $user_login, $user ) {
-		// Check if the $user can `manage_options`.
-		if ( ! $user->has_cap( 'manage_options' ) ) {
-			return;
-		}
-
-		// Check if the user has the `prpl_redirect_on_login` meta.
-		if ( ! \get_user_meta( $user->ID, 'prpl_redirect_on_login', true ) ) {
-			return;
-		}
-
-		if ( isset( $_REQUEST['redirect_to'] ) && '' !== $_REQUEST['redirect_to'] && \admin_url( '/' ) !== $_REQUEST['redirect_to'] ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended, WordPress.Security.NonceVerification.Missing -- We're not processing any data.
-			return;
-		}
-
-		// Redirect to the Progress Planner dashboard.
-		\wp_safe_redirect( \admin_url( 'admin.php?page=progress-planner' ) );
-		exit;
-	}
-
-	/**
 	 * Check if we're on the Progress Planner dashboard page.
 	 *
 	 * @return bool
@@ -500,7 +526,7 @@ class Base {
 	 * @return bool
 	 */
 	public function is_debug_mode_enabled() {
-		return ( \defined( 'PRPL_DEBUG' ) && PRPL_DEBUG ) || \get_option( 'prpl_debug' );
+		return ( ( \defined( 'PRPL_DEBUG' ) && PRPL_DEBUG ) || \get_option( 'prpl_debug' ) ) && \current_user_can( 'manage_options' );
 	}
 }
 // phpcs:enable Generic.Commenting.Todo

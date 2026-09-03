@@ -11,7 +11,6 @@ use Progress_Planner\Suggested_Tasks\Providers\Core_Update;
 use Progress_Planner\Suggested_Tasks\Providers\Content_Create;
 use Progress_Planner\Suggested_Tasks\Providers\Content_Review;
 use Progress_Planner\Suggested_Tasks\Providers\Blog_Description;
-use Progress_Planner\Suggested_Tasks\Providers\Settings_Saved;
 use Progress_Planner\Suggested_Tasks\Providers\Debug_Display;
 use Progress_Planner\Suggested_Tasks\Providers\Disable_Comments;
 use Progress_Planner\Suggested_Tasks\Providers\Disable_Comment_Pagination;
@@ -33,12 +32,16 @@ use Progress_Planner\Suggested_Tasks\Providers\Select_Locale;
 use Progress_Planner\Suggested_Tasks\Providers\Fewer_Tags;
 use Progress_Planner\Suggested_Tasks\Providers\Remove_Terms_Without_Posts;
 use Progress_Planner\Suggested_Tasks\Providers\Update_Term_Description;
+use Progress_Planner\Suggested_Tasks\Providers\Reduce_Autoloaded_Options;
 use Progress_Planner\Suggested_Tasks\Providers\Unpublished_Content;
 use Progress_Planner\Suggested_Tasks\Providers\Collaborator;
 use Progress_Planner\Suggested_Tasks\Providers\Select_Timezone;
 use Progress_Planner\Suggested_Tasks\Providers\Set_Date_Format;
 use Progress_Planner\Suggested_Tasks\Providers\SEO_Plugin;
 use Progress_Planner\Suggested_Tasks\Providers\Improve_Pdf_Handling;
+use Progress_Planner\Suggested_Tasks\Providers\Set_Page_About;
+use Progress_Planner\Suggested_Tasks\Providers\Set_Page_FAQ;
+use Progress_Planner\Suggested_Tasks\Providers\Set_Page_Contact;
 
 /**
  * Tasks_Manager class.
@@ -62,7 +65,6 @@ class Tasks_Manager {
 			new Content_Review(),
 			new Core_Update(),
 			new Blog_Description(),
-			new Settings_Saved(),
 			new Debug_Display(),
 			new Disable_Comments(),
 			new Disable_Comment_Pagination(),
@@ -74,6 +76,7 @@ class Tasks_Manager {
 			new Permalink_Structure(),
 			new Php_Version(),
 			new Search_Engine_Visibility(),
+			new Reduce_Autoloaded_Options(),
 			new User_Tasks(),
 			new Email_Sending(),
 			new Set_Valuable_Post_Types(),
@@ -87,6 +90,9 @@ class Tasks_Manager {
 			new Set_Date_Format(),
 			new SEO_Plugin(),
 			new Improve_Pdf_Handling(),
+			new Set_Page_About(),
+			new Set_Page_FAQ(),
+			new Set_Page_Contact(),
 		];
 
 		// Add the plugin integration.
@@ -309,7 +315,7 @@ class Tasks_Manager {
 			$task_provider = $this->get_task_provider( $task->get_provider_id() );
 
 			// Should we delete the task? Delete tasks which don't have a task provider or repetitive tasks which were created in the previous week.
-			if ( ! $task_provider || ( $task_provider->is_repetitive() && ( ! $task->date || \gmdate( 'YW' ) !== (string) $task->date ) ) ) {
+			if ( ! $task_provider || ( $task_provider->is_repetitive() && ( ! $task->date || \gmdate( 'oW' ) !== (string) $task->date ) ) ) {
 				\progress_planner()->get_suggested_tasks_db()->delete_recommendation( $task->ID );
 			}
 		}
@@ -340,7 +346,7 @@ class Tasks_Manager {
 		$task_provider = $this->get_task_provider( $task->get_provider_id() );
 
 		// Delete tasks which don't have a task provider or repetitive tasks which were created in the previous week.
-		if ( ! $task_provider || ( $task_provider->is_repetitive() && ( ! $task->date || \gmdate( 'YW' ) !== (string) $task->date ) ) ) {
+		if ( ! $task_provider || ( $task_provider->is_repetitive() && ( ! $task->date || \gmdate( 'oW' ) !== (string) $task->date ) ) ) {
 			\progress_planner()->get_suggested_tasks_db()->delete_recommendation( $task->ID );
 		}
 

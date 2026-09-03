@@ -389,7 +389,7 @@ class Update_Term_Description extends Tasks_Interactive {
 			</p>
 			<p style="margin: 0 0 10px 0; font-size: 12px; color: #646970;">
 				<?php
-				printf(
+				\printf(
 					/* translators: %1$s: The taxonomy name, %2$s: The term slug */
 					\esc_html__( 'You are updating the term which belongs to the "%1$s" (slug "%2$s").', 'progress-planner' ),
 					'<span id="prpl-update-term-taxonomy-name"></span>',
@@ -445,6 +445,18 @@ class Update_Term_Description extends Tasks_Interactive {
 			\wp_send_json_error( [ 'message' => \esc_html__( 'Term not found.', 'progress-planner' ) ] );
 		}
 
+		// Only public taxonomies are tracked by this task.
+		$taxonomy_object = \get_taxonomy( $taxonomy );
+		if ( ! $taxonomy_object || ! $taxonomy_object->public ) {
+			\wp_send_json_error( [ 'message' => \esc_html__( 'You do not have permission to update terms.', 'progress-planner' ) ] );
+		}
+
+		// Bind the request to a task that actually suggested this term, so this
+		// handler cannot be repurposed to edit arbitrary terms.
+		if ( ! $this->has_task_for_term( $term_id, $taxonomy ) ) {
+			\wp_send_json_error( [ 'message' => \esc_html__( 'You do not have permission to update terms.', 'progress-planner' ) ] );
+		}
+
 		// Update the term description.
 		$result = \wp_update_term(
 			$term_id,
@@ -459,5 +471,25 @@ class Update_Term_Description extends Tasks_Interactive {
 		}
 
 		\wp_send_json_success( [ 'message' => \esc_html__( 'Term description updated successfully.', 'progress-planner' ) ] );
+	}
+
+	/**
+	 * Check whether a task from this provider targets the given term.
+	 *
+	 * @param int    $term_id  The term ID.
+	 * @param string $taxonomy The taxonomy.
+	 *
+	 * @return bool
+	 */
+	protected function has_task_for_term( $term_id, $taxonomy ) {
+		foreach ( \progress_planner()->get_suggested_tasks_db()->get_tasks_by( [ 'provider_id' => $this->get_provider_id() ] ) as $task ) {
+			if ( (int) $task->target_term_id === (int) $term_id
+				&& (string) $task->target_taxonomy === (string) $taxonomy
+			) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 }

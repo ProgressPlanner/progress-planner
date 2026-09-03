@@ -157,10 +157,16 @@ class Content {
 	 * @return bool
 	 */
 	private function should_skip_saving( $post ) {
+		// Bail if content helpers are not available (can happen during plugin updates).
+		$content_helpers = \progress_planner()->get_activities__content_helpers();
+		if ( null === $content_helpers ) {
+			return true;
+		}
+
 		// Bail if the post is not included in the post-types we're tracking.
 		if ( ! \in_array(
 			$post->post_type,
-			\progress_planner()->get_activities__content_helpers()->get_post_types_names(),
+			\progress_planner()->get_settings()->get_post_types_names(),
 			true
 		) ) {
 			return true;
@@ -187,10 +193,23 @@ class Content {
 	/**
 	 * Check if there is a recent activity for this post.
 	 *
+	 * Prevents duplicate activity records by checking if a similar activity was already recorded.
+	 * Different activity types use different timeframes:
+	 *
+	 * Update activities (±12 hours):
+	 * - Uses a 24-hour window (±12 hours from modification time) to group related updates
+	 * - Prevents multiple update records when a post is saved repeatedly during editing
+	 * - Example: Editing a post at 3 PM won't create new activities if one exists between 3 AM and 3 AM next day
+	 * - The window accounts for timezone differences and allows one update record per day
+	 *
+	 * Other activities (exact match):
+	 * - Publish, trash, delete, etc. check for exact type/post matches
+	 * - No date window needed since these are discrete, one-time events
+	 *
 	 * @param \WP_Post $post The post object.
 	 * @param string   $type The type of activity (ie publish, update, trash, delete etc).
 	 *
-	 * @return bool
+	 * @return bool True if a recent activity exists (skip recording), false otherwise (record new activity).
 	 */
 	private function is_there_recent_activity( $post, $type ) {
 		// Query arguments.
@@ -200,7 +219,9 @@ class Content {
 			'data_id'  => (string) $post->ID,
 		];
 
-		// If it's an update add the start and end date. We don't want to add multiple update activities for the same post on the same day.
+		// For updates, use a ±12 hour window to prevent duplicate update records during editing sessions.
+		// This groups all updates within a 24-hour period into a single activity.
+		// Other activity types (publish, trash, delete) don't need a window since they're one-time events.
 		if ( 'update' === $type ) {
 			$query_args['start_date'] = \progress_planner()->get_utils__date()->get_datetime_from_mysql_date( $post->post_modified )->modify( '-12 hours' );
 			$query_args['end_date']   = \progress_planner()->get_utils__date()->get_datetime_from_mysql_date( $post->post_modified )->modify( '+12 hours' );

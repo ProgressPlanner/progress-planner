@@ -146,6 +146,20 @@ class Rest_Recommendations_Xss_Test extends \WP_UnitTestCase {
 	 */
 	public function test_plain_text_title_is_preserved() {
 		$editor_id = self::factory()->user->create( [ 'role' => 'editor' ] );
+
+		// This test isolates our XSS sanitization: a legitimate plain-text title
+		// must survive `wp_strip_all_tags()` + `sanitize_text_field()` unchanged.
+		// Core's kses would additionally encode the ampersand, but only for users
+		// without `unfiltered_html` — which on multisite excludes editors. Grant
+		// the capability *before* switching the current user, because `kses_init()`
+		// (hooked on `set_current_user`) decides whether to attach the kses filters
+		// at switch time; granting it afterwards would be too late.
+		if ( \is_multisite() ) {
+			\grant_super_admin( $editor_id );
+		} else {
+			( new \WP_User( $editor_id ) )->add_cap( 'unfiltered_html' );
+		}
+
 		\wp_set_current_user( $editor_id );
 
 		$post = $this->create_recommendation_via_rest( 'Buy milk & eggs' );

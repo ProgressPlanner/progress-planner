@@ -13,6 +13,22 @@ namespace Progress_Planner\Rest;
 abstract class Base {
 
 	/**
+	 * Constructor.
+	 */
+	public function __construct() {
+		\add_action( 'rest_api_init', [ $this, 'register_rest_endpoint' ] );
+	}
+
+	/**
+	 * Register REST endpoint.
+	 *
+	 * Child classes must implement this method to define their REST endpoints.
+	 *
+	 * @return void
+	 */
+	abstract public function register_rest_endpoint();
+
+	/**
 	 * Get client IP address.
 	 *
 	 * @return string
@@ -70,7 +86,7 @@ abstract class Base {
 			return true;
 		}
 
-		$license_key = \get_option( 'progress_planner_license_key', false );
+		$license_key = \progress_planner()->get_license_key();
 		if ( ! $license_key || 'no-license' === $license_key ) {
 			// Increment failed attempts counter.
 			\set_transient( $rate_limit_key, $failed_attempts + 1, HOUR_IN_SECONDS );

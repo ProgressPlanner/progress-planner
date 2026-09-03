@@ -227,7 +227,7 @@ class Enqueue {
 
 				// Check if user wants to see all recommendations.
 				$show_all_recommendations = isset( $_GET['prpl_show_all_recommendations'] ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-				$tasks_per_page           = $show_all_recommendations ? -1 : \Progress_Planner\Admin\Widgets\Suggested_Tasks::PER_PAGE_DEFAULT;
+				$tasks_per_page           = $show_all_recommendations ? -1 : \Progress_Planner\Admin\Widgets\Suggested_Tasks::get_per_page();
 
 				// Get tasks from task providers (limited to 5 by default, or unlimited if showing all).
 				$tasks = \progress_planner()->get_suggested_tasks()->get_tasks_in_rest_format(
@@ -269,7 +269,7 @@ class Enqueue {
 						],
 						'delayCelebration' => $delay_celebration,
 						'tasksPerPage'     => $tasks_per_page,
-						'perPageDefault'   => \Progress_Planner\Admin\Widgets\Suggested_Tasks::PER_PAGE_DEFAULT,
+						'perPageDefault'   => \Progress_Planner\Admin\Widgets\Suggested_Tasks::get_per_page(),
 					],
 				];
 				break;
@@ -301,7 +301,7 @@ class Enqueue {
 				$localize_data = [
 					'name' => 'prplCelebrate',
 					'data' => [
-						'raviIconUrl'     => \constant( 'PROGRESS_PLANNER_URL' ) . '/assets/images/icon_progress_planner.svg',
+						'raviIconUrl'     => \progress_planner()->get_ui__branding()->get_admin_menu_icon(),
 						'confettiOptions' => $confetti_options,
 					],
 				];
@@ -371,7 +371,11 @@ class Enqueue {
 			'nextBtnText'                  => \esc_html__( 'Next &rarr;', 'progress-planner' ),
 			'prevBtnText'                  => \esc_html__( '&larr; Previous', 'progress-planner' ),
 			'pageType'                     => \esc_html__( 'Page type', 'progress-planner' ),
-			'progressPlannerSidebar'       => \esc_html__( 'Progress Planner Sidebar', 'progress-planner' ),
+			'progressPlannerSidebar'       => \sprintf(
+				/* translators: %s: The plugin name. */
+				\esc_html__( '%s Sidebar', 'progress-planner' ),
+				\progress_planner()->get_ui__branding()->get_admin_menu_name()
+			),
 			'progressText'                 => \sprintf(
 				/* translators: %1$s: The current step number. %2$s: The total number of steps. */
 				\esc_html__( 'Step %1$s of %2$s', 'progress-planner' ),
@@ -425,8 +429,8 @@ class Enqueue {
 			return;
 		}
 
-		// Inject the script only on the Progress Planner Dashboard, Progress Planner Settings and the WordPress dashboard pages.
-		if ( 'toplevel_page_progress-planner' !== $screen->id && 'progress-planner_page_progress-planner-settings' !== $screen->id && 'dashboard' !== $screen->id ) {
+		// Inject the script only on the Progress Planner Dashboard and the WordPress dashboard pages.
+		if ( 'toplevel_page_progress-planner' !== $screen->id && 'dashboard' !== $screen->id ) {
 			return;
 		}
 		?>

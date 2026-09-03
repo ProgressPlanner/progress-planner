@@ -148,14 +148,19 @@ final class Monthly extends Badge {
 	/**
 	 * Get an array of months.
 	 *
+	 * Year-specific names are supported. If no names are defined for the
+	 * given year, the default (2025) names are returned as a fallback.
+	 *
+	 * @param int|null $year The year. Null returns the default names.
+	 *
 	 * @return array
 	 */
-	public static function get_months() {
+	public static function get_months( $year = null ) {
 		/*
 		 * Indexed months, The array keys are prefixed with an "m"
 		 * so that they are strings and not integers.
 		 */
-		$months = [
+		$default = [
 			'm1'  => 'Jack January',
 			'm2'  => 'Felix February',
 			'm3'  => 'Mary March',
@@ -169,7 +174,29 @@ final class Monthly extends Badge {
 			'm11' => 'Noah November',
 			'm12' => 'Daisy December',
 		];
-		return $months;
+
+		$yearly = [
+			2026 => [
+				'm1'  => 'Jamie January',
+				'm2'  => 'Freya February',
+				'm3'  => 'Milo March',
+				'm4'  => 'Aida April',
+				'm5'  => 'Maeve May',
+				'm6'  => 'Jason June',
+				'm7'  => 'Julia July',
+				'm8'  => 'Ava August',
+				'm9'  => 'Sophie September',
+				'm10' => 'Omar October',
+				'm11' => 'Nathan November',
+				'm12' => 'Daniel December',
+			],
+		];
+
+		if ( null !== $year && isset( $yearly[ $year ] ) ) {
+			return $yearly[ $year ];
+		}
+
+		return $default;
 	}
 
 	/**
@@ -179,7 +206,7 @@ final class Monthly extends Badge {
 	 */
 	public function get_name() {
 		return $this->id
-			? self::get_months()[ 'm' . $this->get_month() ]
+			? self::get_months( (int) $this->get_year() )[ 'm' . $this->get_month() ]
 			: '';
 	}
 
@@ -229,8 +256,8 @@ final class Monthly extends Badge {
 			return $saved_progress;
 		}
 
-		$month     = self::get_months()[ 'm' . $this->get_month() ];
 		$year      = $this->get_year();
+		$month     = self::get_months( (int) $year )[ 'm' . $this->get_month() ];
 		$month_num = (int) $this->get_month();
 
 		$start_date = \DateTime::createFromFormat( 'Y-m-d', "{$year}-{$month_num}-01" );
@@ -292,9 +319,11 @@ final class Monthly extends Badge {
 	 * @return int
 	 */
 	public function get_next_badges_excess_points() {
-		$excess_points       = 0;
-		$next_1_badge_points = 0;
-		$next_2_badge_points = 0;
+		$next_1_badge_points   = 0;
+		$next_2_badge_points   = 0;
+		$badge_1_excess_points = 0;
+		$badge_2_excess_points = 0;
+
 		// Get the next badge object.
 		$next_1_badge = self::get_instance_from_id( $this->get_next_badge_id() );
 		if ( $next_1_badge ) {
@@ -306,9 +335,21 @@ final class Monthly extends Badge {
 			}
 		}
 
-		$excess_points  = \max( 0, $next_1_badge_points - self::TARGET_POINTS );
-		$excess_points += \max( 0, $next_2_badge_points - 2 * self::TARGET_POINTS );
+		// If the $next_1_badge has more than 10 points, calculate the excess points.
+		if ( $next_1_badge_points > self::TARGET_POINTS ) {
+			$badge_1_excess_points = \max( 0, $next_1_badge_points - self::TARGET_POINTS );
+		}
 
-		return (int) $excess_points;
+		// If the $next_2_badge has more than 10 points, calculate the excess points.
+		if ( $next_2_badge_points > self::TARGET_POINTS ) {
+			$badge_2_excess_points = \max( 0, $next_2_badge_points - self::TARGET_POINTS );
+
+			// Does the $next_1_badge need more points to reach 10?
+			if ( $next_1_badge_points < self::TARGET_POINTS ) {
+				$badge_2_excess_points = \max( 0, ( $next_1_badge_points + $badge_2_excess_points ) - self::TARGET_POINTS );
+			}
+		}
+
+		return (int) $badge_1_excess_points + (int) $badge_2_excess_points;
 	}
 }

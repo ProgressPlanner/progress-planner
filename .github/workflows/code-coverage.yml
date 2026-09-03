@@ -1,0 +1,509 @@
+name: Code Coverage
+
+on:
+  pull_request:
+  push:
+    branches:
+      - develop
+      - main
+  workflow_dispatch:
+
+# Cancels all previous workflow runs for the same branch that have not yet completed.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  code-coverage:
+    name: Code Coverage Check
+    runs-on: ubuntu-latest
+
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ALLOW_EMPTY_PASSWORD: false
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: wordpress_tests
+        ports:
+          - 3306:3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=10s --health-retries=10
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Fetch all history for accurate diff
+
+      - name: Install PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          ini-values: zend.assertions=1, error_reporting=-1, display_errors=On, memory_limit=512M
+          coverage: xdebug  # Use Xdebug for coverage (PCOV was causing PHP to crash)
+          tools: composer
+
+      - name: Install SVN and XML tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y subversion libxml2-utils
+
+      - name: Install Composer dependencies
+        uses: ramsey/composer-install@v2
+        with:
+          dependency-versions: "highest"
+          composer-options: "--prefer-dist --with-dependencies"
+          custom-cache-suffix: $(date -u -d "-0 month -$(($(date +%d)-1)) days" "+%F")-codecov-v2
+
+      - name: Install WordPress Test Suite
+        shell: bash
+        run: tests/bin/install-wp-tests.sh wordpress_tests root root 127.0.0.1:3306 latest
+
+      - name: Generate code coverage report for current branch
+        run: |
+          echo "=== Debug: PHP Configuration ==="
+          php -i | grep -E "(memory_limit|max_execution_time|xdebug)"
+          echo "=== Debug: Check Xdebug is loaded ==="
+          php -m | grep xdebug || echo "Xdebug not loaded"
+          php -r "var_dump(extension_loaded('xdebug'));"
+          echo "=== Running PHPUnit with coverage ==="
+          echo "Start time: $(date)"
+          echo "Memory before: $(free -h | grep Mem)"
+
+          # Run PHPUnit with coverage - allow test failures but ensure coverage is generated
+          # test-class-security.php is excluded via phpunit.xml.dist to avoid output contamination
+          set +e
+          # Run PHPUnit and capture both test output and coverage text separately
+          php -d memory_limit=512M -d max_execution_time=300 \
+            vendor/bin/phpunit --configuration phpunit.xml.dist \
+            --coverage-clover=coverage.xml \
+            --coverage-text --colors=never > phpunit-with-coverage.log 2>&1
+          PHPUNIT_EXIT=$?
+          set -e
+
+          # Extract test output (everything before coverage section) for debugging
+          # Coverage section typically starts with a line like "Code Coverage Report:" or summary table
+          # Extract everything up to (but not including) the coverage section
+          awk '/Code Coverage Report:|^Summary|^  Classes:|^  Methods:|^  Lines:/{exit} {print}' phpunit-with-coverage.log > phpunit-output.log || cat phpunit-with-coverage.log > phpunit-output.log
+
+          # Extract coverage text output (the coverage section)
+          # Coverage section starts with summary or "Code Coverage Report"
+          awk '/Code Coverage Report:|^Summary|^  Classes:|^  Methods:|^  Lines:/{flag=1} flag' phpunit-with-coverage.log > current-coverage-full.txt || tail -200 phpunit-with-coverage.log > current-coverage-full.txt
+
+          echo "End time: $(date)"
+          echo "Memory after: $(free -h | grep Mem)"
+          echo "=== Debug: PHPUnit exit code: $PHPUNIT_EXIT ==="
+          echo "=== Note: Exit code $PHPUNIT_EXIT (0=success, 1=test failures, 2=errors, >128=signal termination) ==="
+          echo "=== Debug: Line count of PHPUnit output ==="
+          wc -l phpunit-output.log
+          echo "=== Debug: Last 100 lines of PHPUnit output ==="
+          tail -100 phpunit-output.log
+          echo "=== Debug: After running PHPUnit ==="
+          ls -la coverage* 2>/dev/null || echo "No coverage files in current directory"
+          echo "=== Checking if coverage report was generated ==="
+          if [ -f coverage.xml ]; then
+            echo "SUCCESS: coverage.xml exists!"
+            ls -lh coverage.xml
+            echo "First 20 lines of coverage.xml:"
+            head -20 coverage.xml
+          else
+            echo "FAIL: coverage.xml was not generated"
+            echo "=== Checking for errors in PHPUnit output ==="
+            grep -i "error\|fatal\|exception\|segfault\|out of memory" phpunit-output.log || echo "No obvious errors found"
+            # Exit with error if coverage wasn't generated
+            exit 1
+          fi
+        continue-on-error: false
+
+      - name: Upload PHPUnit output for debugging
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: phpunit-output
+          path: phpunit-output.log
+          retention-days: 7
+
+      - name: Generate coverage report summary
+        id: coverage
+        run: |
+          # Extract overall coverage from coverage.xml (Clover format)
+          # This avoids running PHPUnit twice - we already have coverage.xml from the first run
+          if [ -f coverage.xml ]; then
+            # Extract metrics from Clover XML using xmllint
+            # Fallback to Python if xmllint fails
+            STATEMENTS=$(xmllint --xpath 'string(//project/metrics/@statements)' coverage.xml 2>/dev/null || python3 -c "import xml.etree.ElementTree as ET; tree = ET.parse('coverage.xml'); metrics = tree.find('.//project/metrics'); print(metrics.get('statements', '0') if metrics is not None else '0')" 2>/dev/null || echo "0")
+            COVERED_STATEMENTS=$(xmllint --xpath 'string(//project/metrics/@coveredstatements)' coverage.xml 2>/dev/null || python3 -c "import xml.etree.ElementTree as ET; tree = ET.parse('coverage.xml'); metrics = tree.find('.//project/metrics'); print(metrics.get('coveredstatements', '0') if metrics is not None else '0')" 2>/dev/null || echo "0")
+
+            # Calculate coverage percentage
+            if [ "$STATEMENTS" != "0" ] && [ -n "$STATEMENTS" ] && [ -n "$COVERED_STATEMENTS" ]; then
+              COVERAGE=$(echo "scale=2; ($COVERED_STATEMENTS * 100) / $STATEMENTS" | bc)
+            else
+              COVERAGE="0"
+            fi
+
+            echo "current_coverage=$COVERAGE" >> $GITHUB_OUTPUT
+            echo "Current code coverage: $COVERAGE% (from coverage.xml)"
+            echo "Statements: $COVERED_STATEMENTS / $STATEMENTS"
+          else
+            echo "ERROR: coverage.xml not found!"
+            echo "current_coverage=0" >> $GITHUB_OUTPUT
+            exit 1
+          fi
+
+          # Coverage text output was already extracted from phpunit-with-coverage.log in the previous step
+          # If extraction failed, try to generate it again as fallback
+          if [ ! -s current-coverage-full.txt ]; then
+            echo "Warning: Could not extract coverage text from phpunit-with-coverage.log, generating separately..."
+            vendor/bin/phpunit --configuration phpunit.xml.dist --coverage-text --colors=never > current-coverage-full.txt 2>&1 || true
+          fi
+
+          # Save detailed per-file coverage for later comparison
+          # PHPUnit outputs class name on one line, stats on the next line
+          # We need to combine them: "ClassName" + "  Methods: X% Lines: Y%"
+          awk '
+            /^[A-Za-z_]/ { classname = $0; next }
+            /^  Methods:.*Lines:/ {
+              gsub(/\x1b\[[0-9;]*m/, "", classname);
+              gsub(/\x1b\[[0-9;]*m/, "", $0);
+              print classname " " $0
+            }
+          ' current-coverage-full.txt > current-coverage-details.txt || true
+
+          echo "=== Current coverage details saved ==="
+          head -20 current-coverage-details.txt || true
+
+      - name: Checkout base branch for comparison
+        if: github.event_name == 'pull_request'
+        run: |
+          # Save current branch coverage files
+          cp current-coverage-details.txt /tmp/current-coverage-details.txt 2>/dev/null || true
+          cp current-coverage-full.txt /tmp/current-coverage-full.txt 2>/dev/null || true
+
+          # Stash any local changes (like composer.lock)
+          git stash --include-untracked || true
+          git fetch origin ${{ github.base_ref }}
+          git checkout origin/${{ github.base_ref }}
+
+      - name: Install dependencies on base branch
+        if: github.event_name == 'pull_request'
+        run: |
+          composer install --no-interaction --prefer-dist --optimize-autoloader
+
+      - name: Generate coverage report for base branch
+        if: github.event_name == 'pull_request'
+        id: base_coverage
+        run: |
+          # Generate coverage for base branch (including coverage.xml)
+          vendor/bin/phpunit --configuration phpunit.xml.dist \
+            --coverage-clover=base-coverage.xml \
+            --coverage-text --colors=never > base-coverage-full.txt 2>&1 || true
+
+          # Extract overall coverage from base-coverage.xml (Clover format)
+          if [ -f base-coverage.xml ]; then
+            # Extract metrics from Clover XML using xmllint
+            # Fallback to Python if xmllint fails
+            STATEMENTS=$(xmllint --xpath 'string(//project/metrics/@statements)' base-coverage.xml 2>/dev/null || python3 -c "import xml.etree.ElementTree as ET; tree = ET.parse('base-coverage.xml'); metrics = tree.find('.//project/metrics'); print(metrics.get('statements', '0') if metrics is not None else '0')" 2>/dev/null || echo "0")
+            COVERED_STATEMENTS=$(xmllint --xpath 'string(//project/metrics/@coveredstatements)' base-coverage.xml 2>/dev/null || python3 -c "import xml.etree.ElementTree as ET; tree = ET.parse('base-coverage.xml'); metrics = tree.find('.//project/metrics'); print(metrics.get('coveredstatements', '0') if metrics is not None else '0')" 2>/dev/null || echo "0")
+
+            # Calculate coverage percentage
+            if [ "$STATEMENTS" != "0" ] && [ -n "$STATEMENTS" ] && [ -n "$COVERED_STATEMENTS" ]; then
+              BASE_COVERAGE=$(echo "scale=2; ($COVERED_STATEMENTS * 100) / $STATEMENTS" | bc)
+            else
+              BASE_COVERAGE="0"
+            fi
+
+            echo "base_coverage=$BASE_COVERAGE" >> $GITHUB_OUTPUT
+            echo "Base branch code coverage: $BASE_COVERAGE% (from base-coverage.xml)"
+            echo "Statements: $COVERED_STATEMENTS / $STATEMENTS"
+          else
+            # Fallback to text extraction if XML not available
+            BASE_COVERAGE=$(grep "^  Lines:" base-coverage-full.txt | tail -1 | awk '{print $2}' | sed 's/%//' || echo "0")
+            echo "base_coverage=$BASE_COVERAGE" >> $GITHUB_OUTPUT
+            echo "Base branch code coverage: $BASE_COVERAGE% (from text fallback)"
+          fi
+
+          # Extract per-file coverage for comparison
+          # PHPUnit outputs class name on one line, stats on the next line
+          awk '
+            /^[A-Za-z_]/ { classname = $0; next }
+            /^  Methods:.*Lines:/ {
+              gsub(/\x1b\[[0-9;]*m/, "", classname);
+              gsub(/\x1b\[[0-9;]*m/, "", $0);
+              print classname " " $0
+            }
+          ' base-coverage-full.txt > base-coverage-details.txt || true
+
+          echo "=== Base coverage details saved ==="
+          head -20 base-coverage-details.txt || true
+        continue-on-error: true
+
+      - name: Generate coverage diff report
+        if: github.event_name == 'pull_request'
+        id: coverage_diff
+        run: |
+          # Restore current branch coverage files
+          cp /tmp/current-coverage-details.txt current-coverage-details.txt 2>/dev/null || true
+
+          # Create a Python script to compare coverage
+          cat > compare_coverage.py << 'PYTHON_SCRIPT'
+          import re
+          import sys
+          import json
+
+          def parse_coverage_line(line):
+              """Parse a coverage line to extract class name and line coverage percentage."""
+              # Example line: "Progress_Planner\Activity   Methods:  55.56% ( 5/ 9)   Lines:  91.92% ( 91/ 99)"
+              match = re.search(r'^([\w\\]+)\s+Methods:\s+([\d.]+)%.*Lines:\s+([\d.]+)%\s+\(\s*(\d+)/\s*(\d+)\)', line)
+              if match:
+                  class_name = match.group(1)
+                  # Group 2 is methods percentage (not used)
+                  line_percent = float(match.group(3))  # Lines percentage
+                  covered_lines = int(match.group(4))   # Covered lines count
+                  total_lines = int(match.group(5))     # Total lines count
+                  return class_name, line_percent, covered_lines, total_lines
+              return None, None, None, None
+
+          def load_coverage(filename):
+              """Load coverage data from file."""
+              coverage = {}
+              try:
+                  with open(filename, 'r') as f:
+                      for line in f:
+                          class_name, percent, covered, total = parse_coverage_line(line)
+                          if class_name:
+                              coverage[class_name] = {
+                                  'percent': percent,
+                                  'covered': covered,
+                                  'total': total
+                              }
+              except FileNotFoundError:
+                  pass
+              return coverage
+
+          # Load current and base coverage
+          current = load_coverage('current-coverage-details.txt')
+          base = load_coverage('base-coverage-details.txt')
+
+          # Find changes
+          changes = {
+              'new_files': [],
+              'improved': [],
+              'degraded': [],
+              'unchanged': []
+          }
+
+          # Check all current files
+          for class_name in sorted(current.keys()):
+              curr_data = current[class_name]
+              if class_name not in base:
+                  # New file
+                  changes['new_files'].append({
+                      'class': class_name,
+                      'coverage': curr_data['percent'],
+                      'lines': f"{curr_data['covered']}/{curr_data['total']}"
+                  })
+              else:
+                  base_data = base[class_name]
+                  diff = curr_data['percent'] - base_data['percent']
+                  if abs(diff) < 0.01:  # Less than 0.01% difference
+                      continue  # Skip unchanged files for brevity
+                  elif diff > 0:
+                      changes['improved'].append({
+                          'class': class_name,
+                          'old': base_data['percent'],
+                          'new': curr_data['percent'],
+                          'diff': diff
+                      })
+                  else:
+                      changes['degraded'].append({
+                          'class': class_name,
+                          'old': base_data['percent'],
+                          'new': curr_data['percent'],
+                          'diff': diff
+                      })
+
+          # Output as JSON for GitHub Actions
+          print(json.dumps(changes))
+          PYTHON_SCRIPT
+
+          # Run the comparison
+          CHANGES_JSON=$(python3 compare_coverage.py)
+          echo "coverage_changes<<EOF" >> $GITHUB_OUTPUT
+          echo "$CHANGES_JSON" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+          echo "=== Coverage changes ==="
+          echo "$CHANGES_JSON" | python3 -m json.tool || echo "$CHANGES_JSON"
+        continue-on-error: true
+
+      - name: Compare coverage and enforce threshold
+        if: github.event_name == 'pull_request'
+        run: |
+          CURRENT="${{ steps.coverage.outputs.current_coverage }}"
+          BASE="${{ steps.base_coverage.outputs.base_coverage }}"
+
+          # Default to 0 if base coverage couldn't be determined
+          BASE=${BASE:-0}
+
+          echo "Current Coverage: $CURRENT%"
+          echo "Base Coverage: $BASE%"
+
+          # Calculate the difference
+          DIFF=$(echo "$CURRENT - $BASE" | bc)
+          echo "Coverage Difference: $DIFF%"
+
+          # Check if coverage dropped by more than 0.5%
+          THRESHOLD=-0.5
+          if (( $(echo "$DIFF < $THRESHOLD" | bc -l) )); then
+            echo "❌ Code coverage dropped by ${DIFF}%, which exceeds the allowed threshold of ${THRESHOLD}%"
+            echo "Please add tests to maintain or improve code coverage."
+            exit 1
+          else
+            echo "✅ Code coverage check passed!"
+            echo "Coverage change: ${DIFF}%"
+          fi
+
+      - name: Comment PR with coverage
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        env:
+          COVERAGE_CHANGES: ${{ steps.coverage_diff.outputs.coverage_changes }}
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const current = parseFloat('${{ steps.coverage.outputs.current_coverage }}') || 0;
+            const base = parseFloat('${{ steps.base_coverage.outputs.base_coverage }}') || 0;
+            const diff = (current - base).toFixed(2);
+            const diffEmoji = diff >= 0 ? '📈' : '📉';
+            const coverageEmoji = current >= 80 ? '🎉' : current >= 60 ? '📈' : current >= 40 ? '📊' : '📉';
+            const status = diff >= -0.5 ? '✅' : '⚠️';
+
+            // Parse coverage changes JSON from environment variable
+            let changesJson = {};
+            try {
+              const changesStr = process.env.COVERAGE_CHANGES || '{}';
+              changesJson = JSON.parse(changesStr);
+            } catch (e) {
+              console.log('Failed to parse coverage changes:', e);
+              console.log('Raw value:', process.env.COVERAGE_CHANGES);
+            }
+
+            // Build detailed changes section
+            let detailedChanges = '';
+            let hasChanges = false;
+
+            // Build inner content for details
+            let changesContent = '';
+
+            // New files with coverage
+            if (changesJson.new_files && changesJson.new_files.length > 0) {
+              hasChanges = true;
+              changesContent += '\n### 🆕 New Files\n\n';
+              changesContent += '| Class | Coverage | Lines |\n';
+              changesContent += '|-------|----------|-------|\n';
+              for (const file of changesJson.new_files) {
+                const emoji = file.coverage >= 80 ? '🟢' : file.coverage >= 60 ? '🟡' : '🔴';
+                changesContent += `| ${emoji} \`${file.class}\` | ${file.coverage.toFixed(2)}% | ${file.lines} |\n`;
+              }
+            }
+
+            // Improved coverage
+            if (changesJson.improved && changesJson.improved.length > 0) {
+              hasChanges = true;
+              changesContent += '\n### 📈 Coverage Improved\n\n';
+              changesContent += '| Class | Before | After | Change |\n';
+              changesContent += '|-------|--------|-------|--------|\n';
+              const sortedImproved = changesJson.improved.sort((a, b) => b.diff - a.diff);
+              for (const file of sortedImproved) {
+                changesContent += `| \`${file.class}\` | ${file.old.toFixed(2)}% | ${file.new.toFixed(2)}% | +${file.diff.toFixed(2)}% |\n`;
+              }
+            }
+
+            // Degraded coverage
+            if (changesJson.degraded && changesJson.degraded.length > 0) {
+              hasChanges = true;
+              changesContent += '\n### 📉 Coverage Decreased\n\n';
+              changesContent += '| Class | Before | After | Change |\n';
+              changesContent += '|-------|--------|-------|--------|\n';
+              const sortedDegraded = changesJson.degraded.sort((a, b) => a.diff - b.diff);
+              for (const file of sortedDegraded) {
+                changesContent += `| \`${file.class}\` | ${file.old.toFixed(2)}% | ${file.new.toFixed(2)}% | ${file.diff.toFixed(2)}% |\n`;
+              }
+            }
+
+            // Wrap in collapsible details if there are changes
+            if (hasChanges) {
+              const totalFiles = (changesJson.new_files?.length || 0) +
+                                 (changesJson.improved?.length || 0) +
+                                 (changesJson.degraded?.length || 0);
+              detailedChanges = `\n<details>\n<summary>📊 File-level Coverage Changes (${totalFiles} files)</summary>\n${changesContent}\n</details>\n`;
+            }
+
+            const comment = `## ${status} Code Coverage Report
+
+            | Metric | Value |
+            |--------|-------|
+            | **Total Coverage** | **${current.toFixed(2)}%** ${coverageEmoji} |
+            | Base Coverage | ${base.toFixed(2)}% |
+            | Difference | ${diffEmoji} **${diff}%** |
+
+            ${current >= 40 ? '✅ Coverage meets minimum threshold (40%)' : '⚠️ Coverage below recommended 40% threshold'}
+
+            ${diff < -0.5 ? '⚠️ **Warning:** Coverage dropped by more than 0.5%. Please add tests.' : ''}
+            ${diff >= 0 ? '🎉 Great job maintaining/improving code coverage!' : ''}
+
+            ${detailedChanges}
+
+            <details>
+            <summary>ℹ️ About this report</summary>
+
+            - All tests run in a single job with Xdebug coverage
+            - Security tests excluded from coverage to prevent output issues
+            - Coverage calculated from line coverage percentages
+
+            </details>
+            `;
+
+            // Find existing coverage report comment
+            const {data: comments} = await github.rest.issues.listComments({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+            });
+
+            const botComment = comments.find(comment =>
+              comment.user.type === 'Bot' &&
+              comment.body.includes('Code Coverage Report')
+            );
+
+            if (botComment) {
+              // Update existing comment
+              await github.rest.issues.updateComment({
+                comment_id: botComment.id,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                body: comment
+              });
+            } else {
+              // Create new comment
+              await github.rest.issues.createComment({
+                issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                body: comment
+              });
+            }
+
+      - name: Generate HTML coverage report
+        if: always()
+        run: |
+          vendor/bin/phpunit --coverage-html=coverage-html
+        continue-on-error: true
+
+      - name: Upload HTML coverage report as artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: coverage-html/
+          retention-days: 30

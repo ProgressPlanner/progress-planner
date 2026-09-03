@@ -29,7 +29,7 @@ namespace Progress_Planner\Suggested_Tasks;
  * @property int|null $target_term_id The target term ID for the task
  * @property string|null $target_taxonomy The target taxonomy for the task
  * @property string|null $target_term_name The target term name for the task
- * @property string|null $date The task date in YW format (year-week)
+ * @property string|null $date The task date in oW format (ISO year + ISO week)
  */
 class Task {
 	/**
@@ -102,16 +102,25 @@ class Task {
 	/**
 	 * Check if the task is snoozed.
 	 *
-	 * @return bool
+	 * A task is snoozed when its post_status is 'future', meaning it's scheduled
+	 * to reappear at a later date (the snooze duration selected by the user).
+	 *
+	 * @return bool True if snoozed, false otherwise.
 	 */
 	public function is_snoozed(): bool {
 		return isset( $this->data['post_status'] ) && 'future' === $this->data['post_status'];
 	}
 
 	/**
-	 * Get the snoozed until date.
+	 * Get the date when a snoozed task will reappear.
 	 *
-	 * @return \DateTime|null|false
+	 * Return values explained:
+	 * - DateTime object: Task is snoozed and will reappear on this date
+	 * - null: Task is not snoozed (no post_date set)
+	 * - false: post_date exists but couldn't be parsed (invalid format) - this is from DateTime::createFromFormat()
+	 *
+	 * @return \DateTime|null|false DateTime when task will un-snooze, null if not snoozed,
+	 *                               false if date format is invalid.
 	 */
 	public function snoozed_until() {
 		return isset( $this->data['post_date'] ) ? \DateTime::createFromFormat( 'Y-m-d H:i:s', $this->data['post_date'] ) : null;
@@ -120,7 +129,15 @@ class Task {
 	/**
 	 * Check if the task is completed.
 	 *
-	 * @return bool
+	 * Task completion statuses:
+	 * - 'trash': Task was explicitly completed/dismissed by the user
+	 * - 'pending': Task is in celebration mode (completed but showing celebration UI)
+	 *
+	 * Note: 'pending' being treated as completed is counterintuitive but intentional.
+	 * It represents tasks that were completed and are now in a temporary "celebrate"
+	 * state before being fully archived. This allows showing congratulations UI.
+	 *
+	 * @return bool True if completed (trash or pending status), false otherwise.
 	 */
 	public function is_completed(): bool {
 		return isset( $this->data['post_status'] ) && \in_array( $this->data['post_status'], [ 'trash', 'pending' ], true );

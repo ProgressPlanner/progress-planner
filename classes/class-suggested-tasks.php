@@ -103,12 +103,25 @@ class Suggested_Tasks {
 	 * @return void
 	 */
 	public function insert_activity( string $task_id ): void {
+		/**
+		 * Filter the activity category for a completed task.
+		 *
+		 * Allows customizing the category used when recording task completion activities.
+		 * For example, onboarding tasks may use 'onboarding_task' instead of 'suggested_task'
+		 * to exclude them from monthly badge calculations.
+		 *
+		 * @param string $category The activity category (default: 'suggested_task').
+		 * @param string $task_id  The task ID being completed.
+		 */
+		$category = \apply_filters( 'progress_planner_task_activity_category', 'suggested_task', $task_id );
+
 		// Insert an activity.
-		$activity          = new Suggested_Task_Activity();
-		$activity->type    = 'completed';
-		$activity->data_id = (string) $task_id;
-		$activity->date    = new \DateTime();
-		$activity->user_id = \get_current_user_id();
+		$activity           = new Suggested_Task_Activity();
+		$activity->category = $category;
+		$activity->type     = 'completed';
+		$activity->data_id  = (string) $task_id;
+		$activity->date     = new \DateTime();
+		$activity->user_id  = \get_current_user_id();
 		$activity->save();
 
 		// Allow other classes to react to the completion of a suggested task.
@@ -483,7 +496,8 @@ class Suggested_Tasks {
 		// Handle sorting parameters.
 		if ( isset( $request['filter']['orderby'] ) ) {
 			// @phpstan-ignore-next-line argument.templateType
-			$args['orderby'] = \sanitize_sql_orderby( $request['filter']['orderby'] );
+			$orderby         = \sanitize_sql_orderby( $request['filter']['orderby'] ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+			$args['orderby'] = $orderby !== false ? $orderby : 'date';
 		}
 		if ( isset( $request['filter']['order'] ) ) {
 			$args['order'] = \in_array( \strtoupper( $request['filter']['order'] ), [ 'ASC', 'DESC' ], true )
@@ -640,6 +654,8 @@ class Suggested_Tasks {
 	 * @return string
 	 */
 	public function get_task_id_from_slug( $slug ) {
-		return \explode( '__trashed', $slug )[0];
+		// Cast to string: callers may pass a null post_name/task_id, which would
+		// trigger a deprecation notice from explode() on PHP 8.1+.
+		return \explode( '__trashed', (string) $slug )[0];
 	}
 }
