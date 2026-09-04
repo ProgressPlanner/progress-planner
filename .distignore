@@ -25,4 +25,9 @@ phpstan.neon.dist
 phpunit.xml.dist
 playwright.config.js
 README.md
+/third-party/angie/node_modules
+/third-party/angie/src
+/third-party/angie/tsconfig.json
+/third-party/angie/package.json
+/third-party/angie/package-lock.json
 SECURITY.md
