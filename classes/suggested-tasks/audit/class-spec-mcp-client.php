@@ -1,0 +1,316 @@
+<?php
+/**
+ * AI bridge to the website specification (phase C).
+ *
+ * @package Progress_Planner
+ */
+
+namespace Progress_Planner\Suggested_Tasks\Audit;
+
+/**
+ * Audits a URL against the website specification using WordPress 7.0's core AI client.
+ *
+ * ---------------------------------------------------------------------------
+ * IMPORTANT — read before changing this class:
+ *
+ * The class name says "MCP" because the original design pointed the WordPress
+ * AI client at the specification.website MCP server. Research against the
+ * shipped WP 7.0 API showed that **core's AI client cannot act as an MCP
+ * client** — it only supports locally-registered PHP function declarations /
+ * Abilities, not external MCP servers. (WordPress's MCP story is the MCP
+ * *Adapter*, which makes WP an MCP *server*, the opposite direction.)
+ *
+ * So instead of an MCP transport we:
+ *   1. Fetch the specification's checklist over plain HTTP (it is published as
+ *      Markdown / JSON), and
+ *   2. Hand that checklist + the homepage HTML to `wp_ai_client_prompt()` with a
+ *      JSON-schema-constrained response, asking the model to return per-rule
+ *      pass/fail in our finding schema.
+ *
+ * This uses the *verified* WP 7.0 AI API surface and avoids a hand-rolled MCP
+ * JSON-RPC client.
+ *
+ * The WP 7.0 entry point is guarded by `function_exists( 'wp_ai_client_prompt' )`
+ * and `wp_supports_ai()`, so this class is a safe no-op on WordPress < 7.0 or
+ * when no AI provider is configured — {@see is_available()} returns false and the
+ * local source falls back to deterministic PHP checks only.
+ *
+ * Verified against WordPress 7.0 core (wp-includes/ai-client.php +
+ * wp-includes/ai-client/class-wp-ai-client-prompt-builder.php): the builder is
+ * WP_AI_Client_Prompt_Builder, which delegates SDK methods via __call (so
+ * method_exists() must NOT be used to guard them). `is_supported_for_text_generation()`
+ * returns bool and is gated by wp_supports_ai() + the wp_ai_client_prevent_prompt
+ * filter; `using_max_tokens( int )`, `as_json_response( ?array )` and
+ * `generate_text()` (returns string or WP_Error) all resolve through the wrapper.
+ * The one thing still not exercised is the specification.website checklist
+ * endpoint shape (we tolerate an empty checklist).
+ * ---------------------------------------------------------------------------
+ */
+class Spec_Mcp_Client {
+
+	/**
+	 * Endpoint for the specification's LLM-oriented index.
+	 *
+	 * Per https://specification.website/, /llms.txt is the canonical structured
+	 * Markdown index designed for LLM consumption (~37KB). The /mcp/ URL we used
+	 * earlier returns the HTML page describing the MCP server, NOT spec content,
+	 * so the model was being fed irrelevant HTML.
+	 *
+	 * @var string
+	 */
+	protected const SPEC_CHECKLIST_URL = 'https://specification.website/llms.txt';
+
+	/**
+	 * Whether the AI client is available and a provider is configured.
+	 *
+	 * @return bool
+	 */
+	public function is_available(): bool {
+		/**
+		 * Allow forcibly disabling the AI audit layer (e.g. to save tokens).
+		 *
+		 * @param bool $enabled Whether the AI audit layer is enabled.
+		 */
+		if ( ! \apply_filters( 'progress_planner_spec_audit_ai_enabled', true ) ) {
+			return false;
+		}
+
+		// WP 7.0 core AI client entry point + environment support check.
+		if ( ! \function_exists( 'wp_ai_client_prompt' ) || ! \function_exists( 'wp_supports_ai' ) ) {
+			return false;
+		}
+		if ( ! \wp_supports_ai() ) { // @phpstan-ignore-line function.notFound
+			return false;
+		}
+
+		// is_supported_for_text_generation() is delegated through the builder's
+		// __call, so it must be called directly (method_exists() would miss it).
+		// It returns false when no provider/model is configured for text generation.
+		try {
+			return (bool) \wp_ai_client_prompt( 'ping' )->is_supported_for_text_generation(); // @phpstan-ignore-line function.notFound
+		} catch ( \Throwable $e ) {
+			$this->log_error( 'is_supported_for_text_generation threw', \get_class( $e ), $e->getMessage() );
+			return false;
+		}
+	}
+
+	/**
+	 * Audit a URL against the specification using the AI client.
+	 *
+	 * Returns raw (un-normalized) findings; {@see Audit_Runner::normalize()}
+	 * enforces the schema. Returns an empty array on any failure, so callers can
+	 * safely treat the AI layer as best-effort.
+	 *
+	 * @param string $url The URL to audit.
+	 *
+	 * @return array<int, array<string, mixed>>
+	 */
+	public function audit_url( string $url ): array {
+		if ( ! $this->is_available() ) {
+			return [];
+		}
+
+		$checklist = $this->get_checklist();
+		$html      = $this->fetch_html( $url );
+
+		if ( '' === $html ) {
+			return [];
+		}
+
+		try {
+			$json = $this->run_prompt( $url, $checklist, $html );
+		} catch ( \Throwable $e ) {
+			$this->log_error( 'run_prompt threw', \get_class( $e ), $e->getMessage() );
+			return [];
+		}
+
+		$decoded = \is_string( $json ) ? \json_decode( $json, true ) : $json;
+		if ( ! \is_array( $decoded ) ) {
+			$this->log_error( 'json_decode failed or non-array result', '', \is_string( $json ) ? \substr( $json, 0, 200 ) : \gettype( $json ) );
+			return [];
+		}
+
+		// Accept either a bare list or a { "findings": [...] } envelope.
+		$items = isset( $decoded['findings'] ) && \is_array( $decoded['findings'] ) ? $decoded['findings'] : $decoded;
+
+		$findings = [];
+		foreach ( $items as $item ) {
+			if ( \is_array( $item ) && ! empty( $item['rule_id'] ) ) {
+				$item['source'] = 'mcp-llm';
+				$findings[]     = $item;
+			}
+		}
+
+		return $findings;
+	}
+
+	/**
+	 * Run the AI prompt and return the (JSON) response.
+	 *
+	 * Isolated so the exact WP 7.0 builder chain lives in one place.
+	 *
+	 * @param string $url       The audited URL.
+	 * @param string $checklist The specification checklist text.
+	 * @param string $html      The homepage HTML.
+	 *
+	 * @return string|array<mixed>|null
+	 */
+	protected function run_prompt( string $url, string $checklist, string $html ) {
+		// NOTE: Anthropic's structured-output API requires `additionalProperties:false`
+		// on every `type:object` in the schema. Without it the call 400s with:
+		// output_format.schema: For 'object' type, 'additionalProperties' must
+		// be explicitly set to false.
+		// Verified against the live Connectors API on 2026-05-30.
+		$schema = [
+			'type'                 => 'object',
+			'additionalProperties' => false,
+			'properties'           => [
+				'findings' => [
+					'type'  => 'array',
+					'items' => [
+						'type'                 => 'object',
+						'additionalProperties' => false,
+						'properties'           => [
+							'rule_id'     => [ 'type' => 'string' ],
+							'category'    => [ 'type' => 'string' ],
+							'title'       => [ 'type' => 'string' ],
+							'description' => [ 'type' => 'string' ],
+							'severity'    => [
+								'type' => 'string',
+								'enum' => [ 'high', 'medium', 'low' ],
+							],
+							'status'      => [
+								'type' => 'string',
+								'enum' => [ 'pass', 'fail' ],
+							],
+							'doc_url'     => [ 'type' => 'string' ],
+						],
+						'required'             => [ 'rule_id', 'status', 'title' ],
+					],
+				],
+			],
+			'required'             => [ 'findings' ],
+		];
+
+		// Keep the HTML payload bounded so we don't blow the context / token budget.
+		$html_excerpt = \substr( $html, 0, 20000 );
+
+		$instruction = \sprintf(
+			"You are auditing a website against the Website Specification.\n\n"
+			. "URL: %s\n\n"
+			. "Specification (Markdown index):\n%s\n\n"
+			. "Each spec rule has a CANONICAL identifier derived from its URL on specification.website:\n"
+			. "  https://specification.website/spec/{category}/{slug}/\n"
+			. "For example: /spec/foundations/meta-viewport/ → category=foundations, rule_id=meta-viewport.\n\n"
+			. "For each BASIC rule from the spec that you can evaluate from the HTML below, return a finding:\n"
+			. "  - rule_id: the exact canonical slug from the spec URL (e.g. 'meta-viewport', 'open-graph', 'theme-color'). NEVER invent slugs.\n"
+			. "  - category: the spec category from the URL ('foundations', 'seo', 'accessibility', 'security', 'performance', 'privacy', 'agent-readiness', 'resilience', 'i18n', 'well-known').\n"
+			. "  - title: a short, human title for the fix.\n"
+			. "  - description: 1–2 sentences explaining what's wrong and how to fix it.\n"
+			. "  - severity: 'high' | 'medium' | 'low'.\n"
+			. "  - status: 'pass' if the HTML satisfies the rule, 'fail' otherwise.\n"
+			. "  - doc_url: the full /spec/{category}/{slug}/ URL.\n\n"
+			. "Only include rules whose canonical slug appears in the specification above and which you can actually evaluate from the provided HTML. Do not invent rules. Keep rule_id values consistent across runs.\n\n"
+			. "HTML:\n%s",
+			$url,
+			$checklist,
+			$html_excerpt
+		);
+
+		// These methods are delegated via WP_AI_Client_Prompt_Builder::__call, so
+		// they are called directly (method_exists() would not see them). The
+		// builder is fluent; generate_text() returns a JSON string (per the schema)
+		// or a WP_Error.
+		$result = \wp_ai_client_prompt( $instruction ) // @phpstan-ignore-line function.notFound
+			->using_max_tokens( 2000 )
+			->as_json_response( $schema )
+			->generate_text();
+
+		if ( \is_wp_error( $result ) ) {
+			$this->log_error( 'wp_ai_client_prompt returned WP_Error', $result->get_error_code(), $result->get_error_message() );
+			return null;
+		}
+
+		return $result;
+	}
+
+	/**
+	 * Log a diagnostic line about the AI call when WP_DEBUG is on.
+	 *
+	 * The AI path is best-effort and we deliberately return [] on failure so the
+	 * audit still produces deterministic findings. But silent failure makes the
+	 * feature impossible to debug — this surfaces the cause in debug.log without
+	 * changing the public contract.
+	 *
+	 * @param string $context Short label for where in the flow we failed.
+	 * @param string $code    Optional WP_Error code (or exception class name).
+	 * @param string $message Optional human-readable error message.
+	 *
+	 * @return void
+	 */
+	protected function log_error( string $context, string $code = '', string $message = '' ) {
+		if ( ! ( \defined( 'WP_DEBUG' ) && \WP_DEBUG ) ) {
+			return;
+		}
+		\error_log( // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+			\sprintf( '[progress-planner spec-audit ai] %s | code=%s | %s', $context, $code, $message )
+		);
+	}
+
+	/**
+	 * Fetch the specification checklist text.
+	 *
+	 * Cached for a week; failures fall back to an empty string (the model then
+	 * audits from general knowledge of the spec, still useful but less precise).
+	 *
+	 * @return string
+	 */
+	protected function get_checklist(): string {
+		$cache_key = 'spec_audit_checklist';
+		$cached    = \progress_planner()->get_utils__cache()->get( $cache_key );
+		if ( \is_string( $cached ) ) {
+			return $cached;
+		}
+
+		$response = \wp_remote_get(
+			self::SPEC_CHECKLIST_URL,
+			[
+				'timeout' => 15,
+				'headers' => [ 'Accept' => 'text/markdown, text/plain, */*' ],
+			]
+		);
+
+		if ( \is_wp_error( $response ) || 200 !== (int) \wp_remote_retrieve_response_code( $response ) ) {
+			\progress_planner()->get_utils__cache()->set( $cache_key, '', 5 * MINUTE_IN_SECONDS );
+			return '';
+		}
+
+		$body = (string) \wp_remote_retrieve_body( $response );
+		\progress_planner()->get_utils__cache()->set( $cache_key, $body, WEEK_IN_SECONDS );
+
+		return $body;
+	}
+
+	/**
+	 * Fetch the HTML for a URL.
+	 *
+	 * @param string $url The URL.
+	 *
+	 * @return string
+	 */
+	protected function fetch_html( string $url ): string {
+		$response = \wp_remote_get(
+			$url,
+			[
+				'timeout'    => 10,
+				'user-agent' => 'Progress Planner Spec Audit',
+			]
+		);
+
+		if ( \is_wp_error( $response ) || 200 !== (int) \wp_remote_retrieve_response_code( $response ) ) {
+			return '';
+		}
+
+		return (string) \wp_remote_retrieve_body( $response );
+	}
+}
