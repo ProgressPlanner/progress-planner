@@ -169,11 +169,6 @@ class Base {
 		// Plugin installer.
 		$this->get_plugin_installer();
 
-		/**
-		 * Redirect on login.
-		 */
-		\add_action( 'wp_login', [ $this, 'redirect_on_login' ], 10, 2 );
-
 		if ( \defined( 'WP_CLI' ) && \WP_CLI ) {
 			$this->get_wp_cli__get_stats_command();
 			$this->get_wp_cli__task_command();
@@ -514,34 +509,6 @@ class Base {
 		}
 
 		return false;
-	}
-
-	/**
-	 * Redirect on login.
-	 *
-	 * @param string   $user_login The user login.
-	 * @param \WP_User $user The user object.
-	 *
-	 * @return void
-	 */
-	public function redirect_on_login( $user_login, $user ) {
-		// Check if the $user can `manage_options`.
-		if ( ! $user->has_cap( 'manage_options' ) ) {
-			return;
-		}
-
-		// Check if the user has the `prpl_redirect_on_login` meta.
-		if ( ! \get_user_meta( $user->ID, 'prpl_redirect_on_login', true ) ) {
-			return;
-		}
-
-		if ( isset( $_REQUEST['redirect_to'] ) && '' !== $_REQUEST['redirect_to'] && \admin_url( '/' ) !== $_REQUEST['redirect_to'] ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended, WordPress.Security.NonceVerification.Missing -- We're not processing any data.
-			return;
-		}
-
-		// Redirect to the Progress Planner dashboard.
-		\wp_safe_redirect( \admin_url( 'admin.php?page=progress-planner' ) );
-		exit;
 	}
 
 	/**
