@@ -1,0 +1,354 @@
+<?php
+/**
+ * Monitor WordPress core for pending security updates.
+ *
+ * @package Progress_Planner
+ */
+
+namespace Progress_Planner\Utils;
+
+/**
+ * Detects pending WordPress core security releases.
+ *
+ * Every core patch release (same major.minor, higher patch) is treated
+ * as a security release.
+ */
+class Security_Update_Monitor {
+
+	/**
+	 * The option holding the last offered version we alerted about.
+	 *
+	 * @var string
+	 */
+	const ALERTED_VERSION_OPTION = 'progress_planner_security_update_alerted_version';
+
+	/**
+	 * The option used as a short-lived lock while sending alerts.
+	 *
+	 * @var string
+	 */
+	const LOCK_OPTION = 'prpl_security_alert_lock';
+
+	/**
+	 * Constructor.
+	 */
+	public function __construct() {
+		// Fires whenever wp_version_check() refreshes the transient, including on front-end cron.
+		\add_action( 'set_site_transient_update_core', [ $this, 'maybe_alert' ] );
+
+		// Fallback re-check, before Suggested_Tasks::init() runs on admin_init:20.
+		\add_action( 'admin_init', [ $this, 'maybe_alert_from_stored_transient' ], 5 );
+	}
+
+	/**
+	 * Re-check the stored transient (fallback for sites where the hook never fired).
+	 *
+	 * @return void
+	 */
+	public function maybe_alert_from_stored_transient() {
+		$this->maybe_alert( \get_site_transient( 'update_core' ) );
+	}
+
+	/**
+	 * Alert site admins (and the SaaS) about a pending security update, once per offered version.
+	 *
+	 * @param mixed $transient The update_core site transient value.
+	 *
+	 * @return void
+	 */
+	public function maybe_alert( $transient ) {
+		if ( \is_multisite() && ! \is_main_site() ) {
+			return;
+		}
+
+		$update = self::get_pending_security_update( \is_object( $transient ) ? $transient : null );
+		if ( null === $update ) {
+			return;
+		}
+
+		// One alert per offered version.
+		if ( \get_site_option( self::ALERTED_VERSION_OPTION ) === $update['offered'] ) {
+			return;
+		}
+
+		// Cron and a concurrent admin pageview can both fire this; take a short-lived lock.
+		// Network options, like the alerted-version option, so single- and multisite behave alike.
+		if ( ! \add_site_option( self::LOCK_OPTION, \time() ) ) {
+			$lock_time = (int) \get_site_option( self::LOCK_OPTION );
+			if ( $lock_time > \time() - 30 ) {
+				return;
+			}
+
+			// Stale lock (crashed process): clear it and bail. Proceeding here would let two
+			// concurrent requests both send; the next trigger takes a fresh lock atomically.
+			\delete_site_option( self::LOCK_OPTION );
+			return;
+		}
+
+		try {
+			$this->send_admin_email( $update['installed'], $update['offered'] );
+
+			// Mark as alerted even if sending failed, to avoid alert storms on every request.
+			// The subscriber email is sent by progressplanner.com, which watches the
+			// wordpress.org releases feed and reads this site's version via get-stats.
+			\update_site_option( self::ALERTED_VERSION_OPTION, $update['offered'] );
+		} finally {
+			\delete_site_option( self::LOCK_OPTION );
+		}
+	}
+
+	/**
+	 * Email every user who can install core updates about the security release.
+	 *
+	 * @param string $installed The installed version.
+	 * @param string $offered   The offered version.
+	 *
+	 * @return void
+	 */
+	private function send_admin_email( $installed, $offered ) {
+		$subject = \sprintf(
+			/* translators: 1: The site name, 2: The offered WordPress version. */
+			\__( '[%1$s] Critical: WordPress %2$s security update available', 'progress-planner' ),
+			\wp_specialchars_decode( (string) \get_option( 'blogname' ), ENT_QUOTES ),
+			$offered
+		);
+
+		// Onboarded sites go to the Progress Planner dashboard, which carries the
+		// one-click branch-pinned update button. The wp-admin Updates page only
+		// offers the latest major, so it is just the fallback for sites that have
+		// not onboarded yet (their dashboard would show the welcome screen).
+		$is_onboarded = \progress_planner()->is_privacy_policy_accepted();
+		$action_url   = $is_onboarded
+			? \admin_url( 'admin.php?page=progress-planner' )
+			: \admin_url( 'update-core.php' );
+
+		$paragraphs = [
+			\sprintf(
+				/* translators: 1: The offered WordPress version, 2: The installed WordPress version. */
+				\__( 'A WordPress security release is available: version %1$s (your site runs %2$s).', 'progress-planner' ),
+				$offered,
+				$installed
+			),
+			\sprintf(
+				/* translators: %s: The URL where the update can be installed. */
+				\__(
+					'Security issues in WordPress are typically exploited within hours of a release, so please update as soon as possible:
+
+%s',
+					'progress-planner'
+				),
+				$action_url
+			),
+		];
+
+		if ( $is_onboarded ) {
+			$paragraphs[] = \__( 'Your Progress Planner dashboard has a one-click button to install exactly this update; the task will be marked complete once your site is updated.', 'progress-planner' );
+		}
+
+		$paragraphs[] = \sprintf(
+			/* translators: %s: The URL of the WordPress backups documentation. */
+			\__( 'If you have a backup solution, make a fresh backup before updating — but do not postpone the update if you have none. Learn more about backups: %s', 'progress-planner' ),
+			'https://wordpress.org/documentation/article/wordpress-backups/'
+		);
+		$paragraphs[] = \__( 'If your site has automatic updates enabled, it may install this update by itself — in that case, please verify that the update has been applied.', 'progress-planner' );
+		$paragraphs[] = \__( 'This alert was sent by the Progress Planner plugin.', 'progress-planner' );
+
+		$message = \implode( "\n\n", $paragraphs );
+
+		foreach ( $this->get_recipients() as $email ) {
+			\wp_mail( $email, $subject, $message );
+		}
+	}
+
+	/**
+	 * Get the email addresses of all users who can install core updates.
+	 *
+	 * @return string[]
+	 */
+	private function get_recipients() {
+		if ( \is_multisite() ) {
+			$emails = [];
+			foreach ( \get_super_admins() as $login ) {
+				$user = \get_user_by( 'login', $login );
+				if ( $user ) {
+					$emails[] = $user->user_email;
+				}
+			}
+
+			return \array_values( \array_unique( $emails ) );
+		}
+
+		// Only the addresses are needed; this can run on a front-end cron request.
+		$emails = [];
+		foreach ( \get_users(
+			[
+				'capability' => 'update_core',
+				'fields'     => 'user_email',
+			]
+		) as $email ) {
+			if ( \is_string( $email ) && '' !== $email ) {
+				$emails[] = $email;
+			}
+		}
+
+		return \array_values( \array_unique( $emails ) );
+	}
+
+	/**
+	 * Check whether a security-update task is currently published.
+	 *
+	 * While one is published, the recommendations UI is locked down to that task.
+	 *
+	 * @return bool
+	 */
+	public function is_security_lockdown_active() {
+		return ! empty(
+			\progress_planner()->get_suggested_tasks_db()->get_tasks_by(
+				[
+					'post_status' => 'publish',
+					'provider_id' => 'security-update',
+					'numberposts' => 1,
+				]
+			)
+		);
+	}
+
+	/**
+	 * Check whether an offered version is a security release, compared to the installed one.
+	 *
+	 * A security release is a patch release on the same branch: same major.minor,
+	 * with a higher patch number. Non-stable versions (alpha/beta/RC) never qualify.
+	 *
+	 * @param string $installed The installed WordPress version.
+	 * @param string $offered   The offered WordPress version.
+	 *
+	 * @return bool
+	 */
+	public static function is_security_release( $installed, $offered ) {
+		// Non-stable versions (e.g. 6.9-alpha-59000, 6.9-RC1) never qualify.
+		if ( false !== \strpos( $installed, '-' ) || false !== \strpos( $offered, '-' ) ) {
+			return false;
+		}
+
+		$installed_parts = self::get_version_parts( $installed );
+		$offered_parts   = self::get_version_parts( $offered );
+
+		if ( null === $installed_parts || null === $offered_parts ) {
+			return false;
+		}
+
+		return $installed_parts[0] === $offered_parts[0]
+			&& $installed_parts[1] === $offered_parts[1]
+			&& $offered_parts[2] > $installed_parts[2];
+	}
+
+	/**
+	 * Get the pending security update from an update_core transient, if any.
+	 *
+	 * @param object|null $transient The update_core site transient. Defaults to the stored transient.
+	 * @param string|null $installed The installed version. Defaults to the running WordPress version.
+	 *
+	 * @return array{installed: string, offered: string}|null
+	 */
+	public static function get_pending_security_update( $transient = null, $installed = null ) {
+		if ( null === $installed ) {
+			$installed = self::get_installed_version();
+		}
+
+		$offer = self::get_pending_security_update_offer( $transient, $installed );
+
+		return null === $offer
+			? null
+			: [
+				'installed' => $installed,
+				'offered'   => $offer->current,
+			];
+	}
+
+	/**
+	 * Get the update offer object for the pending security update, if any.
+	 *
+	 * The offer carries the exact version and locale needed to run a
+	 * version-pinned core upgrade through wp-admin/update-core.php.
+	 *
+	 * @param object|null $transient The update_core site transient. Defaults to the stored transient.
+	 * @param string|null $installed The installed version. Defaults to the running WordPress version.
+	 *
+	 * @return object{response: string, current: string, locale?: string}|null
+	 */
+	public static function get_pending_security_update_offer( $transient = null, $installed = null ) {
+		if ( null === $transient ) {
+			$transient = \get_site_transient( 'update_core' );
+		}
+
+		if ( null === $installed ) {
+			$installed = self::get_installed_version();
+		}
+
+		if ( ! \is_object( $transient ) || ! isset( $transient->updates ) || ! \is_array( $transient->updates ) ) {
+			return null;
+		}
+
+		/**
+		 * The best matching offer.
+		 *
+		 * @var object{response: string, current: string, locale?: string}|null $offer
+		 */
+		$offer = null;
+		foreach ( $transient->updates as $update ) {
+			// Same-branch point releases are offered with response "autoupdate" (only the
+			// newest release gets "upgrade"), so a branch-behind site (e.g. 6.9.1 when
+			// 7.0.x is current) receives its 6.9.x security patch as an autoupdate offer.
+			if ( ! \is_object( $update )
+				|| ! isset( $update->response, $update->current )
+				|| ! \in_array( $update->response, [ 'upgrade', 'autoupdate' ], true )
+				|| ! \is_string( $update->current )
+				|| ! self::is_security_release( $installed, $update->current )
+			) {
+				continue;
+			}
+
+			if ( null === $offer || \version_compare( $update->current, $offer->current, '>' ) ) {
+				$offer = $update;
+			}
+		}
+
+		return $offer;
+	}
+
+	/**
+	 * Get the installed WordPress version.
+	 *
+	 * @return string
+	 */
+	public static function get_installed_version() {
+		// wp_get_wp_version() exists since WP 6.7; the plugin supports 6.6.
+		$version = \function_exists( 'wp_get_wp_version' )
+			? \wp_get_wp_version()
+			: ( isset( $GLOBALS['wp_version'] ) && \is_string( $GLOBALS['wp_version'] ) ? $GLOBALS['wp_version'] : '' );
+
+		/**
+		 * Filter the WordPress version the security-update detection treats as installed.
+		 *
+		 * Intended for debugging and testing (e.g. simulating a security release).
+		 *
+		 * @param string $version The running WordPress version.
+		 */
+		return (string) \apply_filters( 'progress_planner_installed_wp_version', $version );
+	}
+
+	/**
+	 * Split a version string into major, minor and patch integers.
+	 *
+	 * @param string $version The version string.
+	 *
+	 * @return array{int, int, int}|null Null when the version is not parsable.
+	 */
+	private static function get_version_parts( $version ) {
+		if ( ! \preg_match( '/^(\d+)\.(\d+)(?:\.(\d+))?$/', $version, $matches ) ) {
+			return null;
+		}
+
+		return [ (int) $matches[1], (int) $matches[2], isset( $matches[3] ) ? (int) $matches[3] : 0 ];
+	}
+}

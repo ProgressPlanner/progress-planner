@@ -153,26 +153,46 @@ class Suggested_Tasks {
 	/**
 	 * If done via automatic updates, the "core update" task should be marked as "trashed" (and skip "pending" status).
 	 *
+	 * @param array $update_results The results of all attempted updates, keyed by type (core, plugin, theme, translation).
+	 *
 	 * @return void
 	 */
-	public function on_automatic_updates_complete(): void {
-		$pending_tasks = \progress_planner()->get_suggested_tasks_db()->get(
-			[
-				'numberposts' => 1,
-				'post_status' => 'publish',
-				'provider_id' => 'update-core',
-				'date_query'  => [ [ 'after' => 'this Monday' ] ],
-			]
-		);
+	public function on_automatic_updates_complete( $update_results = [] ): void {
+		$providers = [
+			// The repetitive update-core task only counts within the current week.
+			'update-core'     => [ 'date_query' => [ [ 'after' => 'this Monday' ] ] ],
+			// The security-update task persists until the update is installed.
+			'security-update' => [],
+		];
 
-		if ( empty( $pending_tasks ) ) {
-			return;
+		// The hook also fires after plugin/theme-only runs; the security task is only
+		// completed when core itself was updated. Evaluation covers every other path.
+		if ( empty( $update_results['core'] ) ) {
+			unset( $providers['security-update'] );
 		}
 
-		\progress_planner()->get_suggested_tasks_db()->update_recommendation( $pending_tasks[0]->ID, [ 'post_status' => 'trash' ] );
+		foreach ( $providers as $provider_id => $extra_args ) {
+			// get_tasks_by() translates provider_id into the taxonomy query; get() would drop it.
+			$pending_tasks = \progress_planner()->get_suggested_tasks_db()->get_tasks_by(
+				\array_merge(
+					[
+						'numberposts' => 1,
+						'post_status' => 'publish',
+						'provider_id' => $provider_id,
+					],
+					$extra_args
+				)
+			);
 
-		// Insert an activity.
-		$this->insert_activity( \progress_planner()->get_suggested_tasks()->get_task_id_from_slug( $pending_tasks[0]->post_name ) );
+			if ( empty( $pending_tasks ) ) {
+				continue;
+			}
+
+			\progress_planner()->get_suggested_tasks_db()->update_recommendation( $pending_tasks[0]->ID, [ 'post_status' => 'trash' ] );
+
+			// Insert an activity.
+			$this->insert_activity( \progress_planner()->get_suggested_tasks()->get_task_id_from_slug( $pending_tasks[0]->post_name ) );
+		}
 	}
 
 	/**
@@ -484,6 +504,12 @@ class Suggested_Tasks {
 			$include_providers = \array_intersect( $include_providers, $request_providers );
 		}
 
+		// While a security-update task is pending, it is the only recommendation
+		// shown to users who can install it.
+		if ( $this->should_lock_down_recommendations( $request, $include_providers ) ) {
+			$include_providers = [ 'security-update' ];
+		}
+
 		$tax_query[] = [
 			'taxonomy' => 'prpl_recommendations_provider',
 			'field'    => 'slug',
@@ -506,6 +532,38 @@ class Suggested_Tasks {
 		}
 
 		return $args;
+	}
+
+	/**
+	 * Check whether a REST recommendations query must be locked down to the security-update task.
+	 *
+	 * The lockdown only applies to publish-status queries from users who can install
+	 * the update. The user's own to-do list (provider "user") and pending-celebration
+	 * queries are never locked down.
+	 *
+	 * @param \WP_REST_Request $request           The request object.
+	 * @param array            $include_providers The provider IDs available to the current user.
+	 *
+	 * @return bool
+	 */
+	private function should_lock_down_recommendations( $request, $include_providers ) {
+		// Only publish-status queries are locked down (celebrations & snoozed tasks flow normally).
+		$statuses = isset( $request['status'] ) ? (array) $request['status'] : [ 'publish' ];
+		if ( [ 'publish' ] !== \array_values( $statuses ) ) {
+			return false;
+		}
+
+		// The user's own to-do list is never locked down.
+		if ( isset( $request['provider'] ) && [ 'user' ] === \explode( ',', $request['provider'] ) ) {
+			return false;
+		}
+
+		// Only users who can install the update are locked down.
+		if ( ! \in_array( 'security-update', $include_providers, true ) ) {
+			return false;
+		}
+
+		return \progress_planner()->get_utils__security_update_monitor()->is_security_lockdown_active();
 	}
 
 	/**
@@ -553,7 +611,7 @@ class Suggested_Tasks {
 		if ( $provider ) {
 			$response->data['prpl_provider'] = $provider_term[0];
 			// Link should be added during run time, since it is not added for users without required capability.
-			$response->data['meta']['prpl_url'] = $response->data['meta']['prpl_url'] && $provider->capability_required()
+			$response->data['meta']['prpl_url'] = ! empty( $response->data['meta']['prpl_url'] ) && $provider->capability_required()
 				? \esc_url( (string) $response->data['meta']['prpl_url'] )
 				: '';
 
@@ -599,6 +657,27 @@ class Suggested_Tasks {
 				'posts_per_page'   => -1,
 			]
 		);
+
+		// While a security-update task is pending, it is the only recommendation
+		// served to users who can install it. User to-do lists and non-publish
+		// statuses (e.g. pending celebrations) are not affected.
+		if ( [ 'publish' ] === \array_values( (array) $args['post_status'] )
+			&& [ 'user' ] !== $args['include_provider']
+			&& \in_array(
+				'security-update',
+				\array_map(
+					static function ( $provider ) {
+						return $provider->get_provider_id();
+					},
+					$this->tasks_manager->get_task_providers_available_for_user()
+				),
+				true
+			)
+			&& \progress_planner()->get_utils__security_update_monitor()->is_security_lockdown_active()
+		) {
+			$args['include_provider'] = [ 'security-update' ];
+			$args['exclude_provider'] = [];
+		}
 
 		// Build query args for get_tasks_by.
 		$query_args = [

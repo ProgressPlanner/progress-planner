@@ -453,4 +453,48 @@ class Suggested_Tasks_Db_Test extends \WP_UnitTestCase {
 		$tasks_2 = $this->db_instance->get();
 		$this->assertEquals( \count( $tasks_1 ), \count( $tasks_2 ) );
 	}
+
+	/**
+	 * Test that adding a task invalidates cached get() results.
+	 *
+	 * @return void
+	 */
+	public function test_add_invalidates_get_cache() {
+		$this->db_instance->add(
+			[
+				'task_id'     => 'cache-test-1',
+				'post_title'  => 'Cache test 1',
+				'provider_id' => 'test-provider',
+			]
+		);
+		$this->assertCount( 1, $this->db_instance->get( [ 'post_status' => 'publish' ] ) );
+
+		$this->db_instance->add(
+			[
+				'task_id'     => 'cache-test-2',
+				'post_title'  => 'Cache test 2',
+				'provider_id' => 'test-provider',
+			]
+		);
+		$this->assertCount( 2, $this->db_instance->get( [ 'post_status' => 'publish' ] ) );
+	}
+
+	/**
+	 * Test that updating a task invalidates cached get() results.
+	 *
+	 * @return void
+	 */
+	public function test_update_invalidates_get_cache() {
+		$post_id = $this->db_instance->add(
+			[
+				'task_id'     => 'cache-test-3',
+				'post_title'  => 'Cache test 3',
+				'provider_id' => 'test-provider',
+			]
+		);
+		$this->assertCount( 1, $this->db_instance->get( [ 'post_status' => 'publish' ] ) );
+
+		$this->db_instance->update_recommendation( $post_id, [ 'post_status' => 'trash' ] );
+		$this->assertCount( 0, $this->db_instance->get( [ 'post_status' => 'publish' ] ) );
+	}
 }
