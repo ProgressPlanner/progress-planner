@@ -168,11 +168,24 @@ class Sunset_Notice {
 		?>
 		<tr class="plugin-update-tr <?php echo \esc_attr( $prpl_is_active ? 'active' : 'inactive' ); ?>" id="prpl-sunset-notice-row" data-slug="progress-planner" data-plugin="<?php echo \esc_attr( $plugin_file ); ?>">
 			<td colspan="<?php echo (int) $prpl_colspan; ?>" class="plugin-update colspanchange">
-				<div class="update-message notice inline notice-warning notice-alt">
+				<div class="notice inline notice-warning notice-alt prpl-sunset-row-notice">
 					<p><?php echo \wp_kses_post( $this->get_message() . ' ' . $this->get_certificate_message() ); ?></p>
 				</div>
 			</td>
 		</tr>
+		<style>
+			/* Opt out of core's red "update available" dashicon, which this notice is not. */
+			#prpl-sunset-notice-row .prpl-sunset-row-notice p:before {
+				content: "\f534";
+				display: inline-block;
+				font: normal 20px/1 dashicons;
+				color: #b26200;
+				margin: -3px 5px 0 -2px;
+				vertical-align: middle;
+				-webkit-font-smoothing: antialiased;
+				-moz-osx-font-smoothing: grayscale;
+			}
+		</style>
 		<?php
 	}
 }
