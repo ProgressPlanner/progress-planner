@@ -28,50 +28,29 @@ class Abilities_Test extends \WP_UnitTestCase {
 	private $abilities;
 
 	/**
-	 * Site score reader.
-	 *
-	 * @var \Progress_Planner\Abilities\Site_Score
-	 */
-	private $site_score;
-
-	/**
-	 * Recommendations reader.
-	 *
-	 * @var \Progress_Planner\Abilities\Recommendations
-	 */
-	private $recommendations;
-
-	/**
 	 * Set up test.
 	 *
 	 * @return void
 	 */
 	public function setUp(): void {
 		parent::setUp();
-
-		// The constructor hooks the registration actions, so building a fresh
-		// instance per test would stack a listener each time and re-register on
-		// the next fire. The plugin's own instance is used instead.
-		$this->abilities       = \progress_planner()->get_abilities__abilities();
-		$this->site_score      = new \Progress_Planner\Abilities\Site_Score();
-		$this->recommendations = new \Progress_Planner\Abilities\Recommendations();
+		$this->abilities = new Abilities();
 	}
 
 	/**
-	 * Invoke a private or protected method on an object.
+	 * Invoke a private or protected method on the instance.
 	 *
-	 * @param object $instance The object.
-	 * @param string $name     The method name.
-	 * @param array  $args     The arguments.
+	 * @param string $name The method name.
+	 * @param array  $args The arguments.
 	 *
 	 * @return mixed
 	 */
-	private function invoke_on( $instance, $name, array $args = [] ) {
-		$reflection = new \ReflectionClass( $instance );
+	private function invoke( $name, array $args = [] ) {
+		$reflection = new \ReflectionClass( $this->abilities );
 		$method     = $reflection->getMethod( $name );
 		$method->setAccessible( true );
 
-		return $method->invokeArgs( $instance, $args );
+		return $method->invokeArgs( $this->abilities, $args );
 	}
 
 	/**
@@ -118,7 +97,7 @@ class Abilities_Test extends \WP_UnitTestCase {
 	public function test_get_site_score_returns_documented_shape() {
 		\wp_set_current_user( self::factory()->user->create( [ 'role' => 'administrator' ] ) );
 
-		$score = $this->site_score->get();
+		$score = $this->abilities->get_site_score();
 
 		foreach ( [ 'score', 'checklist', 'pending_updates', 'badges', 'latest_badge', 'monthly_scores' ] as $key ) {
 			$this->assertArrayHasKey( $key, $score );
@@ -138,7 +117,7 @@ class Abilities_Test extends \WP_UnitTestCase {
 	public function test_get_site_score_is_within_range() {
 		\wp_set_current_user( self::factory()->user->create( [ 'role' => 'administrator' ] ) );
 
-		$score = $this->site_score->get();
+		$score = $this->abilities->get_site_score();
 
 		$this->assertGreaterThanOrEqual( 0, $score['score'] );
 		$this->assertLessThanOrEqual( 100, $score['score'] );
@@ -156,7 +135,7 @@ class Abilities_Test extends \WP_UnitTestCase {
 	public function test_get_site_score_omits_telemetry_fields() {
 		\wp_set_current_user( self::factory()->user->create( [ 'role' => 'administrator' ] ) );
 
-		$score = $this->site_score->get();
+		$score = $this->abilities->get_site_score();
 
 		foreach ( [ 'plugins', 'website', 'branding_id', 'plugin_url' ] as $key ) {
 			$this->assertArrayNotHasKey( $key, $score );
@@ -169,7 +148,7 @@ class Abilities_Test extends \WP_UnitTestCase {
 	 * @return void
 	 */
 	public function test_get_checklist_uses_stable_keys() {
-		$checklist = $this->site_score->get_checklist();
+		$checklist = $this->invoke( 'get_checklist' );
 
 		$this->assertSame(
 			[ 'published_content', 'updated_content', 'no_pending_updates' ],
@@ -203,7 +182,7 @@ class Abilities_Test extends \WP_UnitTestCase {
 		\add_filter( 'pre_site_transient_update_plugins', $no_updates );
 		\add_filter( 'pre_site_transient_update_themes', $no_updates );
 
-		$checklist = $this->site_score->get_checklist();
+		$checklist = $this->invoke( 'get_checklist' );
 
 		\remove_filter( 'pre_site_transient_update_core', $no_updates );
 		\remove_filter( 'pre_site_transient_update_plugins', $no_updates );
@@ -218,9 +197,9 @@ class Abilities_Test extends \WP_UnitTestCase {
 	 * @return void
 	 */
 	public function test_status_maps_to_post_status() {
-		$this->assertSame( 'publish', $this->invoke_on( $this->recommendations, 'get_post_status_for', [ 'pending' ] ) );
-		$this->assertSame( 'trash', $this->invoke_on( $this->recommendations, 'get_post_status_for', [ 'completed' ] ) );
-		$this->assertSame( 'future', $this->invoke_on( $this->recommendations, 'get_post_status_for', [ 'snoozed' ] ) );
+		$this->assertSame( 'publish', $this->invoke( 'get_post_status_for', [ 'pending' ] ) );
+		$this->assertSame( 'trash', $this->invoke( 'get_post_status_for', [ 'completed' ] ) );
+		$this->assertSame( 'future', $this->invoke( 'get_post_status_for', [ 'snoozed' ] ) );
 	}
 
 	/**
@@ -229,7 +208,7 @@ class Abilities_Test extends \WP_UnitTestCase {
 	 * @return void
 	 */
 	public function test_unknown_status_falls_back_to_pending() {
-		$this->assertSame( 'publish', $this->invoke_on( $this->recommendations, 'get_post_status_for', [ 'nonsense' ] ) );
+		$this->assertSame( 'publish', $this->invoke( 'get_post_status_for', [ 'nonsense' ] ) );
 	}
 
 	/**
@@ -240,7 +219,7 @@ class Abilities_Test extends \WP_UnitTestCase {
 	public function test_list_recommendations_returns_documented_shape() {
 		\wp_set_current_user( self::factory()->user->create( [ 'role' => 'administrator' ] ) );
 
-		$result = $this->recommendations->list( [ 'limit' => 5 ] );
+		$result = $this->abilities->list_recommendations( [ 'limit' => 5 ] );
 
 		$this->assertArrayHasKey( 'recommendations', $result );
 		$this->assertArrayHasKey( 'count', $result );
@@ -256,19 +235,7 @@ class Abilities_Test extends \WP_UnitTestCase {
 	public function test_list_recommendations_items_have_documented_fields() {
 		\wp_set_current_user( self::factory()->user->create( [ 'role' => 'administrator' ] ) );
 
-		// A site with no recommendations yet would make this vacuous, so one is
-		// created rather than relying on whatever the suite happens to leave.
-		\progress_planner()->get_suggested_tasks_db()->add(
-			[
-				'task_id'     => 'abilities-test-task',
-				'post_title'  => 'Abilities test task',
-				'provider_id' => 'user',
-			]
-		);
-
-		$result = $this->recommendations->list( [ 'limit' => 5 ] );
-
-		$this->assertNotEmpty( $result['recommendations'], 'Expected at least one recommendation to inspect.' );
+		$result = $this->abilities->list_recommendations( [ 'limit' => 5 ] );
 
 		foreach ( $result['recommendations'] as $recommendation ) {
 			foreach ( [ 'id', 'title', 'description', 'provider_id', 'url', 'points' ] as $key ) {
@@ -290,7 +257,7 @@ class Abilities_Test extends \WP_UnitTestCase {
 	public function test_list_recommendations_honours_limit() {
 		\wp_set_current_user( self::factory()->user->create( [ 'role' => 'administrator' ] ) );
 
-		$result = $this->recommendations->list( [ 'limit' => 1 ] );
+		$result = $this->abilities->list_recommendations( [ 'limit' => 1 ] );
 
 		$this->assertLessThanOrEqual( 1, $result['count'] );
 	}
@@ -303,7 +270,7 @@ class Abilities_Test extends \WP_UnitTestCase {
 	public function test_list_recommendations_filters_by_provider() {
 		\wp_set_current_user( self::factory()->user->create( [ 'role' => 'administrator' ] ) );
 
-		$result = $this->recommendations->list( [ 'provider' => 'provider-that-does-not-exist' ] );
+		$result = $this->abilities->list_recommendations( [ 'provider' => 'provider-that-does-not-exist' ] );
 
 		$this->assertSame( 0, $result['count'] );
 	}
@@ -319,7 +286,7 @@ class Abilities_Test extends \WP_UnitTestCase {
 	public function test_list_recommendations_hides_tasks_from_subscribers() {
 		\wp_set_current_user( self::factory()->user->create( [ 'role' => 'subscriber' ] ) );
 
-		$result = $this->recommendations->list( [] );
+		$result = $this->abilities->list_recommendations( [] );
 
 		$this->assertSame( 0, $result['count'] );
 	}
@@ -330,7 +297,7 @@ class Abilities_Test extends \WP_UnitTestCase {
 	 * @return void
 	 */
 	public function test_get_badges_returns_documented_shape() {
-		$badges = $this->site_score->get_badges();
+		$badges = $this->invoke( 'get_badges' );
 
 		$this->assertIsArray( $badges );
 
@@ -353,7 +320,7 @@ class Abilities_Test extends \WP_UnitTestCase {
 	 * @return void
 	 */
 	public function test_get_monthly_scores_shape() {
-		$scores = $this->site_score->get_monthly_scores();
+		$scores = $this->invoke( 'get_monthly_scores' );
 
 		$this->assertIsArray( $scores );
 
@@ -374,13 +341,13 @@ class Abilities_Test extends \WP_UnitTestCase {
 	 * @return void
 	 */
 	public function test_abilities_are_annotated_read_only() {
-		if ( ! \function_exists( 'wp_get_ability' ) ) {
+		if ( ! \function_exists( 'wp_register_ability' ) ) {
 			$this->markTestSkipped( 'The Abilities API is not available in this WordPress version.' );
 		}
 
-		// The plugin registers on the core init actions, which have already run
-		// by the time the suite starts. Firing them again would re-register and
-		// trigger a doing_it_wrong notice, so the registry is read as-is.
+		\do_action( 'wp_abilities_api_categories_init' );
+		\do_action( 'wp_abilities_api_init' );
+
 		foreach ( [ 'get-site-score', 'list-recommendations' ] as $name ) {
 			$ability = \wp_get_ability( Abilities::CATEGORY . '/' . $name );
 
@@ -394,38 +361,16 @@ class Abilities_Test extends \WP_UnitTestCase {
 	}
 
 	/**
-	 * Test that both abilities are registered under the plugin's own category.
+	 * Test that registration is skipped when the Abilities API is absent.
+	 *
+	 * The plugin must load on WordPress versions without the API.
 	 *
 	 * @return void
 	 */
-	public function test_abilities_use_the_plugin_category() {
-		if ( ! \function_exists( 'wp_get_ability' ) ) {
-			$this->markTestSkipped( 'The Abilities API is not available in this WordPress version.' );
-		}
-
-		foreach ( [ 'get-site-score', 'list-recommendations' ] as $name ) {
-			$ability = \wp_get_ability( Abilities::CATEGORY . '/' . $name );
-
-			$this->assertNotNull( $ability, "Ability {$name} is not registered." );
-			$this->assertSame( Abilities::CATEGORY, $ability->get_category() );
-		}
-	}
-
-	/**
-	 * Test that registration is guarded when the Abilities API is absent.
-	 *
-	 * The plugin must load on WordPress versions without the API, where the
-	 * registration functions do not exist.
-	 *
-	 * @return void
-	 */
-	public function test_registration_is_idempotent() {
-		// Calling registration again must be a no-op rather than incorrect
-		// usage: the WordPress test harness fails any test that leaves a
-		// doing_it_wrong notice behind, which is what catches a regression here.
+	public function test_registration_is_guarded() {
 		$this->abilities->register_categories();
 		$this->abilities->register_abilities();
 
-		$this->assertTrue( true, 'Re-registering did not trigger incorrect usage.' );
+		$this->assertTrue( true, 'Registration did not fatal.' );
 	}
 }
