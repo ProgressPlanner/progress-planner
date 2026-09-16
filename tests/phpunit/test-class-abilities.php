@@ -341,13 +341,13 @@ class Abilities_Test extends \WP_UnitTestCase {
 	 * @return void
 	 */
 	public function test_abilities_are_annotated_read_only() {
-		if ( ! \function_exists( 'wp_register_ability' ) ) {
+		if ( ! \function_exists( 'wp_get_ability' ) ) {
 			$this->markTestSkipped( 'The Abilities API is not available in this WordPress version.' );
 		}
 
-		\do_action( 'wp_abilities_api_categories_init' );
-		\do_action( 'wp_abilities_api_init' );
-
+		// The plugin registers on the core init actions, which have already run
+		// by the time the suite starts. Firing them again would re-register and
+		// trigger a doing_it_wrong notice, so the registry is read as-is.
 		foreach ( [ 'get-site-score', 'list-recommendations' ] as $name ) {
 			$ability = \wp_get_ability( Abilities::CATEGORY . '/' . $name );
 
@@ -361,16 +361,39 @@ class Abilities_Test extends \WP_UnitTestCase {
 	}
 
 	/**
-	 * Test that registration is skipped when the Abilities API is absent.
+	 * Test that both abilities are registered under the plugin's own category.
 	 *
-	 * The plugin must load on WordPress versions without the API.
+	 * @return void
+	 */
+	public function test_abilities_use_the_plugin_category() {
+		if ( ! \function_exists( 'wp_get_ability' ) ) {
+			$this->markTestSkipped( 'The Abilities API is not available in this WordPress version.' );
+		}
+
+		foreach ( [ 'get-site-score', 'list-recommendations' ] as $name ) {
+			$ability = \wp_get_ability( Abilities::CATEGORY . '/' . $name );
+
+			$this->assertNotNull( $ability, "Ability {$name} is not registered." );
+			$this->assertSame( Abilities::CATEGORY, $ability->get_category() );
+		}
+	}
+
+	/**
+	 * Test that registration is guarded when the Abilities API is absent.
+	 *
+	 * The plugin must load on WordPress versions without the API, where the
+	 * registration functions do not exist.
 	 *
 	 * @return void
 	 */
 	public function test_registration_is_guarded() {
+		if ( \function_exists( 'wp_register_ability' ) ) {
+			$this->markTestSkipped( 'The Abilities API is available, so the guard cannot be exercised.' );
+		}
+
 		$this->abilities->register_categories();
 		$this->abilities->register_abilities();
 
-		$this->assertTrue( true, 'Registration did not fatal.' );
+		$this->assertTrue( true, 'Registration did not fatal without the Abilities API.' );
 	}
 }
