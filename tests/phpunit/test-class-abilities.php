@@ -239,7 +239,19 @@ class Abilities_Test extends \WP_UnitTestCase {
 	public function test_list_recommendations_items_have_documented_fields() {
 		\wp_set_current_user( self::factory()->user->create( [ 'role' => 'administrator' ] ) );
 
+		// A site with no recommendations yet would make this vacuous, so one is
+		// created rather than relying on whatever the suite happens to leave.
+		\progress_planner()->get_suggested_tasks_db()->add(
+			[
+				'task_id'     => 'abilities-test-task',
+				'post_title'  => 'Abilities test task',
+				'provider_id' => 'user',
+			]
+		);
+
 		$result = $this->abilities->list_recommendations( [ 'limit' => 5 ] );
+
+		$this->assertNotEmpty( $result['recommendations'], 'Expected at least one recommendation to inspect.' );
 
 		foreach ( $result['recommendations'] as $recommendation ) {
 			foreach ( [ 'id', 'title', 'description', 'provider_id', 'url', 'points' ] as $key ) {
