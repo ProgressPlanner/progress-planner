@@ -57,6 +57,14 @@ class Abilities {
 			return;
 		}
 
+		// Registering twice is incorrect usage. Guarding here rather than relying
+		// on the hook firing once keeps a second instance of this class harmless.
+		// is_registered() is the notice-free probe: wp_get_ability_category()
+		// reports a miss as incorrect usage in its own right.
+		if ( $this->is_category_registered() ) {
+			return;
+		}
+
 		\wp_register_ability_category(
 			self::CATEGORY,
 			[
@@ -76,8 +84,46 @@ class Abilities {
 			return;
 		}
 
+		// As above: re-registering is incorrect usage, so the registry is asked
+		// first rather than assuming this runs exactly once.
+		if ( $this->is_ability_registered( self::CATEGORY . '/get-site-score' ) ) {
+			return;
+		}
+
 		$this->register_get_site_score();
 		$this->register_list_recommendations();
+	}
+
+	/**
+	 * Whether the ability category is already registered.
+	 *
+	 * @return bool
+	 */
+	private function is_category_registered() {
+		if ( ! \class_exists( '\WP_Ability_Categories_Registry' ) ) {
+			return false;
+		}
+
+		$registry = \WP_Ability_Categories_Registry::get_instance();
+
+		return $registry && $registry->is_registered( self::CATEGORY );
+	}
+
+	/**
+	 * Whether an ability is already registered.
+	 *
+	 * @param string $name The fully-qualified ability name.
+	 *
+	 * @return bool
+	 */
+	private function is_ability_registered( $name ) {
+		if ( ! \class_exists( '\WP_Abilities_Registry' ) ) {
+			return false;
+		}
+
+		$registry = \WP_Abilities_Registry::get_instance();
+
+		return $registry && $registry->is_registered( $name );
 	}
 
 	/**

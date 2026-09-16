@@ -34,7 +34,11 @@ class Abilities_Test extends \WP_UnitTestCase {
 	 */
 	public function setUp(): void {
 		parent::setUp();
-		$this->abilities = new Abilities();
+
+		// The constructor hooks the registration actions, so building a fresh
+		// instance per test would stack a listener each time and re-register on
+		// the next fire. The plugin's own instance is used instead.
+		$this->abilities = \progress_planner()->get_abilities__abilities();
 	}
 
 	/**
@@ -386,14 +390,13 @@ class Abilities_Test extends \WP_UnitTestCase {
 	 *
 	 * @return void
 	 */
-	public function test_registration_is_guarded() {
-		if ( \function_exists( 'wp_register_ability' ) ) {
-			$this->markTestSkipped( 'The Abilities API is available, so the guard cannot be exercised.' );
-		}
-
+	public function test_registration_is_idempotent() {
+		// Calling registration again must be a no-op rather than incorrect
+		// usage: the WordPress test harness fails any test that leaves a
+		// doing_it_wrong notice behind, which is what catches a regression here.
 		$this->abilities->register_categories();
 		$this->abilities->register_abilities();
 
-		$this->assertTrue( true, 'Registration did not fatal without the Abilities API.' );
+		$this->assertTrue( true, 'Re-registering did not trigger incorrect usage.' );
 	}
 }
