@@ -59,6 +59,24 @@ class Abilities_Test extends \WP_UnitTestCase {
 	}
 
 	/**
+	 * Tear down test.
+	 *
+	 * Activities live in a custom table that WP_UnitTestCase does not roll
+	 * back, and post IDs are reused across tests. A row left here would be seen
+	 * by a later test that happens to be handed the same ID and asserts it has
+	 * no activity, so this class clears what it caused.
+	 *
+	 * @return void
+	 */
+	public function tearDown(): void {
+		global $wpdb;
+
+		$wpdb->query( 'TRUNCATE TABLE ' . $wpdb->prefix . 'progress_planner_activities' ); // phpcs:ignore WordPress.DB
+
+		parent::tearDown();
+	}
+
+	/**
 	 * Invoke a private or protected method on an object.
 	 *
 	 * @param object $instance The object.
@@ -662,5 +680,98 @@ class Abilities_Test extends \WP_UnitTestCase {
 
 		$this->assertWPError( $result );
 		$this->assertSame( 'progress_planner_seo_plugin_inactive', $result->get_error_code() );
+	}
+
+	/**
+	 * Test that the placeholder deletions are marked destructive.
+	 *
+	 * @return void
+	 */
+	public function test_placeholder_deletions_are_destructive() {
+		$this->assertTrue( Recommendation_Fixes::is_destructive( 'hello-world' ) );
+		$this->assertTrue( Recommendation_Fixes::is_destructive( 'sample-page' ) );
+		$this->assertFalse( Recommendation_Fixes::is_destructive( 'disable-comments' ) );
+	}
+
+	/**
+	 * Test that anything destructive can only be applied by name.
+	 *
+	 * An unattended run must never be the thing that deleted something.
+	 *
+	 * @return void
+	 */
+	public function test_destructive_fixes_are_confirm_only() {
+		$this->assertTrue( Recommendation_Fixes::is_confirm_only( 'hello-world' ) );
+		$this->assertTrue( Recommendation_Fixes::is_confirm_only( 'sample-page' ) );
+		$this->assertFalse( Recommendation_Fixes::is_confirm_only( 'disable-comments' ) );
+	}
+
+	/**
+	 * Test that applying the hello-world fix trashes the post rather than
+	 * deleting it outright.
+	 *
+	 * @return void
+	 */
+	public function test_hello_world_fix_trashes_the_post() {
+		\wp_set_current_user( self::factory()->user->create( [ 'role' => 'administrator' ] ) );
+
+		$post_id = self::factory()->post->create(
+			[
+				'post_title'  => 'Hello world!',
+				'post_name'   => 'hello-world',
+				'post_status' => 'publish',
+			]
+		);
+
+		$this->seed_task( 'hello-world' );
+
+		$result = $this->recommendations->complete( [ 'provider_id' => 'hello-world' ] );
+
+		$this->assertTrue( $result['applied'] );
+		$this->assertSame( 'trash', \get_post_status( $post_id ), 'The post should be recoverable from the trash.' );
+	}
+
+	/**
+	 * Test that next mode never picks a destructive fix.
+	 *
+	 * @return void
+	 */
+	public function test_next_mode_never_deletes() {
+		\wp_set_current_user( self::factory()->user->create( [ 'role' => 'administrator' ] ) );
+
+		$post_id = self::factory()->post->create(
+			[
+				'post_title'  => 'Hello world!',
+				'post_name'   => 'hello-world',
+				'post_status' => 'publish',
+			]
+		);
+
+		$this->seed_task( 'hello-world' );
+
+		$result = $this->recommendations->complete( [] );
+
+		if ( null !== $result['task'] ) {
+			$this->assertNotSame( 'hello-world', $result['task']['provider_id'] );
+		}
+
+		$this->assertSame( 'publish', \get_post_status( $post_id ), 'Next mode must not trash anything.' );
+	}
+
+	/**
+	 * Test that a deletion reports missing content rather than failing oddly.
+	 *
+	 * @return void
+	 */
+	public function test_deletion_reports_missing_target() {
+		\wp_set_current_user( self::factory()->user->create( [ 'role' => 'administrator' ] ) );
+
+		$result = Recommendation_Fixes::apply( 'hello-world' );
+
+		if ( \is_wp_error( $result ) ) {
+			$this->assertSame( 'progress_planner_no_target', $result->get_error_code() );
+		} else {
+			$this->assertTrue( $result );
+		}
 	}
 }

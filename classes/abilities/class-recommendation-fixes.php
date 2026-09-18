@@ -148,6 +148,37 @@ class Recommendation_Fixes {
 			'value'   => false,
 			'summary' => 'Disable author feeds in All in One SEO.',
 		],
+
+		/*
+		 * Deleting WordPress's own placeholder content.
+		 *
+		 * These are the only entries that remove something rather than change a
+		 * setting, so they are the only ones annotated destructive. Two things
+		 * make them defensible anyway: the target is not ambiguous -- the data
+		 * collector resolves the specific post WordPress ships, by slug with a
+		 * title fallback -- and the recommendation exists precisely because the
+		 * site owner is being asked to delete it.
+		 *
+		 * They are trashed, not force-deleted. The dashboard's own JavaScript
+		 * passes force=true and removes the post outright; an agent acting
+		 * unattended should leave a way back, and the task's completion check
+		 * passes either way because it looks for a published post.
+		 *
+		 * confirm_only keeps them out of next-mode, so a daily unattended run
+		 * never deletes anything: they can only be applied by naming the
+		 * provider explicitly.
+		 */
+		'hello-world'                               => [
+			'delete'       => 'post',
+			'confirm_only' => true,
+			'summary'      => 'Move the default "Hello world!" post to the trash.',
+		],
+		'sample-page'                               => [
+			'delete'       => 'page',
+			'confirm_only' => true,
+			'summary'      => 'Move the default "Sample Page" to the trash.',
+		],
+
 		'aioseo-media-pages'                        => [
 			'seo'     => 'aioseo',
 			// Attachment redirection lives under dynamicOptions, not options, and
@@ -225,6 +256,10 @@ class Recommendation_Fixes {
 			);
 		}
 
+		if ( isset( $fix['delete'] ) ) {
+			return self::apply_deletion( $provider_id );
+		}
+
 		if ( isset( $fix['seo'] ) ) {
 			return self::apply_seo_setting( $fix );
 		}
@@ -244,6 +279,77 @@ class Recommendation_Fixes {
 		\update_option( $fix['option'], $new_value );
 
 		return true;
+	}
+
+	/**
+	 * Move a placeholder post to the trash.
+	 *
+	 * The post ID comes from the provider's own data collector, which resolves
+	 * WordPress's default content by slug. Nothing here takes an ID from the
+	 * caller, so an ability argument cannot point this at arbitrary content.
+	 *
+	 * @param string $provider_id The provider ID.
+	 *
+	 * @return true|\WP_Error
+	 */
+	private static function apply_deletion( $provider_id ) {
+		$provider = \progress_planner()->get_suggested_tasks()->get_tasks_manager()->get_task_provider( $provider_id );
+
+		if ( ! $provider || ! \method_exists( $provider, 'get_data_collector' ) ) {
+			return new \WP_Error(
+				'progress_planner_no_target',
+				\__( 'That recommendation is not available on this site.', 'progress-planner' )
+			);
+		}
+
+		$post_id = (int) $provider->get_data_collector()->collect();
+
+		if ( ! $post_id || ! \get_post( $post_id ) ) {
+			return new \WP_Error(
+				'progress_planner_no_target',
+				\__( 'The default content this recommendation refers to is no longer there.', 'progress-planner' )
+			);
+		}
+
+		if ( ! \wp_trash_post( $post_id ) ) {
+			return new \WP_Error(
+				'progress_planner_delete_failed',
+				\__( 'The content could not be moved to the trash.', 'progress-planner' )
+			);
+		}
+
+		return true;
+	}
+
+	/**
+	 * Whether applying a fix removes content rather than changing a setting.
+	 *
+	 * Drives the destructive annotation, which is what a client shows a person
+	 * before calling.
+	 *
+	 * @param string $provider_id The provider ID.
+	 *
+	 * @return bool
+	 */
+	public static function is_destructive( $provider_id ) {
+		$fix = self::get( $provider_id );
+
+		return null !== $fix && isset( $fix['delete'] );
+	}
+
+	/**
+	 * Whether a fix may only be applied by naming its provider explicitly.
+	 *
+	 * Keeps anything that removes content out of an unattended run.
+	 *
+	 * @param string $provider_id The provider ID.
+	 *
+	 * @return bool
+	 */
+	public static function is_confirm_only( $provider_id ) {
+		$fix = self::get( $provider_id );
+
+		return null !== $fix && ! empty( $fix['confirm_only'] );
 	}
 
 	/**

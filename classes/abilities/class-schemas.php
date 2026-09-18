@@ -217,6 +217,10 @@ class Schemas {
 					'type'        => 'boolean',
 					'description' => \__( 'Whether applying it requires a value from the caller, such as the tagline text.', 'progress-planner' ),
 				],
+				'destructive' => [
+					'type'        => 'boolean',
+					'description' => \__( 'Whether applying it removes content rather than changing a setting. These are only applied when named explicitly, never picked automatically.', 'progress-planner' ),
+				],
 			],
 		];
 	}
