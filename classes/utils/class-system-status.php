@@ -16,6 +16,37 @@ use Progress_Planner\Admin\Widgets\Activity_Scores;
 class System_Status {
 
 	/**
+	 * Get the normalized score for each of the last six months.
+	 *
+	 * Shared with the Abilities layer so both report the same history from the
+	 * same definition of a monthly score.
+	 *
+	 * @return array<int, array<string, mixed>> Chart items with 'label' and 'score'.
+	 */
+	public function get_monthly_scores() {
+		return \progress_planner()->get_ui__chart()->get_chart_data(
+			[
+				'items_callback' => fn( $start_date, $end_date ) => \progress_planner()->get_activities__query()->query_activities(
+					[
+						'start_date' => $start_date,
+						'end_date'   => $end_date,
+					]
+				),
+				'dates_params'   => [
+					'start_date' => \DateTime::createFromFormat( 'Y-m-d', \gmdate( 'Y-m-01' ) )->modify( '-6 months' ),
+					'end_date'   => new \DateTime(),
+					'frequency'  => 'monthly',
+					'format'     => 'M',
+				],
+				'count_callback' => fn( $activities, $date ) =>
+					\array_sum( \array_map( fn( $activity ) => $activity->get_points( $date ), $activities ) ) * 100 / Base::SCORE_TARGET,
+				'normalized'     => true,
+				'max'            => 100,
+			]
+		);
+	}
+
+	/**
 	 * Get the system status.
 	 *
 	 * @return array The system status data.
@@ -70,26 +101,7 @@ class System_Status {
 
 		$data['latest_badge'] = \progress_planner()->get_badges()->get_latest_completed_badge();
 
-		$scores = \progress_planner()->get_ui__chart()->get_chart_data(
-			[
-				'items_callback' => fn( $start_date, $end_date ) => \progress_planner()->get_activities__query()->query_activities(
-					[
-						'start_date' => $start_date,
-						'end_date'   => $end_date,
-					]
-				),
-				'dates_params'   => [
-					'start_date' => \DateTime::createFromFormat( 'Y-m-d', \gmdate( 'Y-m-01' ) )->modify( '-6 months' ),
-					'end_date'   => new \DateTime(),
-					'frequency'  => 'monthly',
-					'format'     => 'M',
-				],
-				'count_callback' => fn( $activities, $date ) =>
-					\array_sum( \array_map( fn( $activity ) => $activity->get_points( $date ), $activities ) ) * 100 / Base::SCORE_TARGET,
-				'normalized'     => true,
-				'max'            => 100,
-			]
-		);
+		$scores = $this->get_monthly_scores();
 
 		$data['scores'] = [];
 		foreach ( $scores as $item ) {

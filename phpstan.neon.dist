@@ -24,6 +24,9 @@ parameters:
     - identifier: clone.nonObject
     - identifier: callable.nonCallable
     - identifier: assign.propertyType
+    # The Abilities API landed in WordPress core after the pinned stubs were
+    # generated. Calls are guarded with function_exists() at runtime.
+    - '#Function wp_register_ability(_category)? not found.#'
     - '#Function YoastSEO not found.#'
     - '#.*unknown class YoastSEO.*#'
     - '#Call to static method get_instance\(\) on an unknown class WPSEO_Options.#'
