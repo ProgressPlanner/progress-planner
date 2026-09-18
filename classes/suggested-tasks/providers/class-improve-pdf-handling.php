@@ -152,6 +152,13 @@ class Improve_Pdf_Handling extends Tasks_Interactive {
 	 * @return void
 	 */
 	public function enqueue_scripts( $hook ) {
+		// Don't enqueue the script if the user lacks the capability required by this task.
+		// The web component depends on progress-planner/suggested-task, whose localized
+		// data contains a nonce, so this must not be enqueued for users who can't use it.
+		if ( ! $this->capability_required() ) {
+			return;
+		}
+
 		// Enqueue the script only on Progress Planner and WP dashboard pages.
 		if ( 'toplevel_page_progress-planner' !== $hook && 'index.php' !== $hook ) {
 			return;

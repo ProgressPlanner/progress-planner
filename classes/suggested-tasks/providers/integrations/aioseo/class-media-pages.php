@@ -126,8 +126,7 @@ class Media_Pages extends AIOSEO_Interactive_Provider {
 	 * @return void
 	 */
 	public function handle_interactive_task_specific_submit() {
-		$this->verify_aioseo_active_or_fail();
-		$this->verify_nonce_or_fail();
+		$this->verify_aioseo_ajax_security();
 
 		\aioseo()->dynamicOptions->searchAppearance->postTypes->attachment->redirectAttachmentUrls = 'attachment'; // @phpstan-ignore-line
 

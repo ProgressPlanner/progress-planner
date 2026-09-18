@@ -80,7 +80,7 @@ final class Content_Activity extends Widget {
 			$activities,
 			fn( $activity ) => 'delete' === $activity->type
 				|| ( \is_object( $activity->get_post() )
-					&& \in_array( $activity->get_post()->post_type, \progress_planner()->get_activities__content_helpers()->get_post_types_names(), true )
+					&& \in_array( $activity->get_post()->post_type, \progress_planner()->get_settings()->get_post_types_names(), true )
 				)
 		);
 	}

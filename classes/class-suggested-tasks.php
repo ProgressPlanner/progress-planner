@@ -654,6 +654,8 @@ class Suggested_Tasks {
 	 * @return string
 	 */
 	public function get_task_id_from_slug( $slug ) {
-		return \explode( '__trashed', $slug )[0];
+		// Cast to string: callers may pass a null post_name/task_id, which would
+		// trigger a deprecation notice from explode() on PHP 8.1+.
+		return \explode( '__trashed', (string) $slug )[0];
 	}
 }

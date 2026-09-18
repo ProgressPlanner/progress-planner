@@ -164,12 +164,16 @@
 					? attachment.sizes.thumbnail.url
 					: attachment.url;
 
-			this.elements.preview.innerHTML =
-				'<img src="' +
-				imageUrl +
-				'" alt="' +
-				( attachment.alt || 'Site icon preview' ) +
-				'" style="max-width: 150px; height: auto; border-radius: 4px; border: 1px solid #ddd;">';
+			// Build the node instead of interpolating into an HTML string: the
+			// alt text is free-text set by any upload-capable user, and a value
+			// like `" onerror="` would otherwise break out of the attribute.
+			const img = document.createElement( 'img' );
+			img.src = imageUrl;
+			img.alt = attachment.alt || 'Site icon preview';
+			img.style.cssText =
+				'max-width: 150px; height: auto; border-radius: 4px; border: 1px solid #ddd;';
+
+			this.elements.preview.replaceChildren( img );
 		}
 
 		/**

@@ -26,7 +26,7 @@ $prpl_activity_types = [
 	],
 ];
 
-$prpl_tracked_post_types = \progress_planner()->get_activities__content_helpers()->get_post_types_names();
+$prpl_tracked_post_types = \progress_planner()->get_settings()->get_post_types_names();
 $prpl_activities_count   = [
 	'all' => 0,
 ];

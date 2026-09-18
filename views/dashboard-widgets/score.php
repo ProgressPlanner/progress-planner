@@ -5,6 +5,11 @@
  * @package Progress_Planner
  */
 
+// Exit if accessed directly.
+if ( ! \defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 use Progress_Planner\Badges\Monthly;
 
 $prpl_badge = Monthly::get_instance_from_id( Monthly::get_badge_id_from_date( new \DateTime() ) );
