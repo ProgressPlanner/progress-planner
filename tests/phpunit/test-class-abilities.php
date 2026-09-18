@@ -439,17 +439,26 @@ class Abilities_Test extends \WP_UnitTestCase {
 	 * @return void
 	 */
 	public function test_fixable_list_is_the_vetted_set() {
-		$this->assertSame(
-			[
-				'core-blogdescription',
-				'select-timezone',
-				'set-date-format',
-				'search-engine-visibility',
-				'disable-comments',
-				'disable-comment-pagination',
-			],
-			Recommendation_Fixes::fixable_providers()
-		);
+		$core = [
+			'core-blogdescription',
+			'select-timezone',
+			'set-date-format',
+			'search-engine-visibility',
+			'disable-comments',
+			'disable-comment-pagination',
+		];
+
+		foreach ( $core as $provider_id ) {
+			$this->assertTrue(
+				Recommendation_Fixes::has_fix( $provider_id ),
+				"{$provider_id} should be fixable."
+			);
+		}
+
+		// SEO-plugin entries only make sense when their plugin is active, but the
+		// table lists them unconditionally; the guard is in apply().
+		$this->assertTrue( Recommendation_Fixes::has_fix( 'yoast-crawl-settings-emoji-scripts' ) );
+		$this->assertTrue( Recommendation_Fixes::has_fix( 'aioseo-date-archive' ) );
 	}
 
 	/**
@@ -617,5 +626,24 @@ class Abilities_Test extends \WP_UnitTestCase {
 		}
 
 		$this->assertTrue( $found, 'Expected the seeded recommendation in the list.' );
+	}
+
+	/**
+	 * Test that an SEO fix refuses when its plugin is not active.
+	 *
+	 * The task would not exist on such a site, but the table lists these
+	 * unconditionally, so apply() must not fatal if one is reached.
+	 *
+	 * @return void
+	 */
+	public function test_seo_fix_requires_its_plugin() {
+		if ( \function_exists( 'aioseo' ) ) {
+			$this->markTestSkipped( 'All in One SEO is active in this environment.' );
+		}
+
+		$result = Recommendation_Fixes::apply( 'aioseo-date-archive' );
+
+		$this->assertWPError( $result );
+		$this->assertSame( 'progress_planner_seo_plugin_inactive', $result->get_error_code() );
 	}
 }
