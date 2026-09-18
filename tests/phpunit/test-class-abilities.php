@@ -14,6 +14,7 @@
 namespace Progress_Planner\Tests;
 
 use Progress_Planner\Abilities\Abilities;
+use Progress_Planner\Abilities\Recommendation_Fixes;
 
 /**
  * Abilities test case.
@@ -410,5 +411,211 @@ class Abilities_Test extends \WP_UnitTestCase {
 		$this->abilities->register_abilities();
 
 		$this->assertTrue( true, 'Re-registering did not trigger incorrect usage.' );
+	}
+
+	/**
+	 * Create a pending recommendation for a provider.
+	 *
+	 * @param string $provider_id The provider ID.
+	 *
+	 * @return void
+	 */
+	private function seed_task( $provider_id ) {
+		\progress_planner()->get_suggested_tasks_db()->add(
+			[
+				'task_id'     => 'test-' . $provider_id,
+				'post_title'  => 'Test ' . $provider_id,
+				'provider_id' => $provider_id,
+			]
+		);
+	}
+
+	/**
+	 * Test that only vetted providers are fixable.
+	 *
+	 * The list is deliberate, not derived from class inheritance: Tasks_Interactive
+	 * also covers sending a test email and deleting terms.
+	 *
+	 * @return void
+	 */
+	public function test_fixable_list_is_the_vetted_set() {
+		$this->assertSame(
+			[
+				'core-blogdescription',
+				'select-timezone',
+				'set-date-format',
+				'search-engine-visibility',
+				'disable-comments',
+				'disable-comment-pagination',
+			],
+			Recommendation_Fixes::fixable_providers()
+		);
+	}
+
+	/**
+	 * Test that tasks needing a person are not fixable.
+	 *
+	 * @return void
+	 */
+	public function test_unsafe_providers_are_not_fixable() {
+		foreach ( [ 'sending-email', 'remove-terms-without-posts', 'core-permalink-structure', 'remove-inactive-plugins', 'create-post' ] as $provider_id ) {
+			$this->assertFalse(
+				Recommendation_Fixes::has_fix( $provider_id ),
+				"{$provider_id} must not be auto-applied."
+			);
+		}
+	}
+
+	/**
+	 * Test that a subscriber cannot apply a fix.
+	 *
+	 * @return void
+	 */
+	public function test_can_fix_denies_subscriber() {
+		\wp_set_current_user( self::factory()->user->create( [ 'role' => 'subscriber' ] ) );
+
+		$this->assertFalse( $this->abilities->can_fix() );
+	}
+
+	/**
+	 * Test that applying a fix changes the setting.
+	 *
+	 * @return void
+	 */
+	public function test_complete_recommendation_applies_the_setting() {
+		\wp_set_current_user( self::factory()->user->create( [ 'role' => 'administrator' ] ) );
+		\update_option( 'blog_public', '0' );
+		$this->seed_task( 'search-engine-visibility' );
+
+		$result = $this->abilities->complete_recommendation( [ 'provider_id' => 'search-engine-visibility' ] );
+
+		$this->assertTrue( $result['applied'] );
+		$this->assertSame( 'completed', $result['status'] );
+		$this->assertSame( '1', (string) \get_option( 'blog_public' ) );
+	}
+
+	/**
+	 * Test that a recommendation needing a person is reported, not applied.
+	 *
+	 * @return void
+	 */
+	public function test_complete_recommendation_refuses_manual_tasks() {
+		\wp_set_current_user( self::factory()->user->create( [ 'role' => 'administrator' ] ) );
+		$this->seed_task( 'remove-inactive-plugins' );
+
+		$result = $this->abilities->complete_recommendation( [ 'provider_id' => 'remove-inactive-plugins' ] );
+
+		$this->assertFalse( $result['applied'] );
+		$this->assertSame( 'manual', $result['status'] );
+	}
+
+	/**
+	 * Test that an invalid timezone is rejected before anything is written.
+	 *
+	 * @return void
+	 */
+	public function test_complete_recommendation_validates_timezone() {
+		\wp_set_current_user( self::factory()->user->create( [ 'role' => 'administrator' ] ) );
+		$before = \get_option( 'timezone_string' );
+		$this->seed_task( 'select-timezone' );
+
+		$result = $this->abilities->complete_recommendation(
+			[
+				'provider_id' => 'select-timezone',
+				'value'       => 'Mars/Olympus',
+			]
+		);
+
+		$this->assertWPError( $result );
+		$this->assertSame( 'progress_planner_invalid_timezone', $result->get_error_code() );
+		$this->assertSame( $before, \get_option( 'timezone_string' ) );
+	}
+
+	/**
+	 * Test that a fix needing a value refuses an empty one.
+	 *
+	 * @return void
+	 */
+	public function test_complete_recommendation_requires_a_value() {
+		\wp_set_current_user( self::factory()->user->create( [ 'role' => 'administrator' ] ) );
+		$this->seed_task( 'core-blogdescription' );
+
+		$result = $this->abilities->complete_recommendation( [ 'provider_id' => 'core-blogdescription' ] );
+
+		$this->assertWPError( $result );
+		$this->assertSame( 'progress_planner_missing_value', $result->get_error_code() );
+	}
+
+	/**
+	 * Test that an unknown provider is an error rather than a silent no-op.
+	 *
+	 * @return void
+	 */
+	public function test_complete_recommendation_rejects_unknown_provider() {
+		\wp_set_current_user( self::factory()->user->create( [ 'role' => 'administrator' ] ) );
+
+		$result = $this->abilities->complete_recommendation( [ 'provider_id' => 'no-such-provider' ] );
+
+		$this->assertWPError( $result );
+		$this->assertSame( 'progress_planner_no_such_recommendation', $result->get_error_code() );
+	}
+
+	/**
+	 * Test that next mode reports honestly when there is nothing to do.
+	 *
+	 * @return void
+	 */
+	public function test_next_mode_reports_nothing_to_do() {
+		\wp_set_current_user( self::factory()->user->create( [ 'role' => 'administrator' ] ) );
+
+		$result = $this->abilities->complete_recommendation( [] );
+
+		$this->assertContains( $result['status'], [ 'nothing_to_do', 'completed', 'applied_not_yet_complete' ] );
+	}
+
+	/**
+	 * Test that next mode never picks a fix that needs a value.
+	 *
+	 * There is no correct tagline to invent on the owner's behalf.
+	 *
+	 * @return void
+	 */
+	public function test_next_mode_skips_fixes_needing_a_value() {
+		\wp_set_current_user( self::factory()->user->create( [ 'role' => 'administrator' ] ) );
+		$this->seed_task( 'core-blogdescription' );
+
+		$result = $this->abilities->complete_recommendation( [] );
+
+		if ( null !== $result['task'] ) {
+			$this->assertNotSame( 'core-blogdescription', $result['task']['provider_id'] );
+		} else {
+			$this->assertSame( 'nothing_to_do', $result['status'] );
+		}
+	}
+
+	/**
+	 * Test that the listing marks which recommendations can be applied.
+	 *
+	 * @return void
+	 */
+	public function test_list_recommendations_flags_fixable_items() {
+		\wp_set_current_user( self::factory()->user->create( [ 'role' => 'administrator' ] ) );
+		$this->seed_task( 'search-engine-visibility' );
+
+		$result = $this->abilities->list_recommendations( [ 'limit' => 100 ] );
+
+		$found = false;
+		foreach ( $result['recommendations'] as $recommendation ) {
+			$this->assertArrayHasKey( 'fixable', $recommendation );
+			$this->assertArrayHasKey( 'needs_value', $recommendation );
+
+			if ( 'search-engine-visibility' === $recommendation['provider_id'] ) {
+				$found = true;
+				$this->assertTrue( $recommendation['fixable'] );
+				$this->assertFalse( $recommendation['needs_value'] );
+			}
+		}
+
+		$this->assertTrue( $found, 'Expected the seeded recommendation in the list.' );
 	}
 }

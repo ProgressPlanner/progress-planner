@@ -92,6 +92,7 @@ class Abilities {
 
 		$this->register_get_site_score();
 		$this->register_list_recommendations();
+		$this->register_complete_recommendation();
 	}
 
 	/**
@@ -218,6 +219,210 @@ class Abilities {
 	}
 
 	/**
+	 * Register the complete-recommendation ability.
+	 *
+	 * @return void
+	 */
+	private function register_complete_recommendation() {
+		\wp_register_ability(
+			self::CATEGORY . '/complete-recommendation',
+			[
+				'label'               => \__( 'Complete recommendation', 'progress-planner' ),
+				'description'         => \__( 'Apply a Progress Planner recommendation that consists of a single site setting, such as the tagline, timezone or date format. Only a fixed list of settings can be changed this way; anything needing judgement, content or deletion is reported back with a link instead of being applied.', 'progress-planner' ),
+				'category'            => self::CATEGORY,
+				'input_schema'        => [
+					'type'                 => 'object',
+					'additionalProperties' => false,
+					'properties'           => [
+						'provider_id' => [
+							'type'        => 'string',
+							'description' => \__( 'The provider ID of the recommendation to apply, for example "core-blogdescription". Omit to apply the highest-priority recommendation that can be applied automatically.', 'progress-planner' ),
+						],
+						'value'       => [
+							'type'        => 'string',
+							'description' => \__( 'The value to set, for recommendations that need one: the tagline text, a timezone identifier such as "Europe/Amsterdam", or a date format string. Recommendations with only one correct outcome ignore this.', 'progress-planner' ),
+						],
+					],
+				],
+				'output_schema'       => $this->get_complete_recommendation_schema(),
+				'permission_callback' => [ $this, 'can_fix' ],
+				'execute_callback'    => [ $this, 'complete_recommendation' ],
+				'meta'                => [
+					'show_in_rest' => true,
+					'annotations'  => [
+						'readonly'    => false,
+						'destructive' => false,
+						'idempotent'  => true,
+					],
+				],
+			]
+		);
+	}
+
+	/**
+	 * Whether the current user may apply a fix.
+	 *
+	 * This is the capability the interactive tasks check before writing a
+	 * setting, kept the same here so an ability can never do what the popover
+	 * would refuse. There is no nonce: an authenticated agent call is not a
+	 * forged cross-origin form post, so the capability and the fixed list of
+	 * settings in Recommendation_Fixes are what bound this.
+	 *
+	 * @return bool
+	 */
+	public function can_fix() {
+		return \current_user_can( 'manage_options' );
+	}
+
+	/**
+	 * Apply a recommendation.
+	 *
+	 * @param array<string, mixed> $input The ability input.
+	 *
+	 * @return array<string, mixed>|\WP_Error
+	 */
+	public function complete_recommendation( $input = [] ) {
+		$provider_id = isset( $input['provider_id'] ) ? (string) $input['provider_id'] : '';
+		$value       = isset( $input['value'] ) ? (string) $input['value'] : null;
+
+		if ( '' === $provider_id ) {
+			$provider_id = $this->get_next_fixable_provider_id();
+
+			if ( '' === $provider_id ) {
+				return [
+					'applied'   => false,
+					'status'    => 'nothing_to_do',
+					'message'   => \__( 'There is no pending recommendation that can be applied automatically.', 'progress-planner' ),
+					'task'      => null,
+					'admin_url' => '',
+				];
+			}
+		}
+
+		$task = $this->find_pending_task( $provider_id );
+
+		if ( null === $task ) {
+			return new \WP_Error(
+				'progress_planner_no_such_recommendation',
+				\__( 'There is no pending recommendation for that provider.', 'progress-planner' ),
+				[ 'status' => 404 ]
+			);
+		}
+
+		$provider = \progress_planner()->get_suggested_tasks()->get_tasks_manager()->get_task_provider( $provider_id );
+
+		// The provider's own capability check, the same one the popover runs.
+		if ( ! $provider || ! $provider->capability_required() ) {
+			return new \WP_Error(
+				'progress_planner_cannot_complete',
+				\__( 'You do not have permission to complete this recommendation.', 'progress-planner' ),
+				[ 'status' => 403 ]
+			);
+		}
+
+		// Anything outside the fixable list is reported, never half-applied.
+		if ( ! Recommendation_Fixes::has_fix( $provider_id ) ) {
+			return [
+				'applied'   => false,
+				'status'    => 'manual',
+				'message'   => \__( 'This recommendation needs a person: it involves content, a deletion, or a choice that should not be made automatically. Open the link to handle it.', 'progress-planner' ),
+				'task'      => $this->prepare_recommendation( $task ),
+				'admin_url' => (string) $task->url,
+			];
+		}
+
+		$applied = Recommendation_Fixes::apply( $provider_id, $value );
+
+		if ( \is_wp_error( $applied ) ) {
+			return $applied;
+		}
+
+		// Completion is observed, never asserted: the provider decides whether
+		// the site now satisfies the task. Saying otherwise would award points
+		// for work that did not happen.
+		$completed = \method_exists( $provider, 'is_task_completed' )
+			? (bool) $provider->is_task_completed( $task->get_task_id() )
+			: false;
+
+		return [
+			'applied'   => true,
+			'status'    => $completed ? 'completed' : 'applied_not_yet_complete',
+			'message'   => $completed
+				? \__( 'The setting was changed and the recommendation is now satisfied.', 'progress-planner' )
+				: \__( 'The setting was changed, but the recommendation is not reported as satisfied yet.', 'progress-planner' ),
+			'task'      => $this->prepare_recommendation( $task ),
+			'admin_url' => (string) $task->url,
+		];
+	}
+
+	/**
+	 * Find the highest-priority pending recommendation that can be fixed.
+	 *
+	 * Tasks come back ordered by menu_order, which is the order the dashboard
+	 * shows them in, so "next" means the same thing to an agent as to a person.
+	 *
+	 * @return string The provider ID, or an empty string when there is none.
+	 */
+	private function get_next_fixable_provider_id() {
+		$tasks = \progress_planner()->get_suggested_tasks_db()->get_tasks_by(
+			[
+				'post_status'    => 'publish',
+				'posts_per_page' => -1,
+			]
+		);
+
+		foreach ( $tasks as $task ) {
+			$provider_id = $task->get_provider_id();
+
+			if ( ! Recommendation_Fixes::has_fix( $provider_id ) ) {
+				continue;
+			}
+
+			// A fix needing a value cannot be chosen unattended: there is no
+			// correct tagline to invent on the site owner's behalf.
+			if ( Recommendation_Fixes::needs_value( $provider_id ) ) {
+				continue;
+			}
+
+			$provider = \progress_planner()->get_suggested_tasks()->get_tasks_manager()->get_task_provider( $provider_id );
+
+			if ( ! $provider || ! $provider->capability_required() ) {
+				continue;
+			}
+
+			// Task evaluation runs on admin_init, so a task fixed a moment ago is
+			// still 'publish' here. Skipping the already-satisfied ones stops a
+			// repeated run from picking the same task and reporting it as new work.
+			if ( \method_exists( $provider, 'is_task_completed' ) && $provider->is_task_completed( $task->get_task_id() ) ) {
+				continue;
+			}
+
+			return $provider_id;
+		}
+
+		return '';
+	}
+
+	/**
+	 * Find a pending task for a provider.
+	 *
+	 * @param string $provider_id The provider ID.
+	 *
+	 * @return \Progress_Planner\Suggested_Tasks\Task|null
+	 */
+	private function find_pending_task( $provider_id ) {
+		$tasks = \progress_planner()->get_suggested_tasks_db()->get_tasks_by(
+			[
+				'post_status'    => 'publish',
+				'provider'       => $provider_id,
+				'posts_per_page' => 1,
+			]
+		);
+
+		return $tasks ? $tasks[0] : null;
+	}
+
+	/**
 	 * Get the site score.
 	 *
 	 * Deliberately narrower than the SaaS status payload: the active-plugin
@@ -330,6 +535,10 @@ class Abilities {
 			// User-created tasks carry no points of their own; the provider is
 			// the reliable source, with the stored value preferred when set.
 			'points'      => (int) ( $task->points ?? $provider->get_points() ),
+			// Lets a caller plan a run without discovering by trial which
+			// recommendations it is allowed to apply.
+			'fixable'     => Recommendation_Fixes::has_fix( $provider_id ),
+			'needs_value' => Recommendation_Fixes::needs_value( $provider_id ),
 		];
 	}
 
@@ -512,6 +721,40 @@ class Abilities {
 	}
 
 	/**
+	 * The output schema for complete-recommendation.
+	 *
+	 * @return array<string, mixed>
+	 */
+	private function get_complete_recommendation_schema() {
+		return [
+			'type'       => 'object',
+			'properties' => [
+				'applied'   => [
+					'type'        => 'boolean',
+					'description' => \__( 'Whether a setting was changed.', 'progress-planner' ),
+				],
+				'status'    => [
+					'type'        => 'string',
+					'description' => \__( 'What happened: "completed" when the recommendation is now satisfied, "applied_not_yet_complete" when the setting changed but the task is not satisfied, "manual" when it needs a person, "nothing_to_do" when no automatic recommendation was pending.', 'progress-planner' ),
+					'enum'        => [ 'completed', 'applied_not_yet_complete', 'manual', 'nothing_to_do' ],
+				],
+				'message'   => [
+					'type'        => 'string',
+					'description' => \__( 'A sentence describing the outcome.', 'progress-planner' ),
+				],
+				'task'      => [
+					'type'        => [ 'object', 'null' ],
+					'description' => \__( 'The recommendation that was acted on, if any.', 'progress-planner' ),
+				],
+				'admin_url' => [
+					'type'        => 'string',
+					'description' => \__( 'Where a person can handle this recommendation themselves.', 'progress-planner' ),
+				],
+			],
+		];
+	}
+
+	/**
 	 * The output schema for list-recommendations.
 	 *
 	 * @return array<string, mixed>
@@ -548,6 +791,14 @@ class Abilities {
 							'points'      => [
 								'type'        => 'integer',
 								'description' => \__( 'Points awarded for completing the task.', 'progress-planner' ),
+							],
+							'fixable'     => [
+								'type'        => 'boolean',
+								'description' => \__( 'Whether complete-recommendation can apply this one.', 'progress-planner' ),
+							],
+							'needs_value' => [
+								'type'        => 'boolean',
+								'description' => \__( 'Whether applying it requires a value from the caller, such as the tagline text.', 'progress-planner' ),
 							],
 						],
 					],
