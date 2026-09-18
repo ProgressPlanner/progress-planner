@@ -774,4 +774,94 @@ class Abilities_Test extends \WP_UnitTestCase {
 			$this->assertTrue( $result );
 		}
 	}
+
+	/**
+	 * Test that the page-role recommendations need a page ID.
+	 *
+	 * @return void
+	 */
+	public function test_page_role_fixes_need_a_value() {
+		foreach ( [ 'set-page-about', 'set-page-contact', 'set-page-faq' ] as $provider_id ) {
+			$this->assertTrue( Recommendation_Fixes::has_fix( $provider_id ) );
+			$this->assertTrue( Recommendation_Fixes::needs_value( $provider_id ) );
+			$this->assertFalse( Recommendation_Fixes::is_destructive( $provider_id ) );
+		}
+	}
+
+	/**
+	 * Test that a valid page is recorded as serving the role.
+	 *
+	 * @return void
+	 */
+	public function test_page_role_records_the_page() {
+		\wp_set_current_user( self::factory()->user->create( [ 'role' => 'administrator' ] ) );
+
+		$page_id = self::factory()->post->create(
+			[
+				'post_title'  => 'About Us',
+				'post_type'   => 'page',
+				'post_status' => 'publish',
+			]
+		);
+
+		$this->assertTrue( Recommendation_Fixes::apply( 'set-page-about', (string) $page_id ) );
+
+		$slugs = \wp_get_object_terms( $page_id, 'progress_planner_page_types', [ 'fields' => 'slugs' ] );
+
+		$this->assertContains( 'about', (array) $slugs );
+	}
+
+	/**
+	 * Test that an unusable page ID is refused rather than recorded.
+	 *
+	 * "We recorded your About page" is worth being true, so each of these is an
+	 * error rather than a silent no-op.
+	 *
+	 * @return void
+	 */
+	public function test_page_role_refuses_unusable_ids() {
+		\wp_set_current_user( self::factory()->user->create( [ 'role' => 'administrator' ] ) );
+
+		$cases = [
+			'progress_planner_missing_page_id'    => null,
+			'progress_planner_no_such_page'       => '99999999',
+			'progress_planner_page_not_published' => (string) self::factory()->post->create(
+				[
+					'post_type'   => 'page',
+					'post_status' => 'draft',
+				]
+			),
+			'progress_planner_not_a_page'         => (string) self::factory()->post->create(
+				[
+					'post_type'   => 'post',
+					'post_status' => 'publish',
+				]
+			),
+		];
+
+		foreach ( $cases as $expected_code => $value ) {
+			$result = Recommendation_Fixes::apply( 'set-page-about', $value );
+
+			$this->assertWPError( $result );
+			$this->assertSame( $expected_code, $result->get_error_code() );
+		}
+	}
+
+	/**
+	 * Test that next mode never picks a page-role fix.
+	 *
+	 * There is no correct page to choose on the owner's behalf.
+	 *
+	 * @return void
+	 */
+	public function test_next_mode_skips_page_role_fixes() {
+		\wp_set_current_user( self::factory()->user->create( [ 'role' => 'administrator' ] ) );
+		$this->seed_task( 'set-page-about' );
+
+		$result = $this->recommendations->complete( [] );
+
+		$picked = $result['task']['provider_id'] ?? null;
+
+		$this->assertNotSame( 'set-page-about', $picked );
+	}
 }

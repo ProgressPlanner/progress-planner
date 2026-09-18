@@ -185,8 +185,25 @@ class Recommendations {
 	 * @return bool
 	 */
 	private function is_satisfied( $provider, $task ) {
-		return \method_exists( $provider, 'is_task_completed' )
-			&& (bool) $provider->is_task_completed( $task->get_task_id() );
+		if ( \method_exists( $provider, 'is_task_completed' )
+			&& (bool) $provider->is_task_completed( $task->get_task_id() )
+		) {
+			return true;
+		}
+
+		// Some providers answer through should_add_task() instead: the task
+		// exists precisely while the condition is unmet, so "would not be added
+		// now" means satisfied. The set-page providers are the case in point --
+		// they do not override is_task_completed() at all.
+		//
+		// This can still report false immediately after a write. Page-type
+		// lookups are memoised in a static cache with no invalidation, so within
+		// one request the check may read state from before the change. That is
+		// why the status distinguishes "applied" from "satisfied" rather than
+		// assuming the two are the same: the next request sees it correctly, and
+		// a caller is told what actually happened either way.
+		return \method_exists( $provider, 'should_add_task' )
+			&& false === (bool) $provider->should_add_task();
 	}
 
 	/**

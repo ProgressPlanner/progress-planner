@@ -150,6 +150,39 @@ class Recommendation_Fixes {
 		],
 
 		/*
+		 * Telling the plugin which existing page serves a given role.
+		 *
+		 * These do not create anything. The recommendation asks whether the site
+		 * has an About page; this records the answer and, when the answer is
+		 * yes, which page it is.
+		 *
+		 * The plugin deliberately does not try to find the page itself. Deciding
+		 * that "About Emilia" at /about-us/ is the About page -- and that
+		 * "Job opening" is not -- is a judgement about titles, slugs, navigation
+		 * and content in whatever language the site is written in. A caller that
+		 * can read the site's pages is far better at that than a title match
+		 * would be, and a wrong guess made in PHP would be silent.
+		 *
+		 * So the division is: the caller identifies the page, and this verifies
+		 * the ID names a real published page of an allowed type before writing.
+		 */
+		'set-page-about'                            => [
+			'page_type' => 'about',
+			'input'     => 'value',
+			'summary'   => 'Record which existing page is the About page.',
+		],
+		'set-page-contact'                          => [
+			'page_type' => 'contact',
+			'input'     => 'value',
+			'summary'   => 'Record which existing page is the Contact page.',
+		],
+		'set-page-faq'                              => [
+			'page_type' => 'faq',
+			'input'     => 'value',
+			'summary'   => 'Record which existing page is the FAQ page.',
+		],
+
+		/*
 		 * Deleting WordPress's own placeholder content.
 		 *
 		 * These are the only entries that remove something rather than change a
@@ -256,6 +289,10 @@ class Recommendation_Fixes {
 			);
 		}
 
+		if ( isset( $fix['page_type'] ) ) {
+			return self::apply_page_type( $fix, $value );
+		}
+
 		if ( isset( $fix['delete'] ) ) {
 			return self::apply_deletion( $provider_id );
 		}
@@ -279,6 +316,85 @@ class Recommendation_Fixes {
 		\update_option( $fix['option'], $new_value );
 
 		return true;
+	}
+
+	/**
+	 * Record which page serves a given role.
+	 *
+	 * The page type comes from the table; only the page ID comes from the
+	 * caller, and it is checked before anything is written: it must name a post
+	 * that exists, is published, and is of a post type the site treats as a
+	 * page. An ID that does not pass is an error rather than a silent no-op,
+	 * because "we recorded your About page" is worth being true.
+	 *
+	 * @param array<string, mixed> $fix   The fix definition.
+	 * @param mixed                $value The page ID supplied by the caller.
+	 *
+	 * @return true|\WP_Error
+	 */
+	private static function apply_page_type( array $fix, $value ) {
+		$page_id = \is_numeric( $value ) ? (int) $value : 0;
+
+		if ( 1 > $page_id ) {
+			return new \WP_Error(
+				'progress_planner_missing_page_id',
+				\__( 'This recommendation needs the ID of the page that serves this role.', 'progress-planner' )
+			);
+		}
+
+		$page = \get_post( $page_id );
+
+		if ( ! $page ) {
+			return new \WP_Error(
+				'progress_planner_no_such_page',
+				\__( 'There is no page with that ID.', 'progress-planner' )
+			);
+		}
+
+		if ( 'publish' !== $page->post_status ) {
+			return new \WP_Error(
+				'progress_planner_page_not_published',
+				\__( 'That page is not published, so it cannot serve this role yet.', 'progress-planner' )
+			);
+		}
+
+		if ( ! \in_array( $page->post_type, self::page_post_types(), true ) ) {
+			return new \WP_Error(
+				'progress_planner_not_a_page',
+				\__( 'That post is not a page.', 'progress-planner' )
+			);
+		}
+
+		\progress_planner()->get_admin__page_settings()->set_page_values(
+			[
+				(string) $fix['page_type'] => [
+					'id'        => $page_id,
+					'have_page' => 'yes',
+				],
+			]
+		);
+
+		return true;
+	}
+
+	/**
+	 * The post types that can serve a page role.
+	 *
+	 * Hierarchical public post types, which is what WordPress means by a page,
+	 * rather than a hardcoded 'page' -- a site may serve these roles from a
+	 * custom post type.
+	 *
+	 * @return array<int, string>
+	 */
+	private static function page_post_types() {
+		$types = \get_post_types(
+			[
+				'public'       => true,
+				'hierarchical' => true,
+			]
+		);
+
+		return \array_values( $types );
 	}
 
 	/**
