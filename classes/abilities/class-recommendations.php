@@ -135,12 +135,23 @@ class Recommendations {
 		// for work that did not happen.
 		$completed = $this->is_satisfied( $provider, $task );
 
+		// The wording distinguishes a settings change from a deletion: an agent
+		// relaying this to a person should not describe trashing a post as
+		// changing a setting.
+		if ( Recommendation_Fixes::is_destructive( $provider_id ) ) {
+			$message = $completed
+				? \__( 'The content was moved to the trash and the recommendation is now satisfied. It can be restored from the trash if that was not intended.', 'progress-planner' )
+				: \__( 'The content was moved to the trash, but the recommendation is not reported as satisfied yet.', 'progress-planner' );
+		} else {
+			$message = $completed
+				? \__( 'The setting was changed and the recommendation is now satisfied.', 'progress-planner' )
+				: \__( 'The setting was changed, but the recommendation is not reported as satisfied yet.', 'progress-planner' );
+		}
+
 		return $this->result(
 			true,
 			$completed ? 'completed' : 'applied_not_yet_complete',
-			$completed
-				? \__( 'The setting was changed and the recommendation is now satisfied.', 'progress-planner' )
-				: \__( 'The setting was changed, but the recommendation is not reported as satisfied yet.', 'progress-planner' ),
+			$message,
 			$task
 		);
 	}
@@ -198,8 +209,13 @@ class Recommendations {
 			$provider_id = $task->get_provider_id();
 
 			// A fix needing a value cannot be chosen unattended: there is no
-			// correct tagline to invent on the site owner's behalf.
-			if ( ! Recommendation_Fixes::has_fix( $provider_id ) || Recommendation_Fixes::needs_value( $provider_id ) ) {
+			// correct tagline to invent on the site owner's behalf. Nor can one
+			// that removes content, however well scoped -- an unattended run
+			// should never be the thing that deleted something.
+			if ( ! Recommendation_Fixes::has_fix( $provider_id )
+				|| Recommendation_Fixes::needs_value( $provider_id )
+				|| Recommendation_Fixes::is_confirm_only( $provider_id )
+			) {
 				continue;
 			}
 
@@ -285,6 +301,7 @@ class Recommendations {
 			// recommendations it is allowed to apply.
 			'fixable'     => Recommendation_Fixes::has_fix( $provider_id ),
 			'needs_value' => Recommendation_Fixes::needs_value( $provider_id ),
+			'destructive' => Recommendation_Fixes::is_destructive( $provider_id ),
 		];
 	}
 }
