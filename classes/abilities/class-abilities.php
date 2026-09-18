@@ -41,6 +41,16 @@ class Abilities {
 	const READ_CAPABILITY = 'edit_others_posts';
 
 	/**
+	 * The capability required to change a setting.
+	 *
+	 * The same capability the interactive tasks check before writing, so an
+	 * ability can never do what the popover would refuse.
+	 *
+	 * @var string
+	 */
+	const WRITE_CAPABILITY = 'manage_options';
+
+	/**
 	 * The site-score reader.
 	 *
 	 * @var Site_Score
@@ -135,6 +145,27 @@ class Abilities {
 				]
 			)
 		);
+
+		\wp_register_ability(
+			self::CATEGORY . '/complete-recommendation',
+			$this->ability_args(
+				[
+					'label'               => \__( 'Complete recommendation', 'progress-planner' ),
+					'description'         => \__( 'Apply a Progress Planner recommendation that consists of a single site setting, such as the tagline, timezone or an SEO plugin toggle. Only a fixed list of settings can be changed this way; anything needing judgement, content or deletion is reported back with a link instead of being applied.', 'progress-planner' ),
+					'input_schema'        => Schemas::complete_recommendation_input(),
+					'output_schema'       => Schemas::complete_recommendation(),
+					'permission_callback' => [ $this, 'can_fix' ],
+					'execute_callback'    => [ $this->recommendations, 'complete' ],
+					'readonly'            => false,
+					// Most of what this applies is a settings change, but two
+					// recommendations trash WordPress's placeholder content. The
+					// annotation describes what the ability can do, not what a
+					// given call happens to do, so it is declared destructive and
+					// a client prompts before any of it runs.
+					'destructive'         => true,
+				]
+			)
+		);
 	}
 
 	/**
@@ -148,6 +179,10 @@ class Abilities {
 	 * @return array<string, mixed>
 	 */
 	private function ability_args( array $args ) {
+		$readonly    = $args['readonly'] ?? true;
+		$destructive = $args['destructive'] ?? false;
+		unset( $args['readonly'], $args['destructive'] );
+
 		return \array_merge(
 			[
 				'category'            => self::CATEGORY,
@@ -155,8 +190,8 @@ class Abilities {
 				'meta'                => [
 					'show_in_rest' => true,
 					'annotations'  => [
-						'readonly'    => true,
-						'destructive' => false,
+						'readonly'    => $readonly,
+						'destructive' => $destructive,
 						'idempotent'  => true,
 					],
 				],
@@ -172,6 +207,19 @@ class Abilities {
 	 */
 	public function can_read() {
 		return \current_user_can( self::READ_CAPABILITY );
+	}
+
+	/**
+	 * Whether the current user may apply a fix.
+	 *
+	 * There is no nonce: an authenticated agent call is not a forged
+	 * cross-origin form post, so this capability and the fixed list of settings
+	 * in Recommendation_Fixes are what bound the write surface.
+	 *
+	 * @return bool
+	 */
+	public function can_fix() {
+		return \current_user_can( self::WRITE_CAPABILITY );
 	}
 
 	/**

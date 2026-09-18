@@ -59,6 +59,27 @@ class Schemas {
 		];
 	}
 
+	/**
+	 * The input schema for complete-recommendation.
+	 *
+	 * @return array<string, mixed>
+	 */
+	public static function complete_recommendation_input() {
+		return [
+			'type'                 => 'object',
+			'additionalProperties' => false,
+			'properties'           => [
+				'provider_id' => [
+					'type'        => 'string',
+					'description' => \__( 'The provider ID of the recommendation to apply, for example "core-blogdescription". Omit to apply the highest-priority recommendation that can be applied automatically.', 'progress-planner' ),
+				],
+				'value'       => [
+					'type'        => 'string',
+					'description' => \__( 'The value to set, for recommendations that need one: the tagline text, a timezone identifier such as "Europe/Amsterdam", a date format string, or -- for the recommendations that ask which page serves a role -- the ID of an existing published page. Recommendations with only one correct outcome ignore this. Check needs_value on a recommendation to see whether one is required.', 'progress-planner' ),
+				],
+			],
+		];
+	}
 
 	/**
 	 * The output schema for get-site-score.
@@ -187,6 +208,52 @@ class Schemas {
 				'points'      => [
 					'type'        => 'integer',
 					'description' => \__( 'Points awarded for completing the task.', 'progress-planner' ),
+				],
+				'fixable'     => [
+					'type'        => 'boolean',
+					'description' => \__( 'Whether complete-recommendation can apply this one.', 'progress-planner' ),
+				],
+				'needs_value' => [
+					'type'        => 'boolean',
+					'description' => \__( 'Whether applying it requires a value from the caller, such as the tagline text.', 'progress-planner' ),
+				],
+				'destructive' => [
+					'type'        => 'boolean',
+					'description' => \__( 'Whether applying it removes content rather than changing a setting. These are only applied when named explicitly, never picked automatically.', 'progress-planner' ),
+				],
+			],
+		];
+	}
+
+	/**
+	 * The output schema for complete-recommendation.
+	 *
+	 * @return array<string, mixed>
+	 */
+	public static function complete_recommendation() {
+		return [
+			'type'       => 'object',
+			'properties' => [
+				'applied'   => [
+					'type'        => 'boolean',
+					'description' => \__( 'Whether a setting was changed.', 'progress-planner' ),
+				],
+				'status'    => [
+					'type'        => 'string',
+					'description' => \__( 'What happened: "completed" when the recommendation is now satisfied, "applied_not_yet_complete" when the setting changed but the task is not satisfied, "manual" when it needs a person, "nothing_to_do" when no automatic recommendation was pending.', 'progress-planner' ),
+					'enum'        => [ 'completed', 'applied_not_yet_complete', 'manual', 'nothing_to_do' ],
+				],
+				'message'   => [
+					'type'        => 'string',
+					'description' => \__( 'A sentence describing the outcome.', 'progress-planner' ),
+				],
+				'task'      => [
+					'type'        => [ 'object', 'null' ],
+					'description' => \__( 'The recommendation that was acted on, if any.', 'progress-planner' ),
+				],
+				'admin_url' => [
+					'type'        => 'string',
+					'description' => \__( 'Where a person can handle this recommendation themselves.', 'progress-planner' ),
 				],
 			],
 		];

@@ -14,6 +14,7 @@
 namespace Progress_Planner\Tests;
 
 use Progress_Planner\Abilities\Abilities;
+use Progress_Planner\Abilities\Recommendation_Fixes;
 
 /**
  * Abilities test case.
@@ -35,7 +36,7 @@ class Abilities_Test extends \WP_UnitTestCase {
 	private $site_score;
 
 	/**
-	 * Recommendations reader.
+	 * Recommendations reader and applier.
 	 *
 	 * @var \Progress_Planner\Abilities\Recommendations
 	 */
@@ -55,6 +56,24 @@ class Abilities_Test extends \WP_UnitTestCase {
 		$this->abilities       = \progress_planner()->get_abilities__abilities();
 		$this->site_score      = new \Progress_Planner\Abilities\Site_Score();
 		$this->recommendations = new \Progress_Planner\Abilities\Recommendations();
+	}
+
+	/**
+	 * Tear down test.
+	 *
+	 * Activities live in a custom table that WP_UnitTestCase does not roll
+	 * back, and post IDs are reused across tests. A row left here would be seen
+	 * by a later test that happens to be handed the same ID and asserts it has
+	 * no activity, so this class clears what it caused.
+	 *
+	 * @return void
+	 */
+	public function tearDown(): void {
+		global $wpdb;
+
+		$wpdb->query( 'TRUNCATE TABLE ' . $wpdb->prefix . 'progress_planner_activities' ); // phpcs:ignore WordPress.DB
+
+		parent::tearDown();
 	}
 
 	/**
@@ -427,5 +446,422 @@ class Abilities_Test extends \WP_UnitTestCase {
 		$this->abilities->register_abilities();
 
 		$this->assertTrue( true, 'Re-registering did not trigger incorrect usage.' );
+	}
+
+	/**
+	 * Create a pending recommendation for a provider.
+	 *
+	 * @param string $provider_id The provider ID.
+	 *
+	 * @return void
+	 */
+	private function seed_task( $provider_id ) {
+		\progress_planner()->get_suggested_tasks_db()->add(
+			[
+				'task_id'     => 'test-' . $provider_id,
+				'post_title'  => 'Test ' . $provider_id,
+				'provider_id' => $provider_id,
+			]
+		);
+	}
+
+	/**
+	 * Test that only vetted providers are fixable.
+	 *
+	 * The list is deliberate, not derived from class inheritance: Tasks_Interactive
+	 * also covers sending a test email and deleting terms.
+	 *
+	 * @return void
+	 */
+	public function test_fixable_list_is_the_vetted_set() {
+		$core = [
+			'core-blogdescription',
+			'select-timezone',
+			'set-date-format',
+			'search-engine-visibility',
+			'disable-comments',
+			'disable-comment-pagination',
+		];
+
+		foreach ( $core as $provider_id ) {
+			$this->assertTrue(
+				Recommendation_Fixes::has_fix( $provider_id ),
+				"{$provider_id} should be fixable."
+			);
+		}
+
+		// SEO-plugin entries only make sense when their plugin is active, but the
+		// table lists them unconditionally; the guard is in apply().
+		$this->assertTrue( Recommendation_Fixes::has_fix( 'yoast-crawl-settings-emoji-scripts' ) );
+		$this->assertTrue( Recommendation_Fixes::has_fix( 'aioseo-date-archive' ) );
+	}
+
+	/**
+	 * Test that tasks needing a person are not fixable.
+	 *
+	 * @return void
+	 */
+	public function test_unsafe_providers_are_not_fixable() {
+		foreach ( [ 'sending-email', 'remove-terms-without-posts', 'core-permalink-structure', 'remove-inactive-plugins', 'create-post' ] as $provider_id ) {
+			$this->assertFalse(
+				Recommendation_Fixes::has_fix( $provider_id ),
+				"{$provider_id} must not be auto-applied."
+			);
+		}
+	}
+
+	/**
+	 * Test that a subscriber cannot apply a fix.
+	 *
+	 * @return void
+	 */
+	public function test_can_fix_denies_subscriber() {
+		\wp_set_current_user( self::factory()->user->create( [ 'role' => 'subscriber' ] ) );
+
+		$this->assertFalse( $this->abilities->can_fix() );
+	}
+
+	/**
+	 * Test that applying a fix changes the setting.
+	 *
+	 * @return void
+	 */
+	public function test_complete_recommendation_applies_the_setting() {
+		\wp_set_current_user( self::factory()->user->create( [ 'role' => 'administrator' ] ) );
+		\update_option( 'blog_public', '0' );
+		$this->seed_task( 'search-engine-visibility' );
+
+		$result = $this->recommendations->complete( [ 'provider_id' => 'search-engine-visibility' ] );
+
+		$this->assertTrue( $result['applied'] );
+		$this->assertSame( 'completed', $result['status'] );
+		$this->assertSame( '1', (string) \get_option( 'blog_public' ) );
+	}
+
+	/**
+	 * Test that a recommendation needing a person is reported, not applied.
+	 *
+	 * @return void
+	 */
+	public function test_complete_recommendation_refuses_manual_tasks() {
+		\wp_set_current_user( self::factory()->user->create( [ 'role' => 'administrator' ] ) );
+		$this->seed_task( 'remove-inactive-plugins' );
+
+		$result = $this->recommendations->complete( [ 'provider_id' => 'remove-inactive-plugins' ] );
+
+		$this->assertFalse( $result['applied'] );
+		$this->assertSame( 'manual', $result['status'] );
+	}
+
+	/**
+	 * Test that an invalid timezone is rejected before anything is written.
+	 *
+	 * @return void
+	 */
+	public function test_complete_recommendation_validates_timezone() {
+		\wp_set_current_user( self::factory()->user->create( [ 'role' => 'administrator' ] ) );
+		$before = \get_option( 'timezone_string' );
+		$this->seed_task( 'select-timezone' );
+
+		$result = $this->recommendations->complete(
+			[
+				'provider_id' => 'select-timezone',
+				'value'       => 'Mars/Olympus',
+			]
+		);
+
+		$this->assertWPError( $result );
+		$this->assertSame( 'progress_planner_invalid_timezone', $result->get_error_code() );
+		$this->assertSame( $before, \get_option( 'timezone_string' ) );
+	}
+
+	/**
+	 * Test that a fix needing a value refuses an empty one.
+	 *
+	 * @return void
+	 */
+	public function test_complete_recommendation_requires_a_value() {
+		\wp_set_current_user( self::factory()->user->create( [ 'role' => 'administrator' ] ) );
+		$this->seed_task( 'core-blogdescription' );
+
+		$result = $this->recommendations->complete( [ 'provider_id' => 'core-blogdescription' ] );
+
+		$this->assertWPError( $result );
+		$this->assertSame( 'progress_planner_missing_value', $result->get_error_code() );
+	}
+
+	/**
+	 * Test that an unknown provider is an error rather than a silent no-op.
+	 *
+	 * @return void
+	 */
+	public function test_complete_recommendation_rejects_unknown_provider() {
+		\wp_set_current_user( self::factory()->user->create( [ 'role' => 'administrator' ] ) );
+
+		$result = $this->recommendations->complete( [ 'provider_id' => 'no-such-provider' ] );
+
+		$this->assertWPError( $result );
+		$this->assertSame( 'progress_planner_no_such_recommendation', $result->get_error_code() );
+	}
+
+	/**
+	 * Test that next mode reports honestly when there is nothing to do.
+	 *
+	 * @return void
+	 */
+	public function test_next_mode_reports_nothing_to_do() {
+		\wp_set_current_user( self::factory()->user->create( [ 'role' => 'administrator' ] ) );
+
+		$result = $this->recommendations->complete( [] );
+
+		$this->assertContains( $result['status'], [ 'nothing_to_do', 'completed', 'applied_not_yet_complete' ] );
+	}
+
+	/**
+	 * Test that next mode never picks a fix that needs a value.
+	 *
+	 * There is no correct tagline to invent on the owner's behalf.
+	 *
+	 * @return void
+	 */
+	public function test_next_mode_skips_fixes_needing_a_value() {
+		\wp_set_current_user( self::factory()->user->create( [ 'role' => 'administrator' ] ) );
+		$this->seed_task( 'core-blogdescription' );
+
+		$result = $this->recommendations->complete( [] );
+
+		if ( null !== $result['task'] ) {
+			$this->assertNotSame( 'core-blogdescription', $result['task']['provider_id'] );
+		} else {
+			$this->assertSame( 'nothing_to_do', $result['status'] );
+		}
+	}
+
+	/**
+	 * Test that the listing marks which recommendations can be applied.
+	 *
+	 * @return void
+	 */
+	public function test_list_recommendations_flags_fixable_items() {
+		\wp_set_current_user( self::factory()->user->create( [ 'role' => 'administrator' ] ) );
+		$this->seed_task( 'search-engine-visibility' );
+
+		$result = $this->recommendations->list( [ 'limit' => 100 ] );
+
+		$found = false;
+		foreach ( $result['recommendations'] as $recommendation ) {
+			$this->assertArrayHasKey( 'fixable', $recommendation );
+			$this->assertArrayHasKey( 'needs_value', $recommendation );
+
+			if ( 'search-engine-visibility' === $recommendation['provider_id'] ) {
+				$found = true;
+				$this->assertTrue( $recommendation['fixable'] );
+				$this->assertFalse( $recommendation['needs_value'] );
+			}
+		}
+
+		$this->assertTrue( $found, 'Expected the seeded recommendation in the list.' );
+	}
+
+	/**
+	 * Test that an SEO fix refuses when its plugin is not active.
+	 *
+	 * The task would not exist on such a site, but the table lists these
+	 * unconditionally, so apply() must not fatal if one is reached.
+	 *
+	 * @return void
+	 */
+	public function test_seo_fix_requires_its_plugin() {
+		if ( \function_exists( 'aioseo' ) ) {
+			$this->markTestSkipped( 'All in One SEO is active in this environment.' );
+		}
+
+		$result = Recommendation_Fixes::apply( 'aioseo-date-archive' );
+
+		$this->assertWPError( $result );
+		$this->assertSame( 'progress_planner_seo_plugin_inactive', $result->get_error_code() );
+	}
+
+	/**
+	 * Test that the placeholder deletions are marked destructive.
+	 *
+	 * @return void
+	 */
+	public function test_placeholder_deletions_are_destructive() {
+		$this->assertTrue( Recommendation_Fixes::is_destructive( 'hello-world' ) );
+		$this->assertTrue( Recommendation_Fixes::is_destructive( 'sample-page' ) );
+		$this->assertFalse( Recommendation_Fixes::is_destructive( 'disable-comments' ) );
+	}
+
+	/**
+	 * Test that anything destructive can only be applied by name.
+	 *
+	 * An unattended run must never be the thing that deleted something.
+	 *
+	 * @return void
+	 */
+	public function test_destructive_fixes_are_confirm_only() {
+		$this->assertTrue( Recommendation_Fixes::is_confirm_only( 'hello-world' ) );
+		$this->assertTrue( Recommendation_Fixes::is_confirm_only( 'sample-page' ) );
+		$this->assertFalse( Recommendation_Fixes::is_confirm_only( 'disable-comments' ) );
+	}
+
+	/**
+	 * Test that applying the hello-world fix trashes the post rather than
+	 * deleting it outright.
+	 *
+	 * @return void
+	 */
+	public function test_hello_world_fix_trashes_the_post() {
+		\wp_set_current_user( self::factory()->user->create( [ 'role' => 'administrator' ] ) );
+
+		$post_id = self::factory()->post->create(
+			[
+				'post_title'  => 'Hello world!',
+				'post_name'   => 'hello-world',
+				'post_status' => 'publish',
+			]
+		);
+
+		$this->seed_task( 'hello-world' );
+
+		$result = $this->recommendations->complete( [ 'provider_id' => 'hello-world' ] );
+
+		$this->assertTrue( $result['applied'] );
+		$this->assertSame( 'trash', \get_post_status( $post_id ), 'The post should be recoverable from the trash.' );
+	}
+
+	/**
+	 * Test that next mode never picks a destructive fix.
+	 *
+	 * @return void
+	 */
+	public function test_next_mode_never_deletes() {
+		\wp_set_current_user( self::factory()->user->create( [ 'role' => 'administrator' ] ) );
+
+		$post_id = self::factory()->post->create(
+			[
+				'post_title'  => 'Hello world!',
+				'post_name'   => 'hello-world',
+				'post_status' => 'publish',
+			]
+		);
+
+		$this->seed_task( 'hello-world' );
+
+		$result = $this->recommendations->complete( [] );
+
+		if ( null !== $result['task'] ) {
+			$this->assertNotSame( 'hello-world', $result['task']['provider_id'] );
+		}
+
+		$this->assertSame( 'publish', \get_post_status( $post_id ), 'Next mode must not trash anything.' );
+	}
+
+	/**
+	 * Test that a deletion reports missing content rather than failing oddly.
+	 *
+	 * @return void
+	 */
+	public function test_deletion_reports_missing_target() {
+		\wp_set_current_user( self::factory()->user->create( [ 'role' => 'administrator' ] ) );
+
+		$result = Recommendation_Fixes::apply( 'hello-world' );
+
+		if ( \is_wp_error( $result ) ) {
+			$this->assertSame( 'progress_planner_no_target', $result->get_error_code() );
+		} else {
+			$this->assertTrue( $result );
+		}
+	}
+
+	/**
+	 * Test that the page-role recommendations need a page ID.
+	 *
+	 * @return void
+	 */
+	public function test_page_role_fixes_need_a_value() {
+		foreach ( [ 'set-page-about', 'set-page-contact', 'set-page-faq' ] as $provider_id ) {
+			$this->assertTrue( Recommendation_Fixes::has_fix( $provider_id ) );
+			$this->assertTrue( Recommendation_Fixes::needs_value( $provider_id ) );
+			$this->assertFalse( Recommendation_Fixes::is_destructive( $provider_id ) );
+		}
+	}
+
+	/**
+	 * Test that a valid page is recorded as serving the role.
+	 *
+	 * @return void
+	 */
+	public function test_page_role_records_the_page() {
+		\wp_set_current_user( self::factory()->user->create( [ 'role' => 'administrator' ] ) );
+
+		$page_id = self::factory()->post->create(
+			[
+				'post_title'  => 'About Us',
+				'post_type'   => 'page',
+				'post_status' => 'publish',
+			]
+		);
+
+		$this->assertTrue( Recommendation_Fixes::apply( 'set-page-about', (string) $page_id ) );
+
+		$slugs = \wp_get_object_terms( $page_id, 'progress_planner_page_types', [ 'fields' => 'slugs' ] );
+
+		$this->assertContains( 'about', (array) $slugs );
+	}
+
+	/**
+	 * Test that an unusable page ID is refused rather than recorded.
+	 *
+	 * "We recorded your About page" is worth being true, so each of these is an
+	 * error rather than a silent no-op.
+	 *
+	 * @return void
+	 */
+	public function test_page_role_refuses_unusable_ids() {
+		\wp_set_current_user( self::factory()->user->create( [ 'role' => 'administrator' ] ) );
+
+		$cases = [
+			'progress_planner_missing_page_id'    => null,
+			'progress_planner_no_such_page'       => '99999999',
+			'progress_planner_page_not_published' => (string) self::factory()->post->create(
+				[
+					'post_type'   => 'page',
+					'post_status' => 'draft',
+				]
+			),
+			'progress_planner_not_a_page'         => (string) self::factory()->post->create(
+				[
+					'post_type'   => 'post',
+					'post_status' => 'publish',
+				]
+			),
+		];
+
+		foreach ( $cases as $expected_code => $value ) {
+			$result = Recommendation_Fixes::apply( 'set-page-about', $value );
+
+			$this->assertWPError( $result );
+			$this->assertSame( $expected_code, $result->get_error_code() );
+		}
+	}
+
+	/**
+	 * Test that next mode never picks a page-role fix.
+	 *
+	 * There is no correct page to choose on the owner's behalf.
+	 *
+	 * @return void
+	 */
+	public function test_next_mode_skips_page_role_fixes() {
+		\wp_set_current_user( self::factory()->user->create( [ 'role' => 'administrator' ] ) );
+		$this->seed_task( 'set-page-about' );
+
+		$result = $this->recommendations->complete( [] );
+
+		$picked = $result['task']['provider_id'] ?? null;
+
+		$this->assertNotSame( 'set-page-about', $picked );
 	}
 }
