@@ -14,7 +14,7 @@ needs_confirmation: true
 applies_when:
   # Cornerstone is a concept the SEO plugin provides and acts on. Without one
   # there is nowhere to record the answer and nothing that uses it.
-  - any_plugin_active: [yoast-seo]
+  - any_plugin_active: [wordpress-seo]
 ---
 
 ## Why it matters

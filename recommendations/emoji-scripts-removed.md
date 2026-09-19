@@ -15,7 +15,7 @@ needs_confirmation: false
 # WordPress front end enqueues them by default, so there is no second
 # condition.
 applies_when:
-  - any_plugin_active: [yoast-seo, all-in-one-seo-pack]
+  - any_plugin_active: [wordpress-seo, all-in-one-seo-pack]
 ---
 
 ## Why it matters

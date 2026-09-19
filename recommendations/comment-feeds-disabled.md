@@ -15,7 +15,7 @@ needs_confirmation: false
 # second condition: unlike the author feeds, comment feeds are no more useful
 # on a busy site than on a quiet one.
 applies_when:
-  - any_plugin_active: [yoast-seo, all-in-one-seo-pack]
+  - any_plugin_active: [wordpress-seo, all-in-one-seo-pack]
 ---
 
 ## Why it matters

@@ -15,7 +15,7 @@ needs_confirmation: false
 # it only makes sense where post formats are barely used: a site that really
 # organises content by format has archives worth keeping.
 applies_when:
-  - any_plugin_active: [yoast-seo, all-in-one-seo-pack]
+  - any_plugin_active: [wordpress-seo, all-in-one-seo-pack]
   - posts_with_post_format_count_at_most: 3
 ---
 

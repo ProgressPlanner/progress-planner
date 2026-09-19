@@ -15,7 +15,7 @@ needs_confirmation: false
 # and it only makes sense on a single-author site: on a multi-author blog,
 # readers may legitimately want to follow one writer.
 applies_when:
-  - any_plugin_active: [yoast-seo, all-in-one-seo-pack]
+  - any_plugin_active: [wordpress-seo, all-in-one-seo-pack]
   - author_with_posts_count_at_most: 1
 ---
 

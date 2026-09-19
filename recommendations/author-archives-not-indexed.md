@@ -15,7 +15,7 @@ needs_confirmation: false
 # it only makes sense on a single-author site: with two or more authors who
 # publish, the author archive is a real, distinct listing and should stay.
 applies_when:
-  - any_plugin_active: [yoast-seo, all-in-one-seo-pack]
+  - any_plugin_active: [wordpress-seo, all-in-one-seo-pack]
   - author_with_posts_count_at_most: 1
 ---
 

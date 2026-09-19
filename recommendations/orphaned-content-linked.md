@@ -24,7 +24,7 @@ applies_when:
   # Counting incoming internal links needs an index of them. The SEO plugins
   # that build one are the usual source; without any, the model has to work it
   # out by reading the site, which is slower but not impossible.
-  - any_plugin_active: [yoast-seo, all-in-one-seo-pack]
+  - any_plugin_active: [wordpress-seo, all-in-one-seo-pack]
 ---
 
 ## Why it matters
