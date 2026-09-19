@@ -19,7 +19,7 @@ needs_confirmation: true
 # that represents a person rather than a company -- there the equivalent
 # setting is a personal avatar, which is a different recommendation.
 applies_when:
-  - any_plugin_active: [yoast-seo, all-in-one-seo-pack]
+  - any_plugin_active: [wordpress-seo, all-in-one-seo-pack]
   - represents: organization
 ---
 

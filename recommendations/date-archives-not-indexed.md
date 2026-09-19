@@ -16,7 +16,7 @@ needs_confirmation: false
 # date segments are part of every post URL, and the archives they imply are
 # load-bearing navigation rather than stray duplicates.
 applies_when:
-  - any_plugin_active: [yoast-seo, all-in-one-seo-pack]
+  - any_plugin_active: [wordpress-seo, all-in-one-seo-pack]
   - permalink_structure_excludes: ['%year%', '%monthnum%', '%day%']
 ---
 
