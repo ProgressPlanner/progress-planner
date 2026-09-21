@@ -13,6 +13,118 @@ namespace Progress_Planner\Rest;
 class Recommendations_Controller extends \WP_REST_Posts_Controller {
 
 	/**
+	 * The capability required to read or write recommendations over REST.
+	 *
+	 * This mirrors the gate the rest of the plugin uses for its admin UI
+	 * (see `Base::init()` and `Admin\Dashboard_Widget::$capability`), so the
+	 * REST surface can never be reached by roles that cannot see the feature.
+	 *
+	 * Without these overrides the `prpl_recommendations` CPT inherits the
+	 * default `post` capabilities: any Contributor/Author (`edit_posts`) could
+	 * create, alter, trash and enumerate tasks, and any published task was
+	 * readable anonymously. See the 1.10.0 release audit (S1/S2).
+	 *
+	 * @var string
+	 */
+	const REQUIRED_CAPABILITY = 'edit_others_posts';
+
+	/**
+	 * Whether the current user may access the recommendations REST surface.
+	 *
+	 * @return bool
+	 */
+	protected function current_user_can_access_recommendations() {
+		return \current_user_can( self::REQUIRED_CAPABILITY );
+	}
+
+	/**
+	 * Build the shared "insufficient permissions" error.
+	 *
+	 * @return \WP_Error
+	 */
+	protected function forbidden_error() {
+		return new \WP_Error(
+			'rest_forbidden',
+			\__( 'Sorry, you are not allowed to access Progress Planner recommendations.', 'progress-planner' ),
+			[ 'status' => \rest_authorization_required_code() ]
+		);
+	}
+
+	/**
+	 * Check permissions for reading a collection of recommendations.
+	 *
+	 * @param \WP_REST_Request $request The REST request.
+	 *
+	 * @return true|\WP_Error
+	 */
+	public function get_items_permissions_check( $request ) {
+		if ( ! $this->current_user_can_access_recommendations() ) {
+			return $this->forbidden_error();
+		}
+		return parent::get_items_permissions_check( $request );
+	}
+
+	/**
+	 * Check permissions for reading a single recommendation.
+	 *
+	 * Core's `WP_REST_Posts_Controller::check_read_permission()` allows any
+	 * `publish` post to be read anonymously, so overriding this method is the
+	 * only way to close anonymous single-item reads (audit S2).
+	 *
+	 * @param \WP_REST_Request $request The REST request.
+	 *
+	 * @return true|\WP_Error
+	 */
+	public function get_item_permissions_check( $request ) {
+		if ( ! $this->current_user_can_access_recommendations() ) {
+			return $this->forbidden_error();
+		}
+		return parent::get_item_permissions_check( $request );
+	}
+
+	/**
+	 * Check permissions for creating a recommendation.
+	 *
+	 * @param \WP_REST_Request $request The REST request.
+	 *
+	 * @return true|\WP_Error
+	 */
+	public function create_item_permissions_check( $request ) {
+		if ( ! $this->current_user_can_access_recommendations() ) {
+			return $this->forbidden_error();
+		}
+		return parent::create_item_permissions_check( $request );
+	}
+
+	/**
+	 * Check permissions for updating a recommendation.
+	 *
+	 * @param \WP_REST_Request $request The REST request.
+	 *
+	 * @return true|\WP_Error
+	 */
+	public function update_item_permissions_check( $request ) {
+		if ( ! $this->current_user_can_access_recommendations() ) {
+			return $this->forbidden_error();
+		}
+		return parent::update_item_permissions_check( $request );
+	}
+
+	/**
+	 * Check permissions for deleting a recommendation.
+	 *
+	 * @param \WP_REST_Request $request The REST request.
+	 *
+	 * @return true|\WP_Error
+	 */
+	public function delete_item_permissions_check( $request ) {
+		if ( ! $this->current_user_can_access_recommendations() ) {
+			return $this->forbidden_error();
+		}
+		return parent::delete_item_permissions_check( $request );
+	}
+
+	/**
 	 * Get the item schema for recommendations (tasks) in the REST API.
 	 *
 	 * Extends the default WordPress post schema to support the 'trash' status,

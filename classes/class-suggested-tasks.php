@@ -447,6 +447,15 @@ class Suggested_Tasks {
 				'rewrite'           => [ 'slug' => 'prpl_recommendations_provider' ],
 				'show_in_rest'      => true,
 				'show_in_menu'      => \apply_filters( 'progress_planner_tasks_show_ui', false ),
+				// Gate term writes to the same capability the plugin UI uses, so
+				// a Contributor/Author (default `edit_posts`) cannot assign,
+				// create or alter provider terms via core REST (audit S1).
+				'capabilities'      => [
+					'manage_terms' => 'edit_others_posts',
+					'edit_terms'   => 'edit_others_posts',
+					'delete_terms' => 'edit_others_posts',
+					'assign_terms' => 'edit_others_posts',
+				],
 			]
 		);
 	}
