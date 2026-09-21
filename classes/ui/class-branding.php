@@ -220,7 +220,7 @@ final class Branding {
 	 *
 	 * @return int|null
 	 */
-	public function get_admin_submenu_position(): mixed {
+	public function get_admin_submenu_position() {
 		if ( $this->get_branding_id() !== 0 && $this->get_branding_id() !== 4958 ) {
 			return -1000;
 		}

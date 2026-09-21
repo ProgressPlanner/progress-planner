@@ -1,5 +1,9 @@
 parameters:
   level: 10
+  # The plugin supports PHP 7.4 (see "Requires PHP" in progress-planner.php).
+  # Pinning this makes PHPStan reject PHP 8-only syntax (union types, "mixed",
+  # "never", ...) that "php -l" accepts on 7.4 but that fatals at runtime.
+  phpVersion: 70400
   reportUnmatchedIgnoredErrors: false
   paths:
     - ./classes
