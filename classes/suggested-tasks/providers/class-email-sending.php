@@ -62,13 +62,6 @@ class Email_Sending extends Tasks_Interactive {
 	protected $email_subject = '';
 
 	/**
-	 * The email content.
-	 *
-	 * @var string
-	 */
-	protected $email_content = '';
-
-	/**
 	 * The error.
 	 *
 	 * @var string
@@ -110,16 +103,11 @@ class Email_Sending extends Tasks_Interactive {
 
 		$this->email_subject = \esc_html__( 'Your Progress Planner test message!', 'progress-planner' );
 
-		// Generate a secure token for the completion link to prevent CSRF.
-		$user_id = \get_current_user_id();
-		$token   = \progress_planner()->get_suggested_tasks()->generate_task_completion_token( $this->get_task_id(), $user_id );
-
-		$this->email_content = \sprintf(
-			// translators: %1$s the admin URL.
-			\__( 'You just used Progress Planner to verify if sending email works on your website. <br><br> The good news; it does! <a href="%1$s" target="_self">Click here to mark %2$s\'s Recommendation as completed</a>.', 'progress-planner' ),
-			\admin_url( 'admin.php?page=progress-planner&prpl_complete_task=' . $this->get_task_id() . '&token=' . $token ),
-			\esc_html( \progress_planner()->get_ui__branding()->get_ravi_name() )
-		);
+		// Note: the completion token and email body are generated on demand in
+		// ajax_test_email_sending(), not here. Minting a token on every `init`
+		// would overwrite the token stored when the email was actually sent
+		// (invalidating the link in the user's inbox on the next request), and
+		// $this->email_content is not read anywhere else.
 	}
 
 	/**
