@@ -476,7 +476,7 @@ class Suggested_Tasks {
 			$tax_query[] = [
 				'taxonomy' => 'prpl_recommendations_provider',
 				'field'    => 'slug',
-				'terms'    => \explode( ',', $request['exclude_provider'] ),
+				'terms'    => $this->parse_provider_param( $request['exclude_provider'] ),
 				'operator' => 'NOT IN',
 			];
 		}
@@ -489,7 +489,7 @@ class Suggested_Tasks {
 
 		// Include terms (matches any term in list).
 		if ( isset( $request['provider'] ) ) {
-			$request_providers = \explode( ',', $request['provider'] );
+			$request_providers = $this->parse_provider_param( $request['provider'] );
 			$include_providers = \array_intersect( $include_providers, $request_providers );
 		}
 
@@ -515,6 +515,26 @@ class Suggested_Tasks {
 		}
 
 		return $args;
+	}
+
+	/**
+	 * Normalise a `provider` / `exclude_provider` REST param to a list of slugs.
+	 *
+	 * The param may arrive as a comma-separated string (`?provider=a,b`) or as
+	 * an array (`?provider[]=a&provider[]=b`). Passing an array straight to
+	 * `explode()` throws a TypeError on PHP 8, so branch on the input type and
+	 * sanitise each slug.
+	 *
+	 * @param mixed $value The raw request value.
+	 *
+	 * @return string[] The list of provider slugs.
+	 */
+	protected function parse_provider_param( $value ) {
+		$providers = \is_string( $value )
+			? \explode( ',', $value )
+			: (array) $value;
+
+		return \array_values( \array_filter( \array_map( 'sanitize_key', $providers ) ) );
 	}
 
 	/**
