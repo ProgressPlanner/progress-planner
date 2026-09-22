@@ -61,18 +61,18 @@ class Abilities_Test extends \WP_UnitTestCase {
 	/**
 	 * Invoke a private or protected method on an object.
 	 *
-	 * @param object $object The object.
+	 * @param object $instance The object.
 	 * @param string $name   The method name.
 	 * @param array  $args   The arguments.
 	 *
 	 * @return mixed
 	 */
-	private function invoke_on( $object, $name, array $args = [] ) {
-		$reflection = new \ReflectionClass( $object );
+	private function invoke_on( $instance, $name, array $args = [] ) {
+		$reflection = new \ReflectionClass( $instance );
 		$method     = $reflection->getMethod( $name );
 		$method->setAccessible( true );
 
-		return $method->invokeArgs( $object, $args );
+		return $method->invokeArgs( $instance, $args );
 	}
 
 	/**

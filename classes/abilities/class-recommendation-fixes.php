@@ -31,37 +31,37 @@ class Recommendation_Fixes {
 	 * @var array<string, array<string, mixed>>
 	 */
 	private const FIXES = [
-		'core-blogdescription'       => [
+		'core-blogdescription'                      => [
 			'option'  => 'blogdescription',
 			'input'   => 'value',
 			'type'    => 'string',
 			'summary' => 'Set the site tagline.',
 		],
-		'select-timezone'            => [
+		'select-timezone'                           => [
 			'option'  => 'timezone_string',
 			'input'   => 'value',
 			'type'    => 'timezone',
 			'summary' => 'Set the site timezone.',
 		],
-		'set-date-format'            => [
+		'set-date-format'                           => [
 			'option'  => 'date_format',
 			'input'   => 'value',
 			'type'    => 'string',
 			'summary' => 'Set the date format.',
 		],
-		'search-engine-visibility'   => [
+		'search-engine-visibility'                  => [
 			'option'  => 'blog_public',
 			'value'   => '1',
 			'type'    => 'string',
 			'summary' => 'Allow search engines to index the site.',
 		],
-		'disable-comments'           => [
+		'disable-comments'                          => [
 			'option'  => 'default_comment_status',
 			'value'   => 'closed',
 			'type'    => 'string',
 			'summary' => 'Close comments on new content by default.',
 		],
-		'disable-comment-pagination' => [
+		'disable-comment-pagination'                => [
 			'option'  => 'page_comments',
 			'value'   => '',
 			'type'    => 'string',
@@ -79,37 +79,37 @@ class Recommendation_Fixes {
 		 * field. That affordance is for a person; the underlying setting is a
 		 * plain boolean, so an agent can set it directly.
 		 */
-		'yoast-author-archive'       => [
+		'yoast-author-archive'                      => [
 			'seo'     => 'yoast',
 			'setting' => 'disable-author',
 			'value'   => true,
 			'summary' => 'Disable author archives in Yoast SEO.',
 		],
-		'yoast-date-archive'         => [
+		'yoast-date-archive'                        => [
 			'seo'     => 'yoast',
 			'setting' => 'disable-date',
 			'value'   => true,
 			'summary' => 'Disable date archives in Yoast SEO.',
 		],
-		'yoast-format-archive'       => [
+		'yoast-format-archive'                      => [
 			'seo'     => 'yoast',
 			'setting' => 'disable-post_format',
 			'value'   => true,
 			'summary' => 'Disable post-format archives in Yoast SEO.',
 		],
-		'yoast-media-pages'          => [
+		'yoast-media-pages'                         => [
 			'seo'     => 'yoast',
 			'setting' => 'disable-attachment',
 			'value'   => true,
 			'summary' => 'Redirect attachment pages in Yoast SEO.',
 		],
-		'yoast-crawl-settings-emoji-scripts' => [
+		'yoast-crawl-settings-emoji-scripts'        => [
 			'seo'     => 'yoast',
 			'setting' => 'remove_emoji_scripts',
 			'value'   => true,
 			'summary' => 'Remove emoji scripts via Yoast SEO.',
 		],
-		'yoast-crawl-settings-feed-authors' => [
+		'yoast-crawl-settings-feed-authors'         => [
 			'seo'     => 'yoast',
 			'setting' => 'remove_feed_authors',
 			'value'   => true,
@@ -127,28 +127,28 @@ class Recommendation_Fixes {
 		 * on the live options object, matching what each provider's own submit
 		 * handler does.
 		 */
-		'aioseo-author-archive'      => [
+		'aioseo-author-archive'                     => [
 			'seo'     => 'aioseo',
 			'root'    => 'options',
 			'path'    => [ 'searchAppearance', 'archives', 'author', 'show' ],
 			'value'   => false,
 			'summary' => 'Noindex author archives in All in One SEO.',
 		],
-		'aioseo-date-archive'        => [
+		'aioseo-date-archive'                       => [
 			'seo'     => 'aioseo',
 			'root'    => 'options',
 			'path'    => [ 'searchAppearance', 'archives', 'date', 'show' ],
 			'value'   => false,
 			'summary' => 'Noindex date archives in All in One SEO.',
 		],
-		'aioseo-crawl-settings-feed-authors' => [
+		'aioseo-crawl-settings-feed-authors'        => [
 			'seo'     => 'aioseo',
 			'root'    => 'options',
 			'path'    => [ 'searchAppearance', 'advanced', 'crawlCleanup', 'feeds', 'authors' ],
 			'value'   => false,
 			'summary' => 'Disable author feeds in All in One SEO.',
 		],
-		'aioseo-media-pages'         => [
+		'aioseo-media-pages'                        => [
 			'seo'     => 'aioseo',
 			// Attachment redirection lives under dynamicOptions, not options, and
 			// takes the destination as a string rather than a boolean.
