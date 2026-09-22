@@ -129,7 +129,55 @@ class Recommendations_Controller extends \WP_REST_Posts_Controller {
 		if ( ! $this->current_user_can_access_recommendations() ) {
 			return $this->forbidden_error();
 		}
+
+		// Users without `manage_options` may only create their own personal
+		// (`user`) to-dos: they must not be able to create a task under any other
+		// provider, nor squat a known task's slug in order to suppress it (an
+		// admin-only recommendation is treated as "already existing" by
+		// Suggested_Tasks_DB::add() once a post with its slug exists). See the
+		// 1.10.0 audit S1 / review gap 2 (create half). Administrators are
+		// unrestricted (the plugin creates its provider tasks as an admin).
+		if ( ! \current_user_can( 'manage_options' ) && ! $this->create_is_user_task_only( $request ) ) {
+			return $this->forbidden_error();
+		}
+
 		return parent::create_item_permissions_check( $request );
+	}
+
+	/**
+	 * Whether a create request is limited to a personal (`user`) to-do: it may
+	 * carry only the `user` provider term (or none) and must not set a slug.
+	 *
+	 * @param \WP_REST_Request $request The REST request.
+	 *
+	 * @return bool
+	 */
+	protected function create_is_user_task_only( $request ) {
+		// A client-supplied slug can be used to squat a known task; disallow it.
+		if ( '' !== (string) $request['slug'] ) {
+			return false;
+		}
+
+		$requested_terms = $request['prpl_recommendations_provider'];
+		if ( empty( $requested_terms ) ) {
+			return true;
+		}
+
+		$user_term    = \get_term_by( 'slug', 'user', 'prpl_recommendations_provider' );
+		$user_term_id = $user_term ? (int) $user_term->term_id : 0;
+
+		foreach ( (array) $requested_terms as $term ) {
+			// Terms may arrive as IDs (from wp.api models) or slugs.
+			if ( \is_numeric( $term ) ) {
+				if ( (int) $term !== $user_term_id ) {
+					return false;
+				}
+			} elseif ( 'user' !== $term ) {
+				return false;
+			}
+		}
+
+		return true;
 	}
 
 	/**
