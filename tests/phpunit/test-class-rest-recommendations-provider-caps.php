@@ -133,7 +133,11 @@ class Rest_Recommendations_Provider_Caps_Test extends \WP_UnitTestCase {
 	 */
 	public function test_admin_can_manage_admin_only_task() {
 		$admin = self::factory()->user->create( [ 'role' => 'administrator' ] );
-		$id    = $this->make_task( 'update-core-task-2', 'update-core' );
+		// On multisite, `update_core` is reserved for super admins.
+		if ( \is_multisite() ) {
+			\grant_super_admin( $admin );
+		}
+		$id = $this->make_task( 'update-core-task-2', 'update-core' );
 
 		$this->assertTrue( $this->is_allowed( $admin, 'DELETE', $id ), 'admin delete update-core' );
 	}

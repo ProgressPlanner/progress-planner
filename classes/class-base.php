@@ -98,15 +98,6 @@ class Base {
 			$this->get_utils__playground();
 		}
 
-		// Auto-onboard branded hosts (see #633). This makes blocking remote
-		// calls, so require `manage_options` — that blocks anonymous visitors and
-		// lower-privileged users (e.g. Subscribers) from triggering the calls
-		// (1.10.0 audit S3). It intentionally does NOT gate on `is_admin()`: on a
-		// branded host (pp-hosts) the administrator is redirected to the
-		// *front-end* homepage after set-up (Extendify launch), and this block is
-		// the only path that fetches the license key — gating it to wp-admin
-		// would leave the site un-onboarded on that flow. `! wp_doing_cron()`
-		// keeps cron from making these user-facing calls.
 		// Auto-onboard branded hosts (#633). Require `manage_options` so
 		// anonymous and lower-privileged visitors (e.g. Subscribers) can't
 		// trigger the blocking remote calls (1.10.0 audit S3). Not gated on
