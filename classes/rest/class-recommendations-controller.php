@@ -38,6 +38,40 @@ class Recommendations_Controller extends \WP_REST_Posts_Controller {
 	}
 
 	/**
+	 * Whether the current user may act on the specific task identified by the
+	 * request, based on the task's own provider capability.
+	 *
+	 * This mirrors the per-task gate the AJAX handler applies
+	 * (`Suggested_Tasks::suggested_task_action()`): e.g. an admin-only task such
+	 * as `update-core` requires `update_core`, so an editor cannot read, trash
+	 * or delete it over REST even though they clear the surface-level
+	 * `edit_others_posts` gate (audit S1, review gap 2). Tasks whose provider
+	 * cannot be resolved fall back to the surface gate.
+	 *
+	 * @param \WP_REST_Request $request The REST request.
+	 *
+	 * @return bool
+	 */
+	protected function current_user_can_manage_requested_task( $request ) {
+		$post = $this->get_post( $request['id'] );
+		if ( \is_wp_error( $post ) ) {
+			return true;
+		}
+
+		$task = \progress_planner()->get_suggested_tasks_db()->get_post( $post->ID );
+		if ( ! $task ) {
+			return true;
+		}
+
+		$provider = \progress_planner()->get_suggested_tasks()->get_tasks_manager()->get_task_provider( $task->get_provider_id() );
+		if ( ! $provider ) {
+			return true;
+		}
+
+		return (bool) $provider->capability_required();
+	}
+
+	/**
 	 * Build the shared "insufficient permissions" error.
 	 *
 	 * @return \WP_Error
@@ -76,7 +110,9 @@ class Recommendations_Controller extends \WP_REST_Posts_Controller {
 	 * @return true|\WP_Error
 	 */
 	public function get_item_permissions_check( $request ) {
-		if ( ! $this->current_user_can_access_recommendations() ) {
+		if ( ! $this->current_user_can_access_recommendations()
+			|| ! $this->current_user_can_manage_requested_task( $request )
+		) {
 			return $this->forbidden_error();
 		}
 		return parent::get_item_permissions_check( $request );
@@ -104,7 +140,9 @@ class Recommendations_Controller extends \WP_REST_Posts_Controller {
 	 * @return true|\WP_Error
 	 */
 	public function update_item_permissions_check( $request ) {
-		if ( ! $this->current_user_can_access_recommendations() ) {
+		if ( ! $this->current_user_can_access_recommendations()
+			|| ! $this->current_user_can_manage_requested_task( $request )
+		) {
 			return $this->forbidden_error();
 		}
 		return parent::update_item_permissions_check( $request );
@@ -118,7 +156,9 @@ class Recommendations_Controller extends \WP_REST_Posts_Controller {
 	 * @return true|\WP_Error
 	 */
 	public function delete_item_permissions_check( $request ) {
-		if ( ! $this->current_user_can_access_recommendations() ) {
+		if ( ! $this->current_user_can_access_recommendations()
+			|| ! $this->current_user_can_manage_requested_task( $request )
+		) {
 			return $this->forbidden_error();
 		}
 		return parent::delete_item_permissions_check( $request );
