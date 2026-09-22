@@ -55,10 +55,10 @@ final class Branding {
 			return \constant( 'PROGRESS_PLANNER_BRANDING_ID' );
 		}
 		// The `pp_branding_id` URL param is a preview seam for branded-host
-		// rendering. Honour it only for logged-in users, so an anonymous
-		// visitor cannot steer the branding ID and thereby trigger the
+		// rendering. Honour it only for administrators, so no lower-privileged
+		// or anonymous visitor can steer the branding ID and thereby trigger the
 		// auto-onboard remote call in `Base::init()` (1.10.0 audit S3).
-		if ( isset( $_GET['pp_branding_id'] ) && \is_user_logged_in() ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		if ( isset( $_GET['pp_branding_id'] ) && \current_user_can( 'manage_options' ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 			return (int) $_GET['pp_branding_id']; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		}
 

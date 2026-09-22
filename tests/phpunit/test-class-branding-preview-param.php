@@ -68,19 +68,19 @@ class Branding_Preview_Param_Test extends \WP_UnitTestCase {
 	}
 
 	/**
-	 * A logged-in non-admin (e.g. subscriber) can also preview: the param is
-	 * gated on being logged in, not on a capability, so preview links keep
-	 * working for any authenticated user.
+	 * A logged-in non-admin (e.g. subscriber) must NOT be able to steer the
+	 * branding ID: the param is gated on `manage_options`, since a non-zero
+	 * branding ID can trigger the auto-onboard remote call.
 	 *
 	 * @return void
 	 */
-	public function test_logged_in_subscriber_param_is_honoured() {
+	public function test_logged_in_subscriber_param_is_ignored() {
 		$subscriber = self::factory()->user->create( [ 'role' => 'subscriber' ] );
 		\wp_set_current_user( $subscriber );
 		$_GET['pp_branding_id'] = '4958';
 
 		$branding_id = \progress_planner()->get_ui__branding()->get_branding_id();
 
-		$this->assertSame( 4958, $branding_id, 'logged-in subscriber pp_branding_id should be honoured' );
+		$this->assertSame( 0, $branding_id, 'a subscriber must not be able to set pp_branding_id' );
 	}
 }
