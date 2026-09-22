@@ -298,4 +298,59 @@ class Rest_Recommendations_Permissions_Test extends \WP_UnitTestCase {
 		);
 		$this->assertSame( 200, $update->get_status(), 'admin update should be allowed' );
 	}
+
+	/**
+	 * The CPT's mapped capabilities block non-REST write paths too (XML-RPC,
+	 * block editor). Contributors/Authors cannot create; Editors/admins can.
+	 * This closes the slug-squat that the REST permission checks alone left
+	 * open through wp.newPost (audit S1, review gap 1).
+	 *
+	 * @return void
+	 */
+	public function test_cpt_create_capability_is_gated() {
+		$create_cap = \get_post_type_object( 'prpl_recommendations' )->cap->create_posts;
+		$this->assertSame( 'edit_others_posts', $create_cap, 'create cap must be mapped to edit_others_posts' );
+
+		foreach ( [ 'subscriber', 'contributor', 'author' ] as $role ) {
+			$user = self::factory()->user->create( [ 'role' => $role ] );
+			\wp_set_current_user( $user );
+			$this->assertFalse(
+				\current_user_can( $create_cap ),
+				"$role must not be able to create recommendations (any write path)"
+			);
+		}
+
+		foreach ( [ 'editor', 'administrator' ] as $role ) {
+			$user = self::factory()->user->create( [ 'role' => $role ] );
+			\wp_set_current_user( $user );
+			$this->assertTrue(
+				\current_user_can( $create_cap ),
+				"$role must still be able to create recommendations"
+			);
+		}
+	}
+
+	/**
+	 * Internal task injection is unaffected by the mapped capabilities: it uses
+	 * raw wp_insert_post(), which does not check caps. Even a Subscriber's
+	 * request can inject a task server-side.
+	 *
+	 * @return void
+	 */
+	public function test_internal_injection_ignores_capabilities() {
+		$subscriber = self::factory()->user->create( [ 'role' => 'subscriber' ] );
+		\wp_set_current_user( $subscriber );
+
+		$id = \progress_planner()->get_suggested_tasks_db()->add(
+			[
+				'task_id'     => 'core-siteicon',
+				'post_title'  => 'Set site icon',
+				'post_status' => 'publish',
+				'provider_id' => 'core-siteicon',
+			]
+		);
+
+		$this->assertIsInt( $id );
+		$this->assertGreaterThan( 0, $id, 'internal add() must work regardless of the current user caps' );
+	}
 }

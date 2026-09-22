@@ -387,6 +387,34 @@ class Suggested_Tasks {
 				'menu_position'         => 5,
 				'hierarchical'          => true,
 				'exclude_from_search'   => true,
+				// Map every meta-capability to the plugin's own gate. Without
+				// this the CPT inherits the default `post` capabilities, so any
+				// Contributor/Author (`edit_posts`) could create, edit, trash or
+				// enumerate recommendations through paths that DO check caps —
+				// the REST controller is guarded separately, but XML-RPC
+				// (`wp.newPost`) and the block editor are not (1.10.0 audit S1).
+				// Internal task injection is unaffected: `Suggested_Tasks_DB`
+				// writes with raw `wp_insert_post()`/`wp_update_post()`, which do
+				// not run capability checks.
+				// With `map_meta_cap => true`, only the PRIMITIVE capabilities are
+				// listed here; core derives the meta capabilities (edit_post,
+				// read_post, delete_post) from them per-post. Listing the meta
+				// caps too triggers a `_doing_it_wrong` notice in WP 6.1+.
+				'capability_type'       => 'prpl_recommendation',
+				'map_meta_cap'          => true,
+				'capabilities'          => [
+					'edit_posts'             => 'edit_others_posts',
+					'edit_others_posts'      => 'edit_others_posts',
+					'delete_posts'           => 'edit_others_posts',
+					'delete_others_posts'    => 'edit_others_posts',
+					'publish_posts'          => 'edit_others_posts',
+					'read_private_posts'     => 'edit_others_posts',
+					'create_posts'           => 'edit_others_posts',
+					'delete_private_posts'   => 'edit_others_posts',
+					'delete_published_posts' => 'edit_others_posts',
+					'edit_private_posts'     => 'edit_others_posts',
+					'edit_published_posts'   => 'edit_others_posts',
+				],
 			]
 		);
 
