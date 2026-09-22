@@ -387,6 +387,34 @@ class Suggested_Tasks {
 				'menu_position'         => 5,
 				'hierarchical'          => true,
 				'exclude_from_search'   => true,
+				// Map every meta-capability to the plugin's own gate. Without
+				// this the CPT inherits the default `post` capabilities, so any
+				// Contributor/Author (`edit_posts`) could create, edit, trash or
+				// enumerate recommendations through paths that DO check caps —
+				// the REST controller is guarded separately, but XML-RPC
+				// (`wp.newPost`) and the block editor are not (1.10.0 audit S1).
+				// Internal task injection is unaffected: `Suggested_Tasks_DB`
+				// writes with raw `wp_insert_post()`/`wp_update_post()`, which do
+				// not run capability checks.
+				// With `map_meta_cap => true`, only the PRIMITIVE capabilities are
+				// listed here; core derives the meta capabilities (edit_post,
+				// read_post, delete_post) from them per-post. Listing the meta
+				// caps too triggers a `_doing_it_wrong` notice in WP 6.1+.
+				'capability_type'       => 'prpl_recommendation',
+				'map_meta_cap'          => true,
+				'capabilities'          => [
+					'edit_posts'             => 'edit_others_posts',
+					'edit_others_posts'      => 'edit_others_posts',
+					'delete_posts'           => 'edit_others_posts',
+					'delete_others_posts'    => 'edit_others_posts',
+					'publish_posts'          => 'edit_others_posts',
+					'read_private_posts'     => 'edit_others_posts',
+					'create_posts'           => 'edit_others_posts',
+					'delete_private_posts'   => 'edit_others_posts',
+					'delete_published_posts' => 'edit_others_posts',
+					'edit_private_posts'     => 'edit_others_posts',
+					'edit_published_posts'   => 'edit_others_posts',
+				],
 			]
 		);
 
@@ -447,6 +475,15 @@ class Suggested_Tasks {
 				'rewrite'           => [ 'slug' => 'prpl_recommendations_provider' ],
 				'show_in_rest'      => true,
 				'show_in_menu'      => \apply_filters( 'progress_planner_tasks_show_ui', false ),
+				// Gate term writes to the same capability the plugin UI uses, so
+				// a Contributor/Author (default `edit_posts`) cannot assign,
+				// create or alter provider terms via core REST (audit S1).
+				'capabilities'      => [
+					'manage_terms' => 'edit_others_posts',
+					'edit_terms'   => 'edit_others_posts',
+					'delete_terms' => 'edit_others_posts',
+					'assign_terms' => 'edit_others_posts',
+				],
 			]
 		);
 	}
@@ -467,7 +504,7 @@ class Suggested_Tasks {
 			$tax_query[] = [
 				'taxonomy' => 'prpl_recommendations_provider',
 				'field'    => 'slug',
-				'terms'    => \explode( ',', $request['exclude_provider'] ),
+				'terms'    => $this->parse_provider_param( $request['exclude_provider'] ),
 				'operator' => 'NOT IN',
 			];
 		}
@@ -480,7 +517,7 @@ class Suggested_Tasks {
 
 		// Include terms (matches any term in list).
 		if ( isset( $request['provider'] ) ) {
-			$request_providers = \explode( ',', $request['provider'] );
+			$request_providers = $this->parse_provider_param( $request['provider'] );
 			$include_providers = \array_intersect( $include_providers, $request_providers );
 		}
 
@@ -506,6 +543,26 @@ class Suggested_Tasks {
 		}
 
 		return $args;
+	}
+
+	/**
+	 * Normalise a `provider` / `exclude_provider` REST param to a list of slugs.
+	 *
+	 * The param may arrive as a comma-separated string (`?provider=a,b`) or as
+	 * an array (`?provider[]=a&provider[]=b`). Passing an array straight to
+	 * `explode()` throws a TypeError on PHP 8, so branch on the input type and
+	 * sanitise each slug.
+	 *
+	 * @param mixed $value The raw request value.
+	 *
+	 * @return string[] The list of provider slugs.
+	 */
+	protected function parse_provider_param( $value ) {
+		$providers = \is_string( $value )
+			? \explode( ',', $value )
+			: (array) $value;
+
+		return \array_values( \array_filter( \array_map( 'sanitize_key', $providers ) ) );
 	}
 
 	/**

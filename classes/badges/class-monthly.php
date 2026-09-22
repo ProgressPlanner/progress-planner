@@ -257,11 +257,16 @@ final class Monthly extends Badge {
 		}
 
 		$year      = $this->get_year();
-		$month     = self::get_months( (int) $year )[ 'm' . $this->get_month() ];
 		$month_num = (int) $this->get_month();
 
-		$start_date = \DateTime::createFromFormat( 'Y-m-d', "{$year}-{$month_num}-01" );
-		$end_date   = \DateTime::createFromFormat( 'Y-m-d', "{$year}-{$month_num}-" . \gmdate( 't', \strtotime( $month ) ) );
+		// Derive the month window from the month number. The previous code used
+		// gmdate( 't', strtotime( $badge_name ) ), but the badge name (e.g.
+		// "Felix February") is not a parseable date, so strtotime returned false
+		// and gmdate( 't', false ) always yielded 31 — overflowing shorter months
+		// into the next one (Feb -> Mar 3). This matches the monthly-badges
+		// widget's Y-m-01 / last-day-of-month range.
+		$start_date = \DateTime::createFromFormat( '!Y-n-j', "{$year}-{$month_num}-1" );
+		$end_date   = ( clone $start_date )->modify( 'last day of this month' );
 
 		// Get the activities for the month.
 		$activities = \progress_planner()->get_activities__query()->query_activities(
