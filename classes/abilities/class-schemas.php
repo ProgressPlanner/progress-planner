@@ -217,6 +217,28 @@ class Schemas {
 					'type'        => 'boolean',
 					'description' => \__( 'Whether applying it requires a value from the caller, such as the tagline text.', 'progress-planner' ),
 				],
+				'goal'        => [
+					'type'        => 'object',
+					'description' => \__( 'Present when the recommendation states an outcome instead of a fixed procedure. The site does not know how to satisfy it -- that depends on which plugins are active and what the settings already say -- so the caller reads the instructions, decides on a method, carries it out, and verifies the result before marking it complete. Absent on recommendations the plugin can apply itself.', 'progress-planner' ),
+					'properties'  => [
+						'instructions'       => [
+							'type'        => 'string',
+							'description' => \__( 'The goal, how to verify it has been met, hints about where to look on common setups, and what to leave alone. Written as prose, in Markdown.', 'progress-planner' ),
+						],
+						'verified_by'        => [
+							'type'        => 'string',
+							'description' => \__( '"site_state" when the result can be checked by reading the site -- fetching a URL, reading an option. "owner_confirmation" when only a person can tell, such as whether an email actually arrived.', 'progress-planner' ),
+						],
+						'reversible'         => [
+							'type'        => 'string',
+							'description' => \__( 'Whether the change can be undone. Recommendations that are not reversible delete content or are otherwise final, and should be confirmed with the site owner first.', 'progress-planner' ),
+						],
+						'needs_confirmation' => [
+							'type'        => 'string',
+							'description' => \__( 'Whether to ask the site owner before acting, regardless of whether the change can be undone.', 'progress-planner' ),
+						],
+					],
+				],
 			],
 		];
 	}

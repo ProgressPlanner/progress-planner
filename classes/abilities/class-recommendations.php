@@ -272,7 +272,7 @@ class Recommendations {
 			return null;
 		}
 
-		return [
+		$prepared = [
 			'id'          => (string) \progress_planner()->get_suggested_tasks()->get_task_id_from_slug( $task->post_name ),
 			'title'       => (string) $task->post_title,
 			'description' => (string) $task->description,
@@ -286,5 +286,59 @@ class Recommendations {
 			'fixable'     => Recommendation_Fixes::has_fix( $provider_id ),
 			'needs_value' => Recommendation_Fixes::needs_value( $provider_id ),
 		];
+
+		$goal = $this->goal_for( $provider );
+
+		if ( $goal ) {
+			$prepared['goal'] = $goal;
+		}
+
+		return $prepared;
+	}
+
+	/**
+	 * Get the goal a recommendation states, when it states one.
+	 *
+	 * Most recommendations are a title and a sentence, because the plugin knows
+	 * how to satisfy them and the caller only has to say go. A recommendation
+	 * defined in markdown is the opposite: it describes an outcome and leaves
+	 * the method open, because the method depends on which plugins the site
+	 * runs and what its settings already say.
+	 *
+	 * Without this the two are indistinguishable over the wire -- a goal-shaped
+	 * recommendation would arrive as a one-line summary with its goal, its
+	 * verification and its bounds left behind, which is the whole of what makes
+	 * it worth expressing that way.
+	 *
+	 * Only fields a caller acts on are included. The raw frontmatter is left
+	 * out: it duplicates what is already here and exposes how the file happens
+	 * to be parsed.
+	 *
+	 * @param \Progress_Planner\Suggested_Tasks\Tasks_Interface $provider The provider.
+	 *
+	 * @return array<string, mixed>|null
+	 */
+	private function goal_for( $provider ) {
+		if ( ! $provider instanceof \Progress_Planner\Suggested_Tasks\Providers\Markdown_Rule ) {
+			return null;
+		}
+
+		$rule = $provider->get_rule();
+
+		$goal = [
+			// The goal, how to verify it, the hints and the bounds, as prose.
+			'instructions' => (string) ( $rule['instructions'] ?? '' ),
+		];
+
+		// Whether the site can answer this on its own, or whether it takes a
+		// person to confirm. A caller that assumes the former for a task like
+		// "check email arrives" would mark it done having proved nothing.
+		foreach ( [ 'verified_by', 'reversible', 'needs_confirmation' ] as $key ) {
+			if ( isset( $rule[ $key ] ) ) {
+				$goal[ $key ] = (string) $rule[ $key ];
+			}
+		}
+
+		return $goal;
 	}
 }
