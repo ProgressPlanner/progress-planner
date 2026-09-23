@@ -108,19 +108,6 @@
 		</properties>
 	</rule>
 
-	<!--
-	bin/ holds standalone CLI scripts, not plugin runtime code. They never load
-	WordPress, so the rules about escaping output, WP_Filesystem and wp_remote_get
-	do not apply: there is no page to escape into and no WordPress to call.
-	-->
-	<rule ref="WordPress.Security.EscapeOutput">
-		<exclude-pattern>/bin/</exclude-pattern>
-	</rule>
-
-	<rule ref="WordPress.WP.AlternativeFunctions">
-		<exclude-pattern>/bin/</exclude-pattern>
-	</rule>
-
 	<rule ref="WordPress.NamingConventions.PrefixAllGlobals">
 		<properties>
 			<property name="prefixes" type="array">
