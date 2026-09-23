@@ -155,6 +155,13 @@ abstract class Set_Page_Task extends Tasks_Interactive {
 			\wp_send_json_error( [ 'message' => \esc_html__( 'Invalid page value.', 'progress-planner' ) ] );
 		}
 
+		// "I have this page" must name an actual page. Without this guard the
+		// task completes with have_page = 'yes' but id = 0, i.e. it records that
+		// a page exists while pointing at no page at all.
+		if ( 'yes' === $have_page && 1 > $id ) {
+			\wp_send_json_error( [ 'message' => \esc_html__( 'Please select a page.', 'progress-planner' ) ] );
+		}
+
 		// Extract page name from task ID (e.g., "set-page-about" -> "about").
 		$page_name = \str_replace( 'set-page-', '', $task_id );
 		if ( empty( $page_name ) ) {

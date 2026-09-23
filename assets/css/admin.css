@@ -325,6 +325,22 @@ button.prpl-info-icon {
 }
 
 /*------------------------------------*\
+	Sunset notice.
+\*------------------------------------*/
+.prpl-wrap .prpl-sunset-notice {
+	border-left: 4px solid var(--prpl-background-banner);
+
+	h1 {
+		color: var(--prpl-color-headings);
+		margin-top: 0;
+	}
+
+	p {
+		max-width: 680px;
+	}
+}
+
+/*------------------------------------*\
   Buttons
 \*------------------------------------*/
 
