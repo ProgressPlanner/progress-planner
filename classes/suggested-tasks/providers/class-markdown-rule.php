@@ -61,6 +61,20 @@ class Markdown_Rule extends Tasks {
 	protected $is_dismissable = true;
 
 	/**
+	 * Whether a person can postpone this.
+	 *
+	 * Not offered, because nothing can act on it. Snoozing is a decision a
+	 * caller would need to make too -- a goal that cannot be satisfied on this
+	 * site should be deferred rather than retried every day -- and there is no
+	 * ability for that yet. Until there is, showing the button would let a
+	 * person hide a recommendation in a way an agent can neither see the
+	 * reasoning for nor do itself.
+	 *
+	 * @var bool
+	 */
+	protected $is_snoozable = false;
+
+	/**
 	 * Constructor.
 	 *
 	 * @param array<string, mixed> $rule The parsed rule.
