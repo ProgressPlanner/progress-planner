@@ -78,7 +78,7 @@ $prpl_radio_value = \is_numeric( $prpl_setting_value ) && 0 < $prpl_setting_valu
 						<?php if ( 'no' === $prpl_r_value ) : ?>
 							<div data-action="create">
 								<a
-									target="<?php echo ( 'popovers' === $prpl_context ) ? '_self' : '_blank'; ?>"
+									target="<?php echo ( 'popover' === $prpl_context ) ? '_self' : '_blank'; ?>"
 									class="prpl-button-link"
 									href="<?php echo \esc_url( \admin_url( 'post-new.php?post_type=page&prpl_page_type=' . \esc_attr( $prpl_setting['page'] ) ) ); ?>"
 								>
