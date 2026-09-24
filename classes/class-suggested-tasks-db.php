@@ -109,6 +109,24 @@ class Suggested_Tasks_DB {
 			$posts = $posts_trashed;
 		}
 
+		// Defense in depth: only treat an existing task as "the task" when its
+		// provider matches. Otherwise a post that merely squats the slug (e.g.
+		// one a non-admin created under a different provider) would be treated
+		// as the task and suppress the real recommendation from being injected.
+		// See the 1.10.0 audit S1 / review gap 2. Filtered in PHP on the resolved
+		// provider rather than via a tax_query, because a name + tax_query on a
+		// trashed post does not reliably AND-combine in WP_Query.
+		if ( ! empty( $posts ) && ! empty( $data['provider_id'] ) ) {
+			$posts = \array_values(
+				\array_filter(
+					$posts,
+					static function ( $task ) use ( $data ) {
+						return $task->get_provider_id() === $data['provider_id'];
+					}
+				)
+			);
+		}
+
 		// If task already exists (in any status), return its ID without creating a duplicate.
 		if ( ! empty( $posts ) ) {
 			\delete_option( $lock_key );
