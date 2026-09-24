@@ -46,6 +46,21 @@ class Markdown_Rule extends Tasks {
 	protected $rule;
 
 	/**
+	 * Whether a person can mark this done themselves.
+	 *
+	 * The site cannot evaluate a goal, so without this a person sees a
+	 * recommendation in the dashboard with nothing to click: no popover, no
+	 * setting to change, and no way to say they have handled it. The existing
+	 * "Mark as complete" button is offered on any dismissable task, and it
+	 * finishes the task the same way the ability does -- one activity row, the
+	 * same points -- so a goal ends up in the same place whether a person or an
+	 * agent got there.
+	 *
+	 * @var bool
+	 */
+	protected $is_dismissable = true;
+
+	/**
 	 * Constructor.
 	 *
 	 * @param array<string, mixed> $rule The parsed rule.
