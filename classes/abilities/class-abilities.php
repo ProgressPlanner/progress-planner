@@ -65,11 +65,19 @@ class Abilities {
 	private $recommendations;
 
 	/**
+	 * The completer for recommendations that state a goal.
+	 *
+	 * @var Server_Recommendations
+	 */
+	private $server_recommendations;
+
+	/**
 	 * Constructor.
 	 */
 	public function __construct() {
-		$this->site_score      = new Site_Score();
-		$this->recommendations = new Recommendations();
+		$this->site_score             = new Site_Score();
+		$this->recommendations        = new Recommendations();
+		$this->server_recommendations = new Server_Recommendations();
 
 		// Categories register on an earlier hook than abilities: core rejects an
 		// ability naming a category that does not exist yet.
@@ -156,6 +164,21 @@ class Abilities {
 					'output_schema'       => Schemas::complete_recommendation(),
 					'permission_callback' => [ $this, 'can_fix' ],
 					'execute_callback'    => [ $this->recommendations, 'complete' ],
+					'readonly'            => false,
+				]
+			)
+		);
+
+		\wp_register_ability(
+			self::CATEGORY . '/complete-server-recommendation',
+			$this->ability_args(
+				[
+					'label'               => \__( 'Complete a goal-shaped recommendation', 'progress-planner' ),
+					'description'         => \__( 'Mark a recommendation that states a goal as completed, after you have satisfied it and verified the result yourself. Use this only for recommendations that carry a "goal" -- the ones the plugin cannot apply on its own. Verify before calling: the site does not re-check the goal, so a recommendation marked done without being done scores the site for work nobody did.', 'progress-planner' ),
+					'input_schema'        => Schemas::complete_server_recommendation_input(),
+					'output_schema'       => Schemas::complete_server_recommendation(),
+					'permission_callback' => [ $this, 'can_fix' ],
+					'execute_callback'    => [ $this->server_recommendations, 'complete' ],
 					'readonly'            => false,
 				]
 			)

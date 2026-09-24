@@ -60,6 +60,58 @@ class Schemas {
 	}
 
 	/**
+	 * The input schema for complete-server-recommendation.
+	 *
+	 * @return array<string, mixed>
+	 */
+	public static function complete_server_recommendation_input() {
+		return [
+			'type'                 => 'object',
+			'additionalProperties' => false,
+			'required'             => [ 'id' ],
+			'properties'           => [
+				'id'              => [
+					'type'        => 'string',
+					'description' => \__( 'The ID of the recommendation to mark as completed, as returned by list-recommendations.', 'progress-planner' ),
+				],
+				'owner_confirmed' => [
+					'type'        => 'boolean',
+					'description' => \__( 'Set this only when the site owner has confirmed the result to you. Recommendations whose goal.verified_by is "owner_confirmation" cannot be completed without it, because the result is not observable from the site -- whether an email arrived is the usual case. Never set it on your own reasoning.', 'progress-planner' ),
+				],
+			],
+		];
+	}
+
+	/**
+	 * The output schema for complete-server-recommendation.
+	 *
+	 * @return array<string, mixed>
+	 */
+	public static function complete_server_recommendation() {
+		return [
+			'type'       => 'object',
+			'properties' => [
+				'completed' => [
+					'type'        => 'boolean',
+					'description' => \__( 'Whether this call marked the recommendation as completed.', 'progress-planner' ),
+				],
+				'status'    => [
+					'type'        => 'string',
+					'description' => \__( 'What happened: "completed" when the recommendation is now marked done, "already_completed" when it had been completed before this call.', 'progress-planner' ),
+				],
+				'message'   => [
+					'type'        => 'string',
+					'description' => \__( 'A sentence describing the outcome.', 'progress-planner' ),
+				],
+				'points'    => [
+					'type'        => 'integer',
+					'description' => \__( 'The points awarded for this completion. Zero when the recommendation was already completed.', 'progress-planner' ),
+				],
+			],
+		];
+	}
+
+	/**
 	 * The input schema for complete-recommendation.
 	 *
 	 * @return array<string, mixed>
