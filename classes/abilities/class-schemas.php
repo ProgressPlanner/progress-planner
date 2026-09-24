@@ -75,7 +75,7 @@ class Schemas {
 				],
 				'value'       => [
 					'type'        => 'string',
-					'description' => \__( 'The value to set, for recommendations that need one: the tagline text, a timezone identifier such as "Europe/Amsterdam", or a date format string. Recommendations with only one correct outcome ignore this.', 'progress-planner' ),
+					'description' => \__( 'The value to set, for recommendations that need one: the tagline text, a timezone identifier such as "Europe/Amsterdam", a date format string, or -- for the recommendations that ask which page serves a role -- the ID of an existing published page. Recommendations with only one correct outcome ignore this. Check needs_value on a recommendation to see whether one is required.', 'progress-planner' ),
 				],
 			],
 		];
@@ -216,6 +216,10 @@ class Schemas {
 				'needs_value' => [
 					'type'        => 'boolean',
 					'description' => \__( 'Whether applying it requires a value from the caller, such as the tagline text.', 'progress-planner' ),
+				],
+				'destructive' => [
+					'type'        => 'boolean',
+					'description' => \__( 'Whether applying it removes content rather than changing a setting. These are only applied when named explicitly, never picked automatically.', 'progress-planner' ),
 				],
 			],
 		];
