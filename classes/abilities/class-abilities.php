@@ -159,7 +159,7 @@ class Abilities {
 			$this->ability_args(
 				[
 					'label'               => \__( 'Complete recommendation', 'progress-planner' ),
-					'description'         => \__( 'Apply a Progress Planner recommendation that consists of a single site setting, such as the tagline, timezone or an SEO plugin toggle. Only a fixed list of settings can be changed this way; anything needing judgement, content or deletion is reported back with a link instead of being applied.', 'progress-planner' ),
+					'description'         => \__( 'Apply a Progress Planner recommendation that consists of a single site setting, such as the tagline, timezone or an SEO plugin toggle. Only a fixed list of settings can be changed this way; anything needing judgement, content or deletion is reported back with a link instead of being applied. Not for recommendations that carry a "goal": the plugin cannot apply those, and this returns "manual" for them however satisfied the goal already is. Use complete-server-recommendation once you have met the goal yourself.', 'progress-planner' ),
 					'input_schema'        => Schemas::complete_recommendation_input(),
 					'output_schema'       => Schemas::complete_recommendation(),
 					'permission_callback' => [ $this, 'can_fix' ],

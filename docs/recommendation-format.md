@@ -39,6 +39,23 @@ applies_when:
 
 Five body sections, every file, same order. Nothing needed a sixth.
 
+`## Out of bounds` says what not to touch on the way to the goal — the comments
+are content, leave the nesting depth alone, do not detach the media. It bounds
+the *outcome*.
+
+One bound is not written in any file, because it holds for all of them and a
+rule that has to be repeated forty-two times will eventually be left out of the
+forty-third: **use purpose-built tools only.** When nothing offered can make the
+change, the answer is to stop and say so, leaving the recommendation open. It is
+never to reach for a tool that runs code, edits files or writes to the database
+directly.
+
+That bound is delivered with the `goal` field, so every caller reads it whatever
+rule it picked up. It exists because a real agent, asked to turn off comment
+pagination and refused the option it needed, used a PHP executor instead and got
+the right answer the wrong way. A refusal means the change is not the caller's to
+make; routing around one produces an unreviewable change nobody approved.
+
 ---
 
 ## The two findings that shaped it

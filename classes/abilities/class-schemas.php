@@ -271,7 +271,7 @@ class Schemas {
 				],
 				'goal'        => [
 					'type'        => 'object',
-					'description' => \__( 'Present when the recommendation states an outcome instead of a fixed procedure. The site does not know how to satisfy it -- that depends on which plugins are active and what the settings already say -- so the caller reads the instructions, decides on a method, carries it out, and verifies the result before marking it complete. Absent on recommendations the plugin can apply itself.', 'progress-planner' ),
+					'description' => \__( 'Present when the recommendation states an outcome instead of a fixed procedure. The site does not know how to satisfy it -- that depends on which plugins are active and what the settings already say -- so the caller reads the instructions, decides on a method, carries it out, and verifies the result before marking it complete. Absent on recommendations the plugin can apply itself. Finish one with complete-server-recommendation, never with complete-recommendation: the plugin has no fix for a goal and will report it as needing a person no matter what the site already looks like. Use purpose-built tools only. If no tool you are offered can make the change -- a setting belongs to a plugin that exposes nothing for it, or the option is not one you may write -- stop and report that, leaving the recommendation open. Do not reach for a general-purpose tool that runs code, edits files or queries the database directly to get around a refusal: the refusal is the site telling you the change is not yours to make, and working around it makes an unreviewable change a person did not approve.', 'progress-planner' ),
 					'properties'  => [
 						'instructions'       => [
 							'type'        => 'string',
@@ -310,8 +310,8 @@ class Schemas {
 				],
 				'status'    => [
 					'type'        => 'string',
-					'description' => \__( 'What happened: "completed" when the recommendation is now satisfied, "applied_not_yet_complete" when the setting changed but the task is not satisfied, "manual" when it needs a person, "nothing_to_do" when no automatic recommendation was pending.', 'progress-planner' ),
-					'enum'        => [ 'completed', 'applied_not_yet_complete', 'manual', 'nothing_to_do' ],
+					'description' => \__( 'What happened: "completed" when the recommendation is now satisfied, "applied_not_yet_complete" when the setting changed but the task is not satisfied, "manual" when it needs a person, "is_a_goal" when it states a goal and belongs to complete-server-recommendation instead, "nothing_to_do" when no automatic recommendation was pending.', 'progress-planner' ),
+					'enum'        => [ 'completed', 'applied_not_yet_complete', 'manual', 'is_a_goal', 'nothing_to_do' ],
 				],
 				'message'   => [
 					'type'        => 'string',

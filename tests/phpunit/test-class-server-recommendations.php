@@ -270,6 +270,28 @@ class Server_Recommendations_Test extends \WP_UnitTestCase {
 	}
 
 	/**
+	 * Test that the fix-table ability sends a goal to the right place.
+	 *
+	 * A goal has no entry in the fix table, so it used to fall through to
+	 * "manual" -- which told the caller to open a link that a goal does not
+	 * have, and which no amount of satisfying the goal would change. An agent
+	 * that follows that advice never completes the recommendation.
+	 *
+	 * @return void
+	 */
+	public function test_the_fix_ability_redirects_a_goal() {
+		$task_id   = $this->given_a_goal();
+		$abilities = new \Progress_Planner\Abilities\Recommendations();
+
+		$result = $abilities->complete( [ 'provider_id' => $task_id ] );
+
+		$this->assertIsArray( $result );
+		$this->assertFalse( $result['applied'] );
+		$this->assertSame( 'is_a_goal', $result['status'] );
+		$this->assertStringContainsString( 'complete-server-recommendation', $result['message'] );
+	}
+
+	/**
 	 * Test that an unknown ID is reported rather than silently ignored.
 	 *
 	 * @return void

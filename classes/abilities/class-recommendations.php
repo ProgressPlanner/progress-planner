@@ -114,6 +114,19 @@ class Recommendations {
 			);
 		}
 
+		// A goal states an outcome and leaves the method open, so there is
+		// nothing here to apply and no admin screen to send anyone to. Saying
+		// "needs a person" would be wrong twice: a caller can satisfy it, and
+		// the link offered to a person does not exist.
+		if ( $provider instanceof \Progress_Planner\Suggested_Tasks\Providers\Markdown_Rule ) {
+			return $this->result(
+				false,
+				'is_a_goal',
+				\__( 'This recommendation states a goal rather than a setting to change, so there is nothing to apply here. Read its "goal" field from list-recommendations, satisfy it however this site requires, verify the result, then call complete-server-recommendation.', 'progress-planner' ),
+				$task
+			);
+		}
+
 		// Anything outside the fixable list is reported, never half-applied.
 		if ( ! Recommendation_Fixes::has_fix( $provider_id ) ) {
 			return $this->result(
