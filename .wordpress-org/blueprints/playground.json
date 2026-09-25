@@ -4,8 +4,7 @@
         "networking": true
     },
     "plugins": [
-        "progress-planner",
-        "wordpress-seo"
+        "progress-planner"
     ],
     "steps": [
         {
