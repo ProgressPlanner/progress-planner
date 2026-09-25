@@ -13,22 +13,29 @@ namespace Progress_Planner\Abilities;
 class Recommendations {
 
 	/**
-	 * Map an ability status onto the post status that encodes it.
+	 * Map an ability status onto the post statuses that encode it.
+	 *
+	 * Completion is two statuses, not one. Task::is_completed() counts both
+	 * 'trash' and 'pending', and the plugin writes whichever suits the route:
+	 * the dashboard trashes a task once it has celebrated it, while a task
+	 * completed and not yet celebrated is 'pending'. Returning only 'trash'
+	 * here made such a task appear in no listing at all -- a caller could not
+	 * confirm its own write, or tell completed from deleted.
 	 *
 	 * @param string $status The ability status.
 	 *
-	 * @return string
+	 * @return array<int, string>
 	 */
 	private function get_post_status_for( $status ) {
 		switch ( $status ) {
 			case 'completed':
-				return 'trash';
+				return [ 'trash', 'pending' ];
 
 			case 'snoozed':
-				return 'future';
+				return [ 'future' ];
 
 			default:
-				return 'publish';
+				return [ 'publish' ];
 		}
 	}
 

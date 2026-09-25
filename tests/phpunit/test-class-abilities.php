@@ -237,9 +237,25 @@ class Abilities_Test extends \WP_UnitTestCase {
 	 * @return void
 	 */
 	public function test_status_maps_to_post_status() {
-		$this->assertSame( 'publish', $this->invoke_on( $this->recommendations, 'get_post_status_for', [ 'pending' ] ) );
-		$this->assertSame( 'trash', $this->invoke_on( $this->recommendations, 'get_post_status_for', [ 'completed' ] ) );
-		$this->assertSame( 'future', $this->invoke_on( $this->recommendations, 'get_post_status_for', [ 'snoozed' ] ) );
+		$this->assertSame( [ 'publish' ], $this->invoke_on( $this->recommendations, 'get_post_status_for', [ 'pending' ] ) );
+		$this->assertSame( [ 'future' ], $this->invoke_on( $this->recommendations, 'get_post_status_for', [ 'snoozed' ] ) );
+	}
+
+	/**
+	 * Test that completion covers both post statuses that mean completed.
+	 *
+	 * The dashboard trashes a task once it has celebrated it, while a task
+	 * completed and not yet celebrated is pending. Listing only one of those hid a
+	 * recommendation the caller had just completed, leaving it unable to
+	 * confirm its own write or tell completed from deleted.
+	 *
+	 * @return void
+	 */
+	public function test_completed_covers_both_statuses_that_mean_completed() {
+		$statuses = $this->invoke_on( $this->recommendations, 'get_post_status_for', [ 'completed' ] );
+
+		$this->assertContains( 'trash', $statuses );
+		$this->assertContains( 'pending', $statuses );
 	}
 
 	/**
@@ -248,7 +264,7 @@ class Abilities_Test extends \WP_UnitTestCase {
 	 * @return void
 	 */
 	public function test_unknown_status_falls_back_to_pending() {
-		$this->assertSame( 'publish', $this->invoke_on( $this->recommendations, 'get_post_status_for', [ 'nonsense' ] ) );
+		$this->assertSame( [ 'publish' ], $this->invoke_on( $this->recommendations, 'get_post_status_for', [ 'nonsense' ] ) );
 	}
 
 	/**
