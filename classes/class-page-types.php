@@ -34,6 +34,9 @@ class Page_Types {
 		\add_action( 'init', [ $this, 'maybe_add_terms' ] );
 		\add_action( 'init', [ $this, 'maybe_update_terms' ] );
 
+		// Drop the page-type from REST post writes by users who can't assign it.
+		\add_filter( 'rest_request_before_callbacks', [ $this, 'remove_page_type_if_not_allowed' ], 10, 3 );
+
 		// Add hook when updating the `page_on_front` option.
 		\add_action( 'update_option_page_on_front', [ $this, 'update_option_page_on_front' ] );
 
@@ -63,8 +66,56 @@ class Page_Types {
 				'rewrite'           => [ 'slug' => 'site-type' ],
 				'show_in_rest'      => true,
 				'show_in_menu'      => false,
+				// Assigning a page-type says what a page is *for*, which is a site-level
+				// editorial decision rather than something an author does on their own
+				// post. Without this, assign_terms falls back to `edit_posts` and any
+				// author can set it through the standard REST post endpoint.
+				'capabilities'      => [
+					'manage_terms' => 'manage_categories',
+					'edit_terms'   => 'manage_categories',
+					'delete_terms' => 'manage_categories',
+					'assign_terms' => 'edit_others_posts',
+				],
 			]
 		);
+	}
+
+	/**
+	 * Remove the page-type from a REST post write when the user can't assign it.
+	 *
+	 * Without this, WP rejects the whole request with `rest_cannot_assign_term`, so an
+	 * author who resubmits the page-type an editor already set loses every other change
+	 * in that same save (title, content). Silently dropping the field keeps their edit
+	 * working while leaving the existing page-type untouched.
+	 *
+	 * Hooked on `rest_request_before_callbacks` because the taxonomy permission check
+	 * lives in the posts controller's `*_permissions_check()`, which runs before
+	 * `rest_pre_insert_{$post_type}` would fire.
+	 *
+	 * @param \WP_REST_Response|\WP_HTTP_Response|\WP_Error|mixed $response The response.
+	 * @param array                                               $handler  The route handler.
+	 * @param \WP_REST_Request                                    $request  The request.
+	 *
+	 * @return \WP_REST_Response|\WP_HTTP_Response|\WP_Error|mixed
+	 */
+	public function remove_page_type_if_not_allowed( $response, $handler, $request ) {
+		if ( null === $request[ self::TAXONOMY_NAME ] ) {
+			return $response;
+		}
+
+		// Only touch writes; a GET can legitimately carry the field as a query filter.
+		if ( ! \in_array( $request->get_method(), [ 'POST', 'PUT', 'PATCH' ], true ) ) {
+			return $response;
+		}
+
+		$taxonomy = \get_taxonomy( self::TAXONOMY_NAME );
+		if ( ! $taxonomy || \current_user_can( $taxonomy->cap->assign_terms ) ) {
+			return $response;
+		}
+
+		unset( $request[ self::TAXONOMY_NAME ] );
+
+		return $response;
 	}
 
 	/**
