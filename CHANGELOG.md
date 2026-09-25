@@ -1,8 +1,53 @@
+= 1.10.1 =
+
+This release announces the end of support for the free plugin, and ships some stability and hardening improvements.
+
+* The free Progress Planner plugin has reached the end of its support and updates. A notice now appears on the Progress Planner dashboard and the plugins page, and you can download a certificate of appreciation with your site's achievements.
+
+Maintenance:
+
+* Hardened capability and permission checks across the plugin.
+
+Bugs we fixed:
+
+* Fix a fatal error on PHP 7.4 that could affect every wp-admin page.
+* Fix the monthly badge date range so activity is counted in the correct month.
+* The email-test completion link is no longer invalidated by other page loads.
+* The "Set page" tasks now require a page to be selected before completing.
+* Fix the "Create this page" link opening in a new tab from within a popover.
+
 = 1.10.0 =
+
+Enhancements:
+
+* A brand-new onboarding experience for people setting up Progress Planner.
+* The Settings page is now handled through interactive tasks, in line with the rest of the plugin.
+* Recognize SureRank as an SEO plugin.
+* Show 3 suggested tasks on the WordPress Dashboard widget, and up to 5 on the Progress Planner page.
+* Added 2026 monthly badge names.
+* Strengthened capability and permission checks across the plugin.
+* Various performance improvements and code clean-up.
 
 Added these recommendations from Ravi:
 
-* Reduce number of autoloaded options
+* Reduce the number of autoloaded options.
+* Set your About, Contact and FAQ pages.
+
+Maintenance:
+
+* Confirmed compatibility with WordPress 7.1.
+
+Bugs we fixed:
+
+* Fix a year/week boundary calculation that could affect activity scoring.
+* Fix past badge points calculations.
+* Fix interactive task form re-submission after an error, and improve task completion checks.
+* Add safeguards to prevent fatal errors during plugin updates.
+
+= 1.9.1 =
+
+- Security fix: Authenticated (Editor and above) Stored Cross-Site Scripting (XSS) via recommendation titles. Titles are now sanitized when saved, and existing recommendations are cleaned up via an update script.
+- Thanks to [hongdo](https://patchstack.com/database/researchers/b19114df-00a1-4c42-b2f1-627b22001d57) for responsibly disclosing this issue via the Patchstack Bug Bounty Program.
 
 = 1.9.0 =
 

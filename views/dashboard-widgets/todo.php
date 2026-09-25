@@ -5,6 +5,11 @@
  * @package Progress_Planner
  */
 
+// Exit if accessed directly.
+if ( ! \defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 ?>
 <div id="prpl-dashboard-widget-todo-header">
 	<span style="display:inline-flex;width:2.5em;height:2.5em;"><?php echo \progress_planner()->get_ui__branding()->get_admin_menu_icon( true ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- SVG markup. ?></span>

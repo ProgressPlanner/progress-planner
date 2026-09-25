@@ -13,6 +13,18 @@ namespace Progress_Planner\Suggested_Tasks\Providers;
 class User extends Tasks {
 
 	/**
+	 * The capability required to manage user (personal to-do) tasks.
+	 *
+	 * These are the user's own to-do items, shown to the dashboard-widget
+	 * audience (editors and up). Without this override the provider inherits the
+	 * base `manage_options`, which would stop editors from completing their own
+	 * to-dos even though the widget shows them.
+	 *
+	 * @var string
+	 */
+	protected const CAPABILITY = 'edit_others_posts';
+
+	/**
 	 * Whether the task is dismissable.
 	 *
 	 * @var bool

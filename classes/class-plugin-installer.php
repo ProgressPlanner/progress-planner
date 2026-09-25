@@ -29,8 +29,10 @@ class Plugin_Installer {
 	 */
 	public function install() {
 		// Check if the user has the necessary capabilities.
+		// check_capabilities() returns true when allowed, or a non-empty error
+		// string when not - so this must compare against true, not test truthiness.
 		$can_install = $this->check_capabilities();
-		if ( ! $can_install ) {
+		if ( true !== $can_install ) {
 			\wp_die( \esc_html( $can_install ) );
 		}
 
@@ -91,8 +93,10 @@ class Plugin_Installer {
 	 */
 	public function activate() {
 		// Check if the user has the necessary capabilities.
+		// check_capabilities() returns true when allowed, or a non-empty error
+		// string when not - so this must compare against true, not test truthiness.
 		$can_activate = $this->check_capabilities();
-		if ( ! $can_activate ) {
+		if ( true !== $can_activate ) {
 			\wp_die( \esc_html( $can_activate ) );
 		}
 
