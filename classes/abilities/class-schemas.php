@@ -60,6 +60,58 @@ class Schemas {
 	}
 
 	/**
+	 * The input schema for complete-server-recommendation.
+	 *
+	 * @return array<string, mixed>
+	 */
+	public static function complete_server_recommendation_input() {
+		return [
+			'type'                 => 'object',
+			'additionalProperties' => false,
+			'required'             => [ 'id' ],
+			'properties'           => [
+				'id'              => [
+					'type'        => 'string',
+					'description' => \__( 'The ID of the recommendation to mark as completed, as returned by list-recommendations.', 'progress-planner' ),
+				],
+				'owner_confirmed' => [
+					'type'        => 'boolean',
+					'description' => \__( 'Set this only when the site owner has confirmed the result to you. Recommendations whose goal.verified_by is "owner_confirmation" cannot be completed without it, because the result is not observable from the site -- whether an email arrived is the usual case. Never set it on your own reasoning.', 'progress-planner' ),
+				],
+			],
+		];
+	}
+
+	/**
+	 * The output schema for complete-server-recommendation.
+	 *
+	 * @return array<string, mixed>
+	 */
+	public static function complete_server_recommendation() {
+		return [
+			'type'       => 'object',
+			'properties' => [
+				'completed' => [
+					'type'        => 'boolean',
+					'description' => \__( 'Whether this call marked the recommendation as completed.', 'progress-planner' ),
+				],
+				'status'    => [
+					'type'        => 'string',
+					'description' => \__( 'What happened: "completed" when the recommendation is now marked done, "already_completed" when it had been completed before this call.', 'progress-planner' ),
+				],
+				'message'   => [
+					'type'        => 'string',
+					'description' => \__( 'A sentence describing the outcome.', 'progress-planner' ),
+				],
+				'points'    => [
+					'type'        => 'integer',
+					'description' => \__( 'The points awarded for this completion. Zero when the recommendation was already completed.', 'progress-planner' ),
+				],
+			],
+		];
+	}
+
+	/**
 	 * The input schema for complete-recommendation.
 	 *
 	 * @return array<string, mixed>
@@ -217,6 +269,28 @@ class Schemas {
 					'type'        => 'boolean',
 					'description' => \__( 'Whether applying it requires a value from the caller, such as the tagline text.', 'progress-planner' ),
 				],
+				'goal'        => [
+					'type'        => 'object',
+					'description' => \__( 'Present when the recommendation states an outcome instead of a fixed procedure. The site does not know how to satisfy it -- that depends on which plugins are active and what the settings already say -- so the caller reads the instructions, decides on a method, carries it out, and verifies the result before marking it complete. Absent on recommendations the plugin can apply itself. Finish one with complete-server-recommendation, never with complete-recommendation: the plugin has no fix for a goal and will report it as needing a person no matter what the site already looks like. Use purpose-built tools only. If no tool you are offered can make the change -- a setting belongs to a plugin that exposes nothing for it, or the option is not one you may write -- stop and report that, leaving the recommendation open. Do not reach for a general-purpose tool that runs code, edits files or queries the database directly to get around a refusal: the refusal is the site telling you the change is not yours to make, and working around it makes an unreviewable change a person did not approve.', 'progress-planner' ),
+					'properties'  => [
+						'instructions'       => [
+							'type'        => 'string',
+							'description' => \__( 'The goal, how to verify it has been met, hints about where to look on common setups, and what to leave alone. Written as prose, in Markdown.', 'progress-planner' ),
+						],
+						'verified_by'        => [
+							'type'        => 'string',
+							'description' => \__( '"site_state" when the result can be checked by reading the site -- fetching a URL, reading an option. "owner_confirmation" when only a person can tell, such as whether an email actually arrived.', 'progress-planner' ),
+						],
+						'reversible'         => [
+							'type'        => 'string',
+							'description' => \__( 'Whether the change can be undone. Recommendations that are not reversible delete content or are otherwise final, and should be confirmed with the site owner first.', 'progress-planner' ),
+						],
+						'needs_confirmation' => [
+							'type'        => 'string',
+							'description' => \__( 'Whether to ask the site owner before acting, regardless of whether the change can be undone.', 'progress-planner' ),
+						],
+					],
+				],
 			],
 		];
 	}
@@ -236,8 +310,8 @@ class Schemas {
 				],
 				'status'    => [
 					'type'        => 'string',
-					'description' => \__( 'What happened: "completed" when the recommendation is now satisfied, "applied_not_yet_complete" when the setting changed but the task is not satisfied, "manual" when it needs a person, "nothing_to_do" when no automatic recommendation was pending.', 'progress-planner' ),
-					'enum'        => [ 'completed', 'applied_not_yet_complete', 'manual', 'nothing_to_do' ],
+					'description' => \__( 'What happened: "completed" when the recommendation is now satisfied, "applied_not_yet_complete" when the setting changed but the task is not satisfied, "manual" when it needs a person, "is_a_goal" when it states a goal and belongs to complete-server-recommendation instead, "nothing_to_do" when no automatic recommendation was pending.', 'progress-planner' ),
+					'enum'        => [ 'completed', 'applied_not_yet_complete', 'manual', 'is_a_goal', 'nothing_to_do' ],
 				],
 				'message'   => [
 					'type'        => 'string',
