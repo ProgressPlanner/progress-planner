@@ -269,7 +269,8 @@ final class Branding {
 	public function get_remote_data( $url ) {
 		$cache_key = \md5( $url );
 		$cached    = \progress_planner()->get_utils__cache()->get( $cache_key );
-		if ( $cached ) {
+		// An empty array is a cached failure; only false means a cache miss.
+		if ( false !== $cached ) {
 			return $cached;
 		}
 
