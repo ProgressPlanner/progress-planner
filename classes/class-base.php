@@ -294,7 +294,7 @@ class Base {
 		return \untrailingslashit(
 			\defined( 'PROGRESS_PLANNER_BRANDING_SERVER_URL' )
 				? \constant( 'PROGRESS_PLANNER_BRANDING_SERVER_URL' )
-				: 'https://branding.yolo.online'
+				: 'https://branding.your.online'
 		);
 	}
 
