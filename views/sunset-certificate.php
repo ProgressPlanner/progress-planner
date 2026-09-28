@@ -15,7 +15,8 @@ if ( ! \defined( 'ABSPATH' ) ) {
 $prpl_sunset_notice    = \progress_planner()->get_admin__sunset_notice();
 $prpl_completed_badges = $prpl_sunset_notice->get_completed_badges();
 $prpl_activation_date  = \progress_planner()->get_activation_date();
-$prpl_badge_svg_url    = \progress_planner()->get_remote_server_root_url() . '/wp-json/progress-planner-saas/v1/badge-svg/?badge_id=';
+// The certificate always shows the default (unbranded) badges.
+$prpl_badge_urls = \progress_planner()->get_ui__branding()->get_brand( 0 )['badges'] ?? [];
 
 // Scale the badges to the available space, so the certificate always fits on a single A4 page.
 $prpl_badge_count = \count( $prpl_completed_badges );
@@ -194,7 +195,7 @@ if ( $prpl_badge_count <= 8 ) {
 				<?php foreach ( $prpl_completed_badges as $prpl_badge ) : ?>
 					<div class="prpl-certificate-badge">
 						<img
-							src="<?php echo \esc_url( $prpl_badge_svg_url . $prpl_badge->get_id() ); ?>"
+							src="<?php echo \esc_url( $prpl_badge_urls[ $prpl_badge->get_id() ] ?? \progress_planner()->get_placeholder_svg( 90, 90 ), [ 'https', 'http', 'data' ] ); ?>"
 							alt="<?php echo \esc_attr( $prpl_badge->get_name() ); ?>"
 							onerror="this.onerror=null;this.src='<?php echo \esc_url( \progress_planner()->get_placeholder_svg( 90, 90 ) ); ?>';"
 						>

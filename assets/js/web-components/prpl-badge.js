@@ -13,18 +13,17 @@
 customElements.define(
 	'prpl-badge',
 	class extends HTMLElement {
-		constructor( badgeId, badgeName, brandingId = 0 ) {
+		constructor( badgeId, badgeName ) {
 			// Get parent class properties
 			super();
 
 			badgeId = badgeId || this.getAttribute( 'badge-id' );
 			badgeName = badgeName || this.getAttribute( 'badge-name' );
-			brandingId = brandingId || this.getAttribute( 'branding-id' );
 
-			let url = `${ progressPlannerBadge.remoteServerRootUrl }/wp-json/progress-planner-saas/v1/badge-svg/?badge_id=${ badgeId }`;
-			if ( brandingId ) {
-				url += `&branding_id=${ brandingId }`;
-			}
+			// Badge URLs come from the site's brand; a badge the brand does not have shows the placeholder.
+			const url =
+				progressPlannerBadge.badgeUrls[ badgeId ] ||
+				progressPlannerBadge.placeholderImageUrl;
 
 			if ( ! badgeName || 'null' === badgeName ) {
 				badgeName = `${ prplL10n( 'badge' ) }`;

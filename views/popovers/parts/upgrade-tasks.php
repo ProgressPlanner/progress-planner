@@ -101,7 +101,7 @@ $prpl_badge = \progress_planner()->get_badges()->get_badge( Monthly::get_badge_i
 			<span class="prpl-onboarding-tasks-montly-badge">
 				<span class="prpl-onboarding-tasks-montly-badge-image">
 					<img
-						src="<?php echo \esc_url( \progress_planner()->get_remote_server_root_url() . '/wp-json/progress-planner-saas/v1/badge-svg/?badge_id=' . \esc_attr( $prpl_badge->get_id() ) . '&branding_id=' . (int) \progress_planner()->get_ui__branding()->get_branding_id() ); ?>"
+						src="<?php echo \esc_url( \progress_planner()->get_ui__branding()->get_badge_url( $prpl_badge->get_id() ), [ 'https', 'http', 'data' ] ); ?>"
 						alt="<?php \esc_attr_e( 'Badge', 'progress-planner' ); ?>"
 						onerror="this.onerror=null;this.src='<?php echo \esc_url( \progress_planner()->get_placeholder_svg() ); ?>';"
 					/>
