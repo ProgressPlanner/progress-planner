@@ -139,8 +139,15 @@ class Recommendations {
 
 		// Completion is observed, never asserted: the provider decides whether
 		// the site now satisfies the task. Saying otherwise would award points
-		// for work that did not happen.
-		$completed = $this->is_satisfied( $provider, $task );
+		// for work that did not happen. The exception is a provider with nothing
+		// to observe, whose own record of completion is the submission itself.
+		$completed = Recommendation_Fixes::completes_on_apply( $provider_id ) || $this->is_satisfied( $provider, $task );
+
+		// Recorded now, as the dashboard would on its next load. Otherwise the
+		// task stays listed and unscored until someone opens wp-admin.
+		if ( $completed ) {
+			\progress_planner()->get_suggested_tasks()->mark_completed( $task );
+		}
 
 		// The wording distinguishes a settings change from a deletion: an agent
 		// relaying this to a person should not describe trashing a post as

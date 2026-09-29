@@ -87,12 +87,29 @@ class Suggested_Tasks {
 				continue;
 			}
 
-			// Change the task status to pending.
-			$task->celebrate();
-
-			// Insert an activity.
-			$this->insert_activity( \progress_planner()->get_suggested_tasks()->get_task_id_from_slug( $task->post_name ) );
+			$this->mark_completed( $task );
 		}
+	}
+
+	/**
+	 * Record a task as completed.
+	 *
+	 * The one place completion happens, whichever route found the task done:
+	 * the task waits for its celebration as 'pending', and the activity is what
+	 * points, badges and streaks count.
+	 *
+	 * @param \Progress_Planner\Suggested_Tasks\Task $task The task.
+	 *
+	 * @return void
+	 */
+	public function mark_completed( $task ) {
+		$task->celebrate();
+
+		// update_recommendation() does not flush the task cache, so a later read
+		// in the same request would still see the task as open.
+		\wp_cache_flush_group( \Progress_Planner\Suggested_Tasks_DB::GET_TASKS_CACHE_GROUP );
+
+		$this->insert_activity( $this->get_task_id_from_slug( $task->post_name ) );
 	}
 
 	/**

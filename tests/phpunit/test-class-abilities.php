@@ -71,7 +71,9 @@ class Abilities_Test extends \WP_UnitTestCase {
 	public function tearDown(): void {
 		global $wpdb;
 
-		$wpdb->query( 'TRUNCATE TABLE ' . $wpdb->prefix . 'progress_planner_activities' ); // phpcs:ignore WordPress.DB
+		// DELETE, not TRUNCATE: TRUNCATE commits the open transaction, so the
+		// posts this test created would survive the rollback into the next test.
+		$wpdb->query( 'DELETE FROM ' . $wpdb->prefix . 'progress_planner_activities' ); // phpcs:ignore WordPress.DB
 
 		parent::tearDown();
 	}
@@ -604,6 +606,67 @@ class Abilities_Test extends \WP_UnitTestCase {
 
 		$this->assertTrue( $result['applied'] );
 		$this->assertSame( 'completed', $result['status'] );
+	}
+
+	/**
+	 * Test that a completion is recorded when it happens, not on the next
+	 * admin page load.
+	 *
+	 * @return void
+	 */
+	public function test_complete_recommendation_records_the_completion() {
+		\wp_set_current_user( self::factory()->user->create( [ 'role' => 'administrator' ] ) );
+		\update_option( 'blog_public', '0' );
+		$this->seed_task( 'search-engine-visibility' );
+
+		$result = $this->recommendations->complete( [ 'provider_id' => 'search-engine-visibility' ] );
+
+		$this->assertSame( 'completed', $result['status'] );
+
+		$task = \progress_planner()->get_suggested_tasks_db()->get_post( 'test-search-engine-visibility' );
+		$this->assertNotNull( $task );
+		$this->assertSame( 'pending', \get_post_status( $task->ID ), 'The task waits for its celebration.' );
+
+		$activities = \progress_planner()->get_activities__query()->query_activities(
+			[
+				'data_id' => 'test-search-engine-visibility',
+				'type'    => 'completed',
+			]
+		);
+		$this->assertCount( 1, $activities, 'The completion is scored once.' );
+	}
+
+	/**
+	 * Test that setting the timezone completes its recommendation.
+	 *
+	 * The timezone provider has no state to observe -- any timezone is valid --
+	 * so it counts a recorded completion, which the popover writes on submit
+	 * and the ability used to leave out.
+	 *
+	 * @return void
+	 */
+	public function test_complete_recommendation_completes_the_timezone() {
+		\wp_set_current_user( self::factory()->user->create( [ 'role' => 'administrator' ] ) );
+		\progress_planner()->get_suggested_tasks_db()->add(
+			[
+				'task_id'     => 'select-timezone',
+				'post_title'  => 'Set site timezone',
+				'provider_id' => 'select-timezone',
+			]
+		);
+
+		$result = $this->recommendations->complete(
+			[
+				'provider_id' => 'select-timezone',
+				'value'       => 'Europe/Ljubljana',
+			]
+		);
+
+		$this->assertSame( 'completed', $result['status'] );
+		$this->assertFalse(
+			\progress_planner()->get_suggested_tasks()->get_tasks_manager()->get_task_provider( 'select-timezone' )->should_add_task(),
+			'The provider no longer asks for the task.'
+		);
 	}
 
 	/**
