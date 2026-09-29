@@ -26,6 +26,7 @@ per_item: false                       # true = a template, one task per target
 reversible: true
 verified_by: site_state               # site_state | owner_confirmation
 needs_confirmation: false             # must a person approve before acting
+replaces: [yoast-media-pages, aioseo-media-pages]  # PHP providers this goal describes
 applies_when:
   - any_plugin_active: [yoast-seo, all-in-one-seo-pack]
 ---
@@ -148,6 +149,34 @@ target:
 `find:` is structured because that is the clearest way to tell a model what to
 look for, not because anything parses it. The model reads the block and builds
 the query itself with the abilities it already has.
+
+---
+
+## Rules and the PHP providers
+
+Every rule today describes a recommendation the plugin already has in PHP, and
+says which under `replaces:`. One goal often stands for several providers --
+one per SEO plugin -- so the list is explicit rather than matched by ID.
+
+Such a rule does not become a task of its own. The PHP provider keeps deciding
+when the task is shown and when it is done; the rule only adds its goal to that
+task in `list-recommendations`. Otherwise every recommendation would appear
+twice, and the markdown copy -- which PHP cannot evaluate -- would stay open on
+sites that already meet it.
+
+The goal is left off recommendations `complete-recommendation` can apply: a
+fix known to work beats one the caller has to work out. Recommendations with a
+goal are finished with `complete-server-recommendation`.
+
+A rule without `replaces:` still becomes its own task provider. That remains
+the long-term direction -- a recommendation defined entirely in markdown --
+and `replaces:` is the step on the way there while PHP owns detection.
+`bin/validate-recommendations.php` rejects a `replaces:` entry that names no
+existing provider.
+
+Enable with `define( 'PROGRESS_PLANNER_MARKDOWN_RECOMMENDATIONS', true );` or
+the `progress_planner_markdown_recommendations` filter. The plugin registers
+the loader itself; no extra wiring is needed.
 
 ---
 

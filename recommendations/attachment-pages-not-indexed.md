@@ -10,6 +10,7 @@ per_item: false
 reversible: true
 verified_by: site_state
 needs_confirmation: false
+replaces: [yoast-media-pages, aioseo-media-pages]
 applies_when:
   - option_not_empty: permalink_structure   # pretty permalinks, or there are no attachment URLs to speak of
 ---

@@ -9,6 +9,7 @@ repeats: weekly
 reversible: true
 verified_by: site_state
 needs_confirmation: true
+replaces: [yoast-fix-orphaned-content]
 
 per_item: true
 target:

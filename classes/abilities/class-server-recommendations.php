@@ -70,7 +70,14 @@ class Server_Recommendations {
 		// A recommendation the plugin knows how to apply has its own ability,
 		// which changes the setting and reports what it changed. Completing it
 		// here would mark it done without doing it.
-		if ( ! $provider instanceof \Progress_Planner\Suggested_Tasks\Providers\Markdown_Rule ) {
+		if ( ! $provider || Recommendation_Fixes::has_fix( $provider->get_provider_id() ) ) {
+			$rule = null;
+		} else {
+			// The provider's own rule, or one that names it under `replaces:`.
+			$rule = ( new \Progress_Planner\Suggested_Tasks\Markdown_Recommendations() )->get_rule_for_provider( $provider );
+		}
+
+		if ( ! $provider || null === $rule ) {
 			return new \WP_Error(
 				'progress_planner_not_a_goal',
 				\__( 'That recommendation is not goal-shaped. Use complete-recommendation to apply it.', 'progress-planner' ),
@@ -103,8 +110,6 @@ class Server_Recommendations {
 				'points'    => 0,
 			];
 		}
-
-		$rule = $provider->get_rule();
 
 		if ( 'owner_confirmation' === ( $rule['verified_by'] ?? 'site_state' ) && true !== ( $input['owner_confirmed'] ?? false ) ) {
 			return new \WP_Error(

@@ -13,6 +13,7 @@ verified_by: site_state
 # Installing and activating a plugin adds code to the site and is the owner's
 # decision, not something to be done on their behalf while checking a box.
 needs_confirmation: true
+replaces: [seo-plugin]
 
 # No conditions. This is the rule the SEO-plugin-dependent recommendations
 # depend on, so it has to apply to a site that has nothing installed yet.

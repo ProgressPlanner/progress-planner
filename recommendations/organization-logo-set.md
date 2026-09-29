@@ -13,6 +13,7 @@ verified_by: site_state
 # An image has to be chosen, and only the site owner knows which one is the
 # organization's logo. Nothing may be picked on their behalf.
 needs_confirmation: true
+replaces: [yoast-organization-logo, aioseo-organization-logo]
 
 # Two layers, both required. The rule is meaningless without an SEO plugin
 # that publishes organization markup, and it is the wrong question on a site

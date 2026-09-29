@@ -10,6 +10,7 @@ per_item: false
 reversible: false
 verified_by: site_state
 needs_confirmation: true
+replaces: [remove-inactive-plugins]
 applies_when:
   - is_multisite: false   # on multisite, plugins may be inactive here and active on another site
 ---

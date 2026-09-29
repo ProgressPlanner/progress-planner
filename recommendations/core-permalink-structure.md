@@ -10,6 +10,7 @@ per_item: false
 reversible: false
 verified_by: site_state
 needs_confirmation: true
+replaces: [core-permalink-structure]
 applies_when:
   - option_equals:
       permalink_structure: "/%year%/%monthnum%/%day%/%postname%/"

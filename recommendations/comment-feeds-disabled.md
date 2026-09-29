@@ -10,6 +10,7 @@ per_item: false
 reversible: true
 verified_by: site_state
 needs_confirmation: false
+replaces: [yoast-crawl-settings-feed-global-comments, aioseo-crawl-settings-feed-comments]
 
 # The rule needs an SEO plugin that can suppress core feed routes. There is no
 # second condition: unlike the author feeds, comment feeds are no more useful

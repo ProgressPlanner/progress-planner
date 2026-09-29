@@ -10,6 +10,7 @@ per_item: false
 reversible: true
 verified_by: site_state
 needs_confirmation: false
+replaces: [yoast-crawl-settings-emoji-scripts]
 
 # The rule needs an SEO plugin that can dequeue the core emoji assets. Every
 # WordPress front end enqueues them by default, so there is no second

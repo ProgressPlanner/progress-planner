@@ -10,6 +10,7 @@ per_item: false
 reversible: true
 verified_by: owner_confirmation
 needs_confirmation: true
+replaces: [set-valuable-post-types]
 ---
 
 ## Why it matters

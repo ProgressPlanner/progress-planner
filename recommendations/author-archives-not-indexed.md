@@ -10,6 +10,7 @@ per_item: false
 reversible: true
 verified_by: site_state
 needs_confirmation: false
+replaces: [yoast-author-archive, aioseo-author-archive]
 
 # Two layers. The rule needs an SEO plugin that can control archive output, and
 # it only makes sense on a single-author site: with two or more authors who

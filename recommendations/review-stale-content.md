@@ -9,6 +9,7 @@ repeats: weekly
 reversible: true
 verified_by: owner_confirmation
 needs_confirmation: false
+replaces: [review-post]
 
 # This rule is a template, not a single recommendation: it produces one task
 # per stale item. Each task is identified by its target, so completing the

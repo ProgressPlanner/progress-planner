@@ -10,6 +10,7 @@ per_item: false
 reversible: true
 verified_by: site_state
 needs_confirmation: true
+replaces: [yoast-cornerstone-workout]
 
 applies_when:
   # Cornerstone is a concept the SEO plugin provides and acts on. Without one

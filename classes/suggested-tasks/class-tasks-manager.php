@@ -119,6 +119,12 @@ class Tasks_Manager {
 
 		// All in One SEO integration.
 		new Add_AIOSEO_Providers();
+
+		// Goal-shaped recommendations defined in markdown. Opt-in, see
+		// Markdown_Recommendations::is_enabled().
+		if ( Markdown_Recommendations::is_enabled() ) {
+			\add_filter( 'progress_planner_suggested_tasks_providers', [ new Markdown_Recommendations(), 'register_providers' ] );
+		}
 	}
 
 	/**

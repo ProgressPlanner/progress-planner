@@ -9,6 +9,7 @@ repeats: weekly
 reversible: true
 verified_by: site_state
 needs_confirmation: true
+replaces: [update-term-description]
 
 per_item: true
 target:

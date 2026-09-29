@@ -3,9 +3,20 @@
  * Load recommendations defined as markdown files.
  *
  * A test harness for the goal-shaped recommendation format. Rules live in
- * /recommendations as markdown, and each one that applies becomes a task
- * provider like any other, registered through the filter the plugin already
- * offers third parties.
+ * /recommendations as markdown, and a rule plays one of two roles.
+ *
+ * A rule with `replaces:` describes recommendations the plugin already has in
+ * PHP, and only adds its goal to them. The PHP provider keeps deciding when the
+ * task is shown and when it is done -- that detection already exists and is
+ * tested, and a second copy of the task would show the same work twice. The
+ * list is explicit because one goal often stands for several providers: "date
+ * archives are not indexed" is one Yoast task and one AIOSEO task.
+ *
+ * A rule without it becomes a task provider of its own, registered through the
+ * filter the plugin already offers third parties. That is the long-term shape
+ * of the format -- a recommendation defined entirely in markdown -- and the
+ * `replaces:` role is the step on the way there, while the PHP providers still
+ * own detection.
  *
  * Registering providers rather than writing tasks directly is what keeps the
  * rest of the plugin from needing to know these exist: the dashboard renders
@@ -35,6 +46,13 @@ namespace Progress_Planner\Suggested_Tasks;
  * Markdown_Recommendations class.
  */
 class Markdown_Recommendations {
+
+	/**
+	 * Parsed rules, keyed by the directory they were read from.
+	 *
+	 * @var array<string, array<string, array<string, mixed>>>
+	 */
+	private static $rules = [];
 
 	/**
 	 * Whether loading markdown rules is enabled.
@@ -81,6 +99,14 @@ class Markdown_Recommendations {
 	public function get_rules() {
 		$directory = self::get_directory();
 
+		// Every listed recommendation asks for its goal, so without this one
+		// listing would read and parse every file once per task.
+		if ( isset( self::$rules[ $directory ] ) ) {
+			return self::$rules[ $directory ];
+		}
+
+		self::$rules[ $directory ] = [];
+
 		if ( ! \is_dir( $directory ) ) {
 			return [];
 		}
@@ -100,6 +126,8 @@ class Markdown_Recommendations {
 				$rules[ (string) $rule['id'] ] = $rule;
 			}
 		}
+
+		self::$rules[ $directory ] = $rules;
 
 		return $rules;
 	}
@@ -149,23 +177,26 @@ class Markdown_Recommendations {
 			return null;
 		}
 
-		$rule['required_plugins'] = $this->get_required_plugins( $frontmatter );
+		$rule['required_plugins'] = $this->get_inline_list( $frontmatter, 'any_plugin_active' );
+		$rule['replaces']         = $this->get_inline_list( $frontmatter, 'replaces' );
 
 		return $rule;
 	}
 
 	/**
-	 * Get the plugin slugs a rule needs, from its any_plugin_active condition.
+	 * Read a list written inline, as `key: [a, b]`.
 	 *
-	 * The only part of applies_when read here. Everything else is the model's
-	 * to judge.
+	 * Used for `replaces` and for `any_plugin_active`, the one part of
+	 * applies_when read here. Everything else in applies_when is the model's to
+	 * judge.
 	 *
 	 * @param string $frontmatter The raw frontmatter.
+	 * @param string $key         The key.
 	 *
 	 * @return array<int, string>
 	 */
-	private function get_required_plugins( $frontmatter ) {
-		if ( ! \preg_match( '/any_plugin_active:\s*\[([^\]]*)\]/', $frontmatter, $matches ) ) {
+	private function get_inline_list( $frontmatter, $key ) {
+		if ( ! \preg_match( '/' . \preg_quote( $key, '/' ) . ':\s*\[([^\]]*)\]/', $frontmatter, $matches ) ) {
 			return [];
 		}
 
@@ -254,6 +285,11 @@ class Markdown_Recommendations {
 		$providers = [];
 
 		foreach ( $this->get_rules() as $rule ) {
+			// Its goal is attached to the PHP providers it names instead.
+			if ( ! empty( $rule['replaces'] ) ) {
+				continue;
+			}
+
 			if ( ! $this->applies( $rule ) ) {
 				continue;
 			}
@@ -273,6 +309,36 @@ class Markdown_Recommendations {
 	 */
 	public function register_providers( $providers ) {
 		return \array_merge( (array) $providers, $this->get_providers() );
+	}
+
+	/**
+	 * Get the rule that states the goal for a provider, if one does.
+	 *
+	 * A rule's own provider carries it. Any other provider has one when a rule
+	 * lists it under `replaces:`.
+	 *
+	 * @param \Progress_Planner\Suggested_Tasks\Tasks_Interface $provider The provider.
+	 *
+	 * @return array<string, mixed>|null
+	 */
+	public function get_rule_for_provider( $provider ) {
+		if ( $provider instanceof \Progress_Planner\Suggested_Tasks\Providers\Markdown_Rule ) {
+			return $provider->get_rule();
+		}
+
+		if ( ! self::is_enabled() ) {
+			return null;
+		}
+
+		$provider_id = $provider->get_provider_id();
+
+		foreach ( $this->get_rules() as $rule ) {
+			if ( \in_array( $provider_id, (array) $rule['replaces'], true ) ) {
+				return $rule;
+			}
+		}
+
+		return null;
 	}
 
 	/**

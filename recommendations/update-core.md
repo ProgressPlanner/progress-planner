@@ -10,6 +10,7 @@ per_item: false
 reversible: false
 verified_by: site_state
 needs_confirmation: true
+replaces: [update-core]
 ---
 
 ## Why it matters

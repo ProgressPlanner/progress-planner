@@ -10,6 +10,7 @@ per_item: false
 reversible: true
 verified_by: site_state
 needs_confirmation: false
+replaces: [yoast-date-archive, aioseo-date-archive]
 
 # Two layers. The rule needs an SEO plugin that can control archive output, and
 # it is the wrong question on a site whose permalinks contain a date: there the

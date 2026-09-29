@@ -10,6 +10,7 @@ per_item: false
 reversible: true
 verified_by: site_state
 needs_confirmation: true
+replaces: [wp-debug-display]
 applies_when:
   - constant_true: WP_DEBUG
   - constant_true: WP_DEBUG_DISPLAY

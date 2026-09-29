@@ -9,6 +9,7 @@ repeats: never
 reversible: false
 verified_by: site_state
 needs_confirmation: true
+replaces: [remove-terms-without-posts]
 
 # This rule is a template, not a single recommendation: it produces one task
 # per unused term. Each task is identified by the term it targets, so removing

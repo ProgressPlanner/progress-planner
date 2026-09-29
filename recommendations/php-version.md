@@ -10,6 +10,7 @@ per_item: false
 reversible: true
 verified_by: site_state
 needs_confirmation: true
+replaces: [php-version]
 ---
 
 ## Why it matters

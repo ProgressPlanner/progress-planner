@@ -10,6 +10,7 @@ per_item: false
 reversible: true
 verified_by: site_state
 needs_confirmation: false
+replaces: [disable-comment-pagination]
 applies_when:
   - option_not_empty: page_comments
 ---

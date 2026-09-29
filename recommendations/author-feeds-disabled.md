@@ -10,6 +10,7 @@ per_item: false
 reversible: true
 verified_by: site_state
 needs_confirmation: false
+replaces: [yoast-crawl-settings-feed-authors, aioseo-crawl-settings-feed-authors]
 
 # Two layers. The rule needs an SEO plugin that can suppress core feed routes,
 # and it only makes sense on a single-author site: on a multi-author blog,

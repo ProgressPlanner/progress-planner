@@ -74,13 +74,35 @@ function scalars( string $frontmatter ): array {
 }
 
 /**
+ * Collect the provider IDs the plugin defines in PHP.
+ *
+ * Read from the source rather than by loading WordPress, so the script stays a
+ * plain CLI check. Every provider declares its ID as a PROVIDER_ID constant.
+ *
+ * @return array<int, string>
+ */
+function provider_ids(): array {
+	$ids   = [];
+	$files = new \RecursiveIteratorIterator( new \RecursiveDirectoryIterator( __DIR__ . '/../classes', \FilesystemIterator::SKIP_DOTS ) );
+
+	foreach ( $files as $file ) {
+		if ( 'php' === $file->getExtension() && preg_match_all( "/PROVIDER_ID\\s*=\\s*'([^']+)'/", (string) file_get_contents( (string) $file ), $m ) ) {
+			$ids = array_merge( $ids, $m[1] );
+		}
+	}
+
+	return array_values( array_unique( $ids ) );
+}
+
+/**
  * Check one file.
  *
- * @param string $path The file path.
+ * @param string             $path         The file path.
+ * @param array<int, string> $provider_ids The provider IDs defined in PHP.
  *
  * @return array<int, string> Problems found.
  */
-function check( string $path ): array {
+function check( string $path, array $provider_ids ): array {
 	$raw    = (string) file_get_contents( $path );
 	$name   = basename( $path, '.md' );
 	$errors = [];
@@ -166,6 +188,16 @@ function check( string $path ): array {
 		}
 	}
 
+	// A rule that names a provider that does not exist attaches its goal to
+	// nothing and is not loaded on its own either, so it silently disappears.
+	if ( preg_match( '/^replaces:\s*\[([^\]]*)\]/m', $frontmatter, $m ) ) {
+		foreach ( array_filter( array_map( 'trim', explode( ',', $m[1] ) ) ) as $replaced ) {
+			if ( ! in_array( $replaced, $provider_ids, true ) ) {
+				$errors[] = "replaces `{$replaced}`, which is not a provider ID";
+			}
+		}
+	}
+
 	if ( false !== strpos( $raw, "\xE2\x80\x94" ) ) {
 		$errors[] = 'contains an em-dash; use -- instead';
 	}
@@ -200,10 +232,11 @@ function run( array $args ): int {
 
 	sort( $files );
 
-	$failed = 0;
+	$failed       = 0;
+	$provider_ids = provider_ids();
 
 	foreach ( $files as $file ) {
-		$errors = check( $file );
+		$errors = check( $file, $provider_ids );
 
 		if ( $errors ) {
 			++$failed;

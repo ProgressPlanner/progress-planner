@@ -8,6 +8,7 @@ repeats: never
 reversible: true
 verified_by: owner_confirmation
 needs_confirmation: true
+replaces: [user]
 
 # These are not authored here. The site owner writes them, and this file exists
 # only so a model encountering one knows what kind of thing it is looking at.

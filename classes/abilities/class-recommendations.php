@@ -122,10 +122,9 @@ class Recommendations {
 		}
 
 		// A goal states an outcome and leaves the method open, so there is
-		// nothing here to apply and no admin screen to send anyone to. Saying
-		// "needs a person" would be wrong twice: a caller can satisfy it, and
-		// the link offered to a person does not exist.
-		if ( $provider instanceof \Progress_Planner\Suggested_Tasks\Providers\Markdown_Rule ) {
+		// nothing here to apply. Saying "needs a person" would be wrong: a
+		// caller can satisfy it.
+		if ( null !== $this->goal_for( $provider ) ) {
 			return $this->result(
 				false,
 				'is_a_goal',
@@ -368,16 +367,25 @@ class Recommendations {
 	 * out: it duplicates what is already here and exposes how the file happens
 	 * to be parsed.
 	 *
+	 * A recommendation the plugin can apply itself gets no goal, even when a
+	 * rule describes it. The goal's presence tells the caller to work out a
+	 * method and finish with complete-server-recommendation; offering that
+	 * alongside a fix that is known to work would invite the worse path.
+	 *
 	 * @param \Progress_Planner\Suggested_Tasks\Tasks_Interface $provider The provider.
 	 *
 	 * @return array<string, mixed>|null
 	 */
 	private function goal_for( $provider ) {
-		if ( ! $provider instanceof \Progress_Planner\Suggested_Tasks\Providers\Markdown_Rule ) {
+		if ( Recommendation_Fixes::has_fix( $provider->get_provider_id() ) ) {
 			return null;
 		}
 
-		$rule = $provider->get_rule();
+		$rule = ( new \Progress_Planner\Suggested_Tasks\Markdown_Recommendations() )->get_rule_for_provider( $provider );
+
+		if ( null === $rule ) {
+			return null;
+		}
 
 		$goal = [
 			// The goal, how to verify it, the hints and the bounds, as prose.

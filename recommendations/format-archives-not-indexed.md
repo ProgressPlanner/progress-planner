@@ -10,6 +10,7 @@ per_item: false
 reversible: true
 verified_by: site_state
 needs_confirmation: false
+replaces: [yoast-format-archive]
 
 # Two layers. The rule needs an SEO plugin that can control archive output, and
 # it only makes sense where post formats are barely used: a site that really
