@@ -121,6 +121,18 @@ class Recommendations {
 			);
 		}
 
+		// A goal states an outcome and leaves the method open, so there is
+		// nothing here to apply. Saying "needs a person" would be wrong: a
+		// caller can satisfy it.
+		if ( null !== $this->goal_for( $provider ) ) {
+			return $this->result(
+				false,
+				'is_a_goal',
+				\__( 'This recommendation states a goal rather than a setting to change, so there is nothing to apply here. Read its "goal" field from list-recommendations, satisfy it however this site requires, verify the result, then call complete-server-recommendation.', 'progress-planner' ),
+				$task
+			);
+		}
+
 		// Anything outside the fixable list is reported, never half-applied.
 		if ( ! Recommendation_Fixes::has_fix( $provider_id ) ) {
 			return $this->result(
@@ -312,7 +324,7 @@ class Recommendations {
 			return null;
 		}
 
-		return [
+		$prepared = [
 			'id'          => (string) \progress_planner()->get_suggested_tasks()->get_task_id_from_slug( $task->post_name ),
 			'title'       => (string) $task->post_title,
 			'description' => (string) $task->description,
@@ -327,5 +339,68 @@ class Recommendations {
 			'needs_value' => Recommendation_Fixes::needs_value( $provider_id ),
 			'destructive' => Recommendation_Fixes::is_destructive( $provider_id ),
 		];
+
+		$goal = $this->goal_for( $provider );
+
+		if ( $goal ) {
+			$prepared['goal'] = $goal;
+		}
+
+		return $prepared;
+	}
+
+	/**
+	 * Get the goal a recommendation states, when it states one.
+	 *
+	 * Most recommendations are a title and a sentence, because the plugin knows
+	 * how to satisfy them and the caller only has to say go. A recommendation
+	 * defined in markdown is the opposite: it describes an outcome and leaves
+	 * the method open, because the method depends on which plugins the site
+	 * runs and what its settings already say.
+	 *
+	 * Without this the two are indistinguishable over the wire -- a goal-shaped
+	 * recommendation would arrive as a one-line summary with its goal, its
+	 * verification and its bounds left behind, which is the whole of what makes
+	 * it worth expressing that way.
+	 *
+	 * Only fields a caller acts on are included. The raw frontmatter is left
+	 * out: it duplicates what is already here and exposes how the file happens
+	 * to be parsed.
+	 *
+	 * A recommendation the plugin can apply itself gets no goal, even when a
+	 * rule describes it. The goal's presence tells the caller to work out a
+	 * method and finish with complete-server-recommendation; offering that
+	 * alongside a fix that is known to work would invite the worse path.
+	 *
+	 * @param \Progress_Planner\Suggested_Tasks\Tasks_Interface $provider The provider.
+	 *
+	 * @return array<string, mixed>|null
+	 */
+	private function goal_for( $provider ) {
+		if ( Recommendation_Fixes::has_fix( $provider->get_provider_id() ) ) {
+			return null;
+		}
+
+		$rule = ( new \Progress_Planner\Suggested_Tasks\Markdown_Recommendations() )->get_rule_for_provider( $provider );
+
+		if ( null === $rule ) {
+			return null;
+		}
+
+		$goal = [
+			// The goal, how to verify it, the hints and the bounds, as prose.
+			'instructions' => (string) ( $rule['instructions'] ?? '' ),
+		];
+
+		// Whether the site can answer this on its own, or whether it takes a
+		// person to confirm. A caller that assumes the former for a task like
+		// "check email arrives" would mark it done having proved nothing.
+		foreach ( [ 'verified_by', 'reversible', 'needs_confirmation' ] as $key ) {
+			if ( isset( $rule[ $key ] ) ) {
+				$goal[ $key ] = (string) $rule[ $key ];
+			}
+		}
+
+		return $goal;
 	}
 }

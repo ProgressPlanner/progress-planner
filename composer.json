@@ -40,6 +40,9 @@
 		"lint-blueprint": [
 			"@php -r \"exit( intval( is_null( json_decode( file_get_contents( './.wordpress-org/blueprints/blueprint.json' ) ) ) ) );\""
 		],
+		"validate-recommendations": [
+			"@php bin/validate-recommendations.php recommendations"
+		],
 		"test": [
 			"@php ./vendor/phpunit/phpunit/phpunit --dont-report-useless-tests"
 		],
