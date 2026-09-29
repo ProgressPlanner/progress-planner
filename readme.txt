@@ -4,7 +4,7 @@ Tags: planning, maintenance, writing, blogging
 Requires at least: 6.7
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 1.10.0
+Stable tag: 1.10.1
 License: GPL3+
 License URI: https://www.gnu.org/licenses/gpl-3.0.en.html
 
@@ -82,6 +82,24 @@ https://youtu.be/e1bmxZYyXFY
 7. Get a weekly email with stats on how well you're doing on your site!
 
 == Changelog ==
+
+= 1.10.1 =
+
+This release announces the end of support for the free plugin, and ships some stability and hardening improvements.
+
+* The free Progress Planner plugin has reached the end of its support and updates. A notice now appears on the Progress Planner dashboard and the plugins page, and you can download a certificate of appreciation with your site's achievements.
+
+Maintenance:
+
+* Hardened capability and permission checks across the plugin.
+
+Bugs we fixed:
+
+* Fix a fatal error on PHP 7.4 that could affect every wp-admin page.
+* Fix the monthly badge date range so activity is counted in the correct month.
+* The email-test completion link is no longer invalidated by other page loads.
+* The "Set page" tasks now require a page to be selected before completing.
+* Fix the "Create this page" link opening in a new tab from within a popover.
 
 = 1.10.0 =
 
