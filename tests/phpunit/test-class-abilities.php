@@ -71,7 +71,9 @@ class Abilities_Test extends \WP_UnitTestCase {
 	public function tearDown(): void {
 		global $wpdb;
 
-		$wpdb->query( 'TRUNCATE TABLE ' . $wpdb->prefix . 'progress_planner_activities' ); // phpcs:ignore WordPress.DB
+		// DELETE, not TRUNCATE: TRUNCATE commits the open transaction, so the
+		// posts this test created would survive the rollback into the next test.
+		$wpdb->query( 'DELETE FROM ' . $wpdb->prefix . 'progress_planner_activities' ); // phpcs:ignore WordPress.DB
 
 		parent::tearDown();
 	}
@@ -237,9 +239,25 @@ class Abilities_Test extends \WP_UnitTestCase {
 	 * @return void
 	 */
 	public function test_status_maps_to_post_status() {
-		$this->assertSame( 'publish', $this->invoke_on( $this->recommendations, 'get_post_status_for', [ 'pending' ] ) );
-		$this->assertSame( 'trash', $this->invoke_on( $this->recommendations, 'get_post_status_for', [ 'completed' ] ) );
-		$this->assertSame( 'future', $this->invoke_on( $this->recommendations, 'get_post_status_for', [ 'snoozed' ] ) );
+		$this->assertSame( [ 'publish' ], $this->invoke_on( $this->recommendations, 'get_post_status_for', [ 'pending' ] ) );
+		$this->assertSame( [ 'future' ], $this->invoke_on( $this->recommendations, 'get_post_status_for', [ 'snoozed' ] ) );
+	}
+
+	/**
+	 * Test that completion covers both post statuses that mean completed.
+	 *
+	 * The dashboard trashes a task once it has celebrated it, while a task
+	 * completed and not yet celebrated is pending. Listing only one of those hid a
+	 * recommendation the caller had just completed, leaving it unable to
+	 * confirm its own write or tell completed from deleted.
+	 *
+	 * @return void
+	 */
+	public function test_completed_covers_both_statuses_that_mean_completed() {
+		$statuses = $this->invoke_on( $this->recommendations, 'get_post_status_for', [ 'completed' ] );
+
+		$this->assertContains( 'trash', $statuses );
+		$this->assertContains( 'pending', $statuses );
 	}
 
 	/**
@@ -248,7 +266,7 @@ class Abilities_Test extends \WP_UnitTestCase {
 	 * @return void
 	 */
 	public function test_unknown_status_falls_back_to_pending() {
-		$this->assertSame( 'publish', $this->invoke_on( $this->recommendations, 'get_post_status_for', [ 'nonsense' ] ) );
+		$this->assertSame( [ 'publish' ], $this->invoke_on( $this->recommendations, 'get_post_status_for', [ 'nonsense' ] ) );
 	}
 
 	/**
@@ -557,6 +575,98 @@ class Abilities_Test extends \WP_UnitTestCase {
 		$this->assertTrue( $result['applied'] );
 		$this->assertSame( 'completed', $result['status'] );
 		$this->assertSame( '1', (string) \get_option( 'blog_public' ) );
+	}
+
+	/**
+	 * Test that setting a page role is seen as satisfied in the same request.
+	 *
+	 * The check reads page types through a cache that the write goes around,
+	 * so the recommendation used to report applied_not_yet_complete until the
+	 * next request.
+	 *
+	 * @return void
+	 */
+	public function test_complete_recommendation_sees_a_page_role_it_just_set() {
+		\wp_set_current_user( self::factory()->user->create( [ 'role' => 'administrator' ] ) );
+		$page_id = self::factory()->post->create(
+			[
+				'post_title'  => 'About Us',
+				'post_type'   => 'page',
+				'post_status' => 'publish',
+			]
+		);
+		$this->seed_task( 'set-page-about' );
+
+		$result = $this->recommendations->complete(
+			[
+				'provider_id' => 'set-page-about',
+				'value'       => (string) $page_id,
+			]
+		);
+
+		$this->assertTrue( $result['applied'] );
+		$this->assertSame( 'completed', $result['status'] );
+	}
+
+	/**
+	 * Test that a completion is recorded when it happens, not on the next
+	 * admin page load.
+	 *
+	 * @return void
+	 */
+	public function test_complete_recommendation_records_the_completion() {
+		\wp_set_current_user( self::factory()->user->create( [ 'role' => 'administrator' ] ) );
+		\update_option( 'blog_public', '0' );
+		$this->seed_task( 'search-engine-visibility' );
+
+		$result = $this->recommendations->complete( [ 'provider_id' => 'search-engine-visibility' ] );
+
+		$this->assertSame( 'completed', $result['status'] );
+
+		$task = \progress_planner()->get_suggested_tasks_db()->get_post( 'test-search-engine-visibility' );
+		$this->assertNotNull( $task );
+		$this->assertSame( 'pending', \get_post_status( $task->ID ), 'The task waits for its celebration.' );
+
+		$activities = \progress_planner()->get_activities__query()->query_activities(
+			[
+				'data_id' => 'test-search-engine-visibility',
+				'type'    => 'completed',
+			]
+		);
+		$this->assertCount( 1, $activities, 'The completion is scored once.' );
+	}
+
+	/**
+	 * Test that setting the timezone completes its recommendation.
+	 *
+	 * The timezone provider has no state to observe -- any timezone is valid --
+	 * so it counts a recorded completion, which the popover writes on submit
+	 * and the ability used to leave out.
+	 *
+	 * @return void
+	 */
+	public function test_complete_recommendation_completes_the_timezone() {
+		\wp_set_current_user( self::factory()->user->create( [ 'role' => 'administrator' ] ) );
+		\progress_planner()->get_suggested_tasks_db()->add(
+			[
+				'task_id'     => 'select-timezone',
+				'post_title'  => 'Set site timezone',
+				'provider_id' => 'select-timezone',
+			]
+		);
+
+		$result = $this->recommendations->complete(
+			[
+				'provider_id' => 'select-timezone',
+				'value'       => 'Europe/Ljubljana',
+			]
+		);
+
+		$this->assertSame( 'completed', $result['status'] );
+		$this->assertFalse(
+			\progress_planner()->get_suggested_tasks()->get_tasks_manager()->get_task_provider( 'select-timezone' )->should_add_task(),
+			'The provider no longer asks for the task.'
+		);
 	}
 
 	/**

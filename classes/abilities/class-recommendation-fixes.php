@@ -27,6 +27,10 @@ class Recommendation_Fixes {
 	 * - input:   the input property name, when the caller supplies the value.
 	 * - type:    'string' or 'boolean-ish', used to validate before writing.
 	 * - summary: what the caller is agreeing to, in plain words.
+	 * - completes_on_apply: set when the provider records completion instead
+	 *   of detecting it, so applying the fix is the completion -- as submitting
+	 *   the popover is. There is no state to observe: any timezone or date
+	 *   format is a valid answer.
 	 *
 	 * @var array<string, array<string, mixed>>
 	 */
@@ -38,16 +42,18 @@ class Recommendation_Fixes {
 			'summary' => 'Set the site tagline.',
 		],
 		'select-timezone'                           => [
-			'option'  => 'timezone_string',
-			'input'   => 'value',
-			'type'    => 'timezone',
-			'summary' => 'Set the site timezone.',
+			'option'             => 'timezone_string',
+			'input'              => 'value',
+			'type'               => 'timezone',
+			'summary'            => 'Set the site timezone.',
+			'completes_on_apply' => true,
 		],
 		'set-date-format'                           => [
-			'option'  => 'date_format',
-			'input'   => 'value',
-			'type'    => 'string',
-			'summary' => 'Set the date format.',
+			'option'             => 'date_format',
+			'input'              => 'value',
+			'type'               => 'string',
+			'summary'            => 'Set the date format.',
+			'completes_on_apply' => true,
 		],
 		'search-engine-visibility'                  => [
 			'option'  => 'blog_public',
@@ -435,6 +441,19 @@ class Recommendation_Fixes {
 		}
 
 		return true;
+	}
+
+	/**
+	 * Whether applying a fix is itself the completion.
+	 *
+	 * @param string $provider_id The provider ID.
+	 *
+	 * @return bool
+	 */
+	public static function completes_on_apply( $provider_id ) {
+		$fix = self::get( $provider_id );
+
+		return null !== $fix && ! empty( $fix['completes_on_apply'] );
 	}
 
 	/**

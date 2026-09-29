@@ -13,22 +13,29 @@ namespace Progress_Planner\Abilities;
 class Recommendations {
 
 	/**
-	 * Map an ability status onto the post status that encodes it.
+	 * Map an ability status onto the post statuses that encode it.
+	 *
+	 * Completion is two statuses, not one. Task::is_completed() counts both
+	 * 'trash' and 'pending', and the plugin writes whichever suits the route:
+	 * the dashboard trashes a task once it has celebrated it, while a task
+	 * completed and not yet celebrated is 'pending'. Returning only 'trash'
+	 * here made such a task appear in no listing at all -- a caller could not
+	 * confirm its own write, or tell completed from deleted.
 	 *
 	 * @param string $status The ability status.
 	 *
-	 * @return string
+	 * @return array<int, string>
 	 */
 	private function get_post_status_for( $status ) {
 		switch ( $status ) {
 			case 'completed':
-				return 'trash';
+				return [ 'trash', 'pending' ];
 
 			case 'snoozed':
-				return 'future';
+				return [ 'future' ];
 
 			default:
-				return 'publish';
+				return [ 'publish' ];
 		}
 	}
 
@@ -145,8 +152,15 @@ class Recommendations {
 
 		// Completion is observed, never asserted: the provider decides whether
 		// the site now satisfies the task. Saying otherwise would award points
-		// for work that did not happen.
-		$completed = $this->is_satisfied( $provider, $task );
+		// for work that did not happen. The exception is a provider with nothing
+		// to observe, whose own record of completion is the submission itself.
+		$completed = Recommendation_Fixes::completes_on_apply( $provider_id ) || $this->is_satisfied( $provider, $task );
+
+		// Recorded now, as the dashboard would on its next load. Otherwise the
+		// task stays listed and unscored until someone opens wp-admin.
+		if ( $completed ) {
+			\progress_planner()->get_suggested_tasks()->mark_completed( $task );
+		}
 
 		// The wording distinguishes a settings change from a deletion: an agent
 		// relaying this to a person should not describe trashing a post as
@@ -208,13 +222,6 @@ class Recommendations {
 		// exists precisely while the condition is unmet, so "would not be added
 		// now" means satisfied. The set-page providers are the case in point --
 		// they do not override is_task_completed() at all.
-		//
-		// This can still report false immediately after a write. Page-type
-		// lookups are memoised in a static cache with no invalidation, so within
-		// one request the check may read state from before the change. That is
-		// why the status distinguishes "applied" from "satisfied" rather than
-		// assuming the two are the same: the next request sees it correctly, and
-		// a caller is told what actually happened either way.
 		return \method_exists( $provider, 'should_add_task' )
 			&& false === (bool) $provider->should_add_task();
 	}
