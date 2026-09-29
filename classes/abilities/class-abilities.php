@@ -157,6 +157,12 @@ class Abilities {
 					'permission_callback' => [ $this, 'can_fix' ],
 					'execute_callback'    => [ $this->recommendations, 'complete' ],
 					'readonly'            => false,
+					// Most of what this applies is a settings change, but two
+					// recommendations trash WordPress's placeholder content. The
+					// annotation describes what the ability can do, not what a
+					// given call happens to do, so it is declared destructive and
+					// a client prompts before any of it runs.
+					'destructive'         => true,
 				]
 			)
 		);
@@ -173,8 +179,9 @@ class Abilities {
 	 * @return array<string, mixed>
 	 */
 	private function ability_args( array $args ) {
-		$readonly = $args['readonly'] ?? true;
-		unset( $args['readonly'] );
+		$readonly    = $args['readonly'] ?? true;
+		$destructive = $args['destructive'] ?? false;
+		unset( $args['readonly'], $args['destructive'] );
 
 		return \array_merge(
 			[
@@ -184,9 +191,7 @@ class Abilities {
 					'show_in_rest' => true,
 					'annotations'  => [
 						'readonly'    => $readonly,
-						// Nothing registered here deletes or overwrites content:
-						// the write ability changes settings from a fixed list.
-						'destructive' => false,
+						'destructive' => $destructive,
 						'idempotent'  => true,
 					],
 				],
