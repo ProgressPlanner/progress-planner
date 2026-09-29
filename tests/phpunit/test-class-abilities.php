@@ -576,6 +576,37 @@ class Abilities_Test extends \WP_UnitTestCase {
 	}
 
 	/**
+	 * Test that setting a page role is seen as satisfied in the same request.
+	 *
+	 * The check reads page types through a cache that the write goes around,
+	 * so the recommendation used to report applied_not_yet_complete until the
+	 * next request.
+	 *
+	 * @return void
+	 */
+	public function test_complete_recommendation_sees_a_page_role_it_just_set() {
+		\wp_set_current_user( self::factory()->user->create( [ 'role' => 'administrator' ] ) );
+		$page_id = self::factory()->post->create(
+			[
+				'post_title'  => 'About Us',
+				'post_type'   => 'page',
+				'post_status' => 'publish',
+			]
+		);
+		$this->seed_task( 'set-page-about' );
+
+		$result = $this->recommendations->complete(
+			[
+				'provider_id' => 'set-page-about',
+				'value'       => (string) $page_id,
+			]
+		);
+
+		$this->assertTrue( $result['applied'] );
+		$this->assertSame( 'completed', $result['status'] );
+	}
+
+	/**
 	 * Test that a recommendation needing a person is reported, not applied.
 	 *
 	 * @return void
