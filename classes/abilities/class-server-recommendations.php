@@ -119,18 +119,10 @@ class Server_Recommendations {
 			);
 		}
 
-		// 'pending' is what completion means for a recommendation, and what the
-		// email link sets. Not 'trash': a trashed task cannot be read back, so
-		// was_task_completed() stops recognising it and a second call reports
-		// the recommendation missing rather than already done.
-		\progress_planner()->get_suggested_tasks_db()->update_recommendation( $task->ID, [ 'post_status' => 'pending' ] );
-
-		// update_recommendation() does not flush the task cache, so without this
-		// a second call in the same request reads the status from before the
-		// update and completes the recommendation again.
-		\wp_cache_flush_group( \Progress_Planner\Suggested_Tasks_DB::GET_TASKS_CACHE_GROUP );
-
-		\progress_planner()->get_suggested_tasks()->insert_activity( $task_id );
+		// The same completion every route records: 'pending' until celebrated,
+		// not 'trash' -- a trashed task cannot be read back, so a second call
+		// would report the recommendation missing rather than already done.
+		\progress_planner()->get_suggested_tasks()->mark_completed( $task );
 
 		return [
 			'completed' => true,
