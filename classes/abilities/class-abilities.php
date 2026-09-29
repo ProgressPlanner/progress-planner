@@ -212,6 +212,9 @@ class Abilities {
 				'permission_callback' => [ $this, 'can_read' ],
 				'meta'                => [
 					'show_in_rest' => true,
+					// The MCP adapter's default server lists and runs only
+					// abilities that opt in here; without it no agent sees them.
+					'mcp'          => [ 'public' => true ],
 					'annotations'  => [
 						'readonly'    => $readonly,
 						'destructive' => $destructive,

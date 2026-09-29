@@ -413,6 +413,27 @@ class Abilities_Test extends \WP_UnitTestCase {
 	}
 
 	/**
+	 * Test that every ability is exposed to MCP clients.
+	 *
+	 * The MCP adapter's default server hides abilities that do not opt in, so
+	 * without the flag an agent connected through it cannot see any of them.
+	 *
+	 * @return void
+	 */
+	public function test_abilities_are_public_to_mcp() {
+		if ( ! \function_exists( 'wp_get_ability' ) ) {
+			$this->markTestSkipped( 'The Abilities API is not available in this WordPress version.' );
+		}
+
+		foreach ( [ 'get-site-score', 'list-recommendations', 'complete-recommendation' ] as $name ) {
+			$ability = \wp_get_ability( Abilities::CATEGORY . '/' . $name );
+
+			$this->assertNotNull( $ability, "Ability {$name} is not registered." );
+			$this->assertTrue( $ability->get_meta()['mcp']['public'] ?? false, "Ability {$name} is not public to MCP." );
+		}
+	}
+
+	/**
 	 * Test that both abilities are registered under the plugin's own category.
 	 *
 	 * @return void
