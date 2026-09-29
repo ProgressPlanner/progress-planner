@@ -443,7 +443,7 @@ class Abilities_Test extends \WP_UnitTestCase {
 			$this->markTestSkipped( 'The Abilities API is not available in this WordPress version.' );
 		}
 
-		foreach ( [ 'get-site-score', 'list-recommendations', 'complete-recommendation' ] as $name ) {
+		foreach ( [ 'get-site-score', 'list-recommendations', 'complete-recommendation', 'complete-server-recommendation' ] as $name ) {
 			$ability = \wp_get_ability( Abilities::CATEGORY . '/' . $name );
 
 			$this->assertNotNull( $ability, "Ability {$name} is not registered." );
