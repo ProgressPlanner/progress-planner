@@ -283,6 +283,22 @@ class Base {
 	}
 
 	/**
+	 * Get the branding server root URL.
+	 *
+	 * Branding (brand data and badge images) is served separately from the
+	 * remote server above, which keeps serving lessons, challenges and onboarding.
+	 *
+	 * @return string
+	 */
+	public function get_branding_server_url() {
+		return \untrailingslashit(
+			\defined( 'PROGRESS_PLANNER_BRANDING_SERVER_URL' )
+				? \constant( 'PROGRESS_PLANNER_BRANDING_SERVER_URL' )
+				: 'https://branding.your.online'
+		);
+	}
+
+	/**
 	 * Get the placeholder SVG.
 	 *
 	 * @param int $width The width of the placeholder image.
