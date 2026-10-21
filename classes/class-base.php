@@ -55,6 +55,7 @@ use Progress_Planner\Utils\Deprecations;
  * @method \Progress_Planner\Admin\Widgets\Challenge get_admin__widgets__challenge()
  * @method \Progress_Planner\Admin\Widgets\Activity_Scores get_admin__widgets__activity_scores()
  * @method \Progress_Planner\Utils\Date get_utils__date()
+ * @method \Progress_Planner\Abilities\Abilities get_abilities__abilities()
  */
 class Base {
 
@@ -140,6 +141,10 @@ class Base {
 		// REST API.
 		$this->get_rest__stats();
 		$this->get_rest__tasks();
+
+		// Abilities API. Registered on every request, not only in wp-admin: an
+		// agent reaching the site over REST is not an admin request.
+		$this->get_abilities__abilities();
 
 		// Onboarding.
 		$this->get_utils__onboard();
