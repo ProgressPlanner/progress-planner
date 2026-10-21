@@ -2,6 +2,7 @@ name: Playground Comment
 
 on:
   pull_request:
+    types: [opened, synchronize, reopened, labeled, unlabeled]
 
 jobs:
   playground:
@@ -75,19 +76,58 @@ jobs:
 
       - name: Prepare blueprint with artifact link
         id: blueprint
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           set -euxo pipefail
           ARTIFACT_URL="https://nightly.link/${{ github.repository }}/actions/runs/${{ github.run_id }}/${{ github.event.repository.name }}.zip"
 
+          # Fetch PR labels using GitHub CLI
+          PR_LABELS_JSON=$(gh pr view ${{ github.event.number }} --json labels --jq '.labels' || echo '[]')
+          echo "Fetched PR labels: $PR_LABELS_JSON"
+
+          # Write PR labels to temp file to avoid shell quoting issues
+          echo "$PR_LABELS_JSON" > /tmp/pr_labels.json
+
+          # Write Node.js script to temp file
+          cat > /tmp/prepare_blueprint.js <<'SCRIPT_END'
+const fs = require('fs');
+const blueprint = JSON.parse(fs.readFileSync('.wordpress-org/blueprints/playground.json', 'utf8'));
+
+// Replace the current plugin with artifact URL
+blueprint.plugins = blueprint.plugins.map(plugin =>
+  plugin === process.env.REPO_NAME ? process.env.ARTIFACT_URL : plugin
+);
+
+// Read PR labels from temp file
+let prLabels = [];
+try {
+  const prLabelsJson = fs.readFileSync('/tmp/pr_labels.json', 'utf8').trim();
+  console.error('Raw PR labels JSON:', prLabelsJson);
+  prLabels = JSON.parse(prLabelsJson);
+} catch (e) {
+  console.error('Error parsing PR labels JSON:', e);
+  console.error('Error details:', e.message);
+}
+console.error('PR Labels:', JSON.stringify(prLabels, null, 2));
+
+const pluginSlugs = prLabels
+  .filter(label => label.name && label.name.startsWith('plugin:'))
+  .map(label => label.name.replace(/^plugin:/, ''));
+console.error('Plugin slugs:', JSON.stringify(pluginSlugs, null, 2));
+
+// Add plugin slugs to the plugins array (avoid duplicates)
+pluginSlugs.forEach(slug => {
+  if (!blueprint.plugins.includes(slug)) {
+    blueprint.plugins.push(slug);
+  }
+});
+
+console.log(JSON.stringify(blueprint));
+SCRIPT_END
+
           # Use Node.js to parse, modify, and stringify the JSON
-          BLUEPRINT=$(node -e "
-            const fs = require('fs');
-            const blueprint = JSON.parse(fs.readFileSync('.wordpress-org/blueprints/playground.json', 'utf8'));
-            blueprint.plugins = blueprint.plugins.map(plugin =>
-              plugin === '${{ github.event.repository.name }}' ? '$ARTIFACT_URL' : plugin
-            );
-            console.log(JSON.stringify(blueprint));
-          ")
+          BLUEPRINT=$(REPO_NAME='${{ github.event.repository.name }}' ARTIFACT_URL="https://nightly.link/${{ github.repository }}/actions/runs/${{ github.run_id }}/${{ github.event.repository.name }}.zip" node /tmp/prepare_blueprint.js)
 
           # Base64 encode the blueprint
           ENCODED_BLUEPRINT=$(echo -n "$BLUEPRINT" | base64 -w 0)
