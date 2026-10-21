@@ -8,9 +8,14 @@ test.describe( 'Yoast Focus Element', () => {
 			'/wp-admin/admin.php?page=wpseo_page_settings#/crawl-optimization'
 		);
 
-		// Skip if Yoast settings page doesn't load (not installed or wrong version)
+		// Skip if Yoast settings page doesn't load (not installed or wrong version).
+		// WP 7.2+ shows a 404 "page does not exist" for unregistered admin pages.
 		if (
-			await page.locator( 'text=Sorry, you are not allowed' ).isVisible()
+			await page
+				.locator(
+					'text=/Sorry, you are not allowed|The requested page does not exist/'
+				)
+				.isVisible()
 		) {
 			test.skip();
 			return;
@@ -73,7 +78,11 @@ test.describe( 'Yoast Focus Element', () => {
 
 		// Skip if Yoast settings page doesn't load
 		if (
-			await page.locator( 'text=Sorry, you are not allowed' ).isVisible()
+			await page
+				.locator(
+					'text=/Sorry, you are not allowed|The requested page does not exist/'
+				)
+				.isVisible()
 		) {
 			test.skip();
 			return;
