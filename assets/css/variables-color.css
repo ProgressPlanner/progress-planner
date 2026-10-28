@@ -97,8 +97,6 @@
 
 	/* Input field dropdown */
 	--prpl-color-field-border: var(--prpl-color-border);
-	--prpl-color-text-placeholder: var(--prpl-color-ui-icon);
-	--prpl-color-text-dropdown: var(--prpl-color-text);
 	--prpl-color-field-shadow: var(--prpl-color-shadow-paper);
 
 	/* Badge */
