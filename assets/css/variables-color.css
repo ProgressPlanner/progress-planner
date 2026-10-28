@@ -7,7 +7,7 @@
 	/* Paper */
 	--prpl-background-paper: #fff;
 	--prpl-color-border: #d1d5db;
-	--prpl-color-divider: var(--prpl-color-border);
+	--prpl-color-divider: #d1d5db;
 	--prpl-color-shadow-paper: #000;
 
 	/* Graph */
@@ -19,11 +19,11 @@
 
 	/* Table */
 	--prpl-background-table: var(--prpl-background);
-	--prpl-background-top-task: #fff9f0;
+	--prpl-background-top-task: color-mix(in srgb, var(--prpl-color-monthly) 10%, var(--prpl-background-paper));
 	--prpl-color-border-top-task: var(--prpl-color-monthly);
 	--prpl-color-border-next-top-task: var(--prpl-graph-color-4);
-	--prpl-color-selection-controls-inactive: #9ca3af;
-	--prpl-color-selection-controls: var(--prpl-color-selection-controls-inactive); /* TBD */
+	--prpl-color-selection-controls: #9ca3af;
+	--prpl-color-selection-controls-active: #3bb3a6;
 	--prpl-color-ui-icon: #6b7280;
 	--prpl-color-ui-icon-hover: var(--prpl-color-link);
 	--prpl-color-ui-icon-hover-fill: var(--prpl-background-content-badge);
@@ -33,6 +33,9 @@
 	--prpl-background-point-inactive: var(--prpl-color-border);
 	--prpl-text-point-inactive: var(--prpl-color-headings);
 
+	/* Border around the points badge; none unless a brand sets it */
+	--prpl-color-border-point: transparent;
+
 	/* Text */
 	--prpl-color-text: #4b5563;
 	--prpl-color-text-hover: var(--prpl-color-link);
@@ -41,53 +44,56 @@
 	--prpl-color-link: #1e40af;
 	--prpl-color-link-hover: var(--prpl-color-text);
 	--prpl-color-link-visited: var(--prpl-graph-color-4);
+	--prpl-color-text-score: var(--prpl-color-text);
+	--prpl-color-text-score-small: var(--prpl-color-text);
 
 	/* Topics */
 	--prpl-color-monthly: #faa310;
 	--prpl-color-monthly-2: #faa310;
 	--prpl-color-streak: var(--prpl-color-monthly);
 	--prpl-color-content-badge: var(--prpl-color-monthly);
-	--prpl-background-monthly: #fff9f0;
+	--prpl-color-publish: var(--prpl-color-monthly);
+	--prpl-color-flying-start: var(--prpl-color-monthly);
+
+	/* Topic backgrounds: 10% of the topic color */
+	--prpl-background-monthly: color-mix(in srgb, var(--prpl-color-monthly) 10%, var(--prpl-background-paper));
 	--prpl-background-content: #f6f5fb;
 	--prpl-background-activity: #f2faf9;
-	--prpl-background-streak: #fff6f7;
-	--prpl-background-content-badge: #effbfe;
+	--prpl-background-streak: color-mix(in srgb, var(--prpl-color-streak) 10%, var(--prpl-background-paper));
+	--prpl-background-content-badge: color-mix(in srgb, var(--prpl-color-content-badge) 10%, var(--prpl-background-paper));
+	--prpl-background-publish: color-mix(in srgb, var(--prpl-color-publish) 10%, var(--prpl-background-paper));
+	--prpl-background-flying-start: color-mix(in srgb, var(--prpl-color-flying-start) 10%, var(--prpl-background-paper));
 
 	/* Alert success */
 	--prpl-color-alert-success: #16a34a;
 	--prpl-color-alert-success-text: #14532d;
 	--prpl-background-alert-success: #f0fdf4;
+	--prpl-color-border-alert-success: #b9e3c8;
 
 	/* Alert error */
 	--prpl-color-alert-error: #e73136;
 	--prpl-color-alert-error-text: #7f1d1d;
 	--prpl-background-alert-error: #fdeded;
+	--prpl-color-border-alert-error: #f8c1c2;
 
 	/* Alert warning */
 	--prpl-color-alert-warning: #eab308;
 	--prpl-color-alert-warning-text: #713f12;
 	--prpl-background-alert-warning: #fefce8;
+	--prpl-color-border-alert-warning: #f9e8b4;
 
 	/* Alert info */
 	--prpl-color-alert-info: #2563eb;
 	--prpl-color-alert-info-text: #1e3a8a;
 	--prpl-background-alert-info: #eff6ff;
+	--prpl-color-border-alert-info: #becceb;
 
 	/* Button */
 	--prpl-color-button-primary: #dd324f;
-	--prpl-color-button-primary-hover: #cf2441;
-	--prpl-color-button-primary-shadow: var(--prpl-color-shadow-paper);
-	--prpl-color-button-primary-border: none;
+	--prpl-color-button-primary-hover: color-mix(in srgb, var(--prpl-color-button-primary), #000 10%);
 	--prpl-color-button-primary-text: var(--prpl-background-paper);
-
-	/* Settings page */
-	--prpl-color-setting-pages-icon: var(--prpl-color-monthly);
-	--prpl-color-setting-posts-icon: var(--prpl-graph-color-4);
-	--prpl-color-setting-login-icon: var(--prpl-graph-color-3);
-	--prpl-background-setting-pages: var(--prpl-background-monthly);
-	--prpl-background-setting-posts: var(--prpl-background-content);
-	--prpl-background-setting-login: var(--prpl-background-activity);
-	--prpl-color-border-settings: var(--prpl-color-border);
+	--prpl-color-button-secondary-border: #faa310;
+	--prpl-color-button-secondary-text: #374151;
 
 	/* Input field dropdown */
 	--prpl-color-field-border: var(--prpl-color-border);

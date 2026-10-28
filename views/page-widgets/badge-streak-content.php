@@ -34,7 +34,7 @@ if ( ! $prpl_widget_details ) {
 <div class="prpl-latest-badges-wrapper">
 	<prpl-gauge
 		background="<?php echo \esc_attr( $prpl_widget_details->get_background() ); ?>"
-		color="var(--prpl-color-monthly)"
+		color="var(--prpl-color-content-badge)"
 		data-max="100"
 		data-value="<?php echo (float) $prpl_widget_details->get_progress()['progress']; ?>"
 	>

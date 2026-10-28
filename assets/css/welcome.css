@@ -2,7 +2,7 @@
 	padding: 0;
 	background-color: var(--prpl-background-paper);
 	border: 1px solid var(--prpl-color-border);
-	border-radius: var(--prpl-border-radius);
+	border-radius: var(--prpl-radius-paper);
 }
 
 .prpl-welcome {
@@ -31,8 +31,8 @@
 		display: flex;
 		justify-content: space-between;
 		align-items: center;
-		border-top-left-radius: var(--prpl-border-radius);
-		border-top-right-radius: var(--prpl-border-radius);
+		border-top-left-radius: var(--prpl-radius-paper);
+		border-top-right-radius: var(--prpl-radius-paper);
 		overflow: hidden;
 
 		h1 {
