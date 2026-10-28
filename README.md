@@ -58,6 +58,14 @@ composer phpstan     # Run static analysis
 composer lint        # Check PHP syntax
 ```
 
+### Pre-commit hook
+
+`npm install` sets up the husky pre-commit hook: coding standards, PHPStan and the CSS/JS linters.
+It also checks the shared `--prpl-*` names against `tokens.json` in
+[your-branding](https://github.com/ProgressPlanner/your-branding) when `YOUR_BRANDING_DIR` points
+at a checkout of it (`export YOUR_BRANDING_DIR=~/path/to/your-branding`). A name the plugin reads
+must be listed there; without the variable the check is skipped.
+
 ## Branches on this repository
 
 We use a couple of branches in this repository to keep things clean:
