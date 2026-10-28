@@ -404,21 +404,22 @@ button.prpl-info-icon {
 	--prpl-button-secondary-tint: color-mix(in srgb, var(--prpl-color-button-secondary-border) 6%, var(--prpl-background-paper));
 	color: var(--prpl-color-button-secondary-text);
 	background: var(--prpl-background-paper);
-	box-shadow: inset 0 0 0 1px var(--prpl-color-button-secondary-border);
 
+	/* The outline sits on ::after, which covers the button's own background. */
 	&::after {
 		background: var(--prpl-background-paper);
+		box-shadow: inset 0 0 0 1px var(--prpl-color-button-secondary-border);
 	}
 
 	&:not([disabled]):hover,
 	&:not([disabled]):focus {
 		color: var(--prpl-color-button-secondary-text);
 		background: var(--prpl-button-secondary-tint);
-		box-shadow: inset 0 0 0 1px var(--prpl-color-button-secondary-border);
+		box-shadow: none;
 
 		&::after {
 			background: var(--prpl-button-secondary-tint);
-			box-shadow: 0 0 0 1px var(--prpl-color-button-secondary-border);
+			box-shadow: inset 0 0 0 1px var(--prpl-color-button-secondary-border);
 		}
 	}
 }
