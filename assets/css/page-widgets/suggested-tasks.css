@@ -253,7 +253,7 @@
 			border: none;
 			color: var(--prpl-color-text);
 			font-weight: 600;
-			border-radius: var(--prpl-radius-paper);
+			border-radius: var(--prpl-radius-button);
 			background-color: var(--prpl-background-banner);
 			cursor: pointer;
 
