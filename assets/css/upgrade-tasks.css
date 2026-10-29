@@ -6,7 +6,7 @@
 
 #prpl-onboarding-tasks {
 	border: 1px solid var(--prpl-color-border);
-	border-radius: var(--prpl-border-radius);
+	border-radius: var(--prpl-radius-paper);
 	padding: var(--prpl-padding);
 	min-width: 0;
 	min-height: 0;

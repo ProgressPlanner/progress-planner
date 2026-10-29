@@ -238,7 +238,7 @@
 
 	#todo-list-completed-delete-all-wrapper {
 		margin: 0.25rem 0.5rem 0.75rem 0.5rem;
-		border-top: 1px solid var(--prpl-color-border);
+		border-top: 1px solid var(--prpl-color-divider);
 		display: none;
 
 		#todo-list-completed-delete-all {
@@ -356,6 +356,7 @@
 		font-size: var(--prpl-font-size-small);
 		border-radius: 6px;
 		background-color: var(--prpl-background-alert-warning);
+		border: 1px solid var(--prpl-color-border-alert-warning);
 
 		.prpl-note-icon {
 			display: flex;
