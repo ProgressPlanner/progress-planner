@@ -17,6 +17,13 @@ class Content_Review extends Tasks {
 	use Dismissable_Task;
 
 	/**
+	 * The note prefix used to identify Progress Planner notes.
+	 *
+	 * @var string
+	 */
+	public const NOTE_PREFIX = '[PRPL]';
+
+	/**
 	 * The capability required to perform the task.
 	 *
 	 * @var string
@@ -116,6 +123,62 @@ class Content_Review extends Tasks {
 		}
 
 		$this->init_dismissable_task();
+
+		// Handle note injection and avatar customization.
+		if ( $this->supports_notes() ) {
+			\add_action( 'load-post.php', [ $this, 'maybe_inject_notes' ] );
+			\add_filter( 'pre_get_avatar_data', [ $this, 'filter_note_avatar' ], 10, 2 );
+			\add_action( 'admin_head', [ $this, 'add_note_avatar_styles' ] );
+			\add_action( 'enqueue_block_editor_assets', [ $this, 'maybe_enqueue_notes_sidebar_script' ] );
+		}
+	}
+
+	/**
+	 * Maybe inject notes when editing a post.
+	 *
+	 * @return void
+	 */
+	public function maybe_inject_notes() {
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- No action taken, just injecting notes.
+		if ( ! isset( $_GET['prpl_inject_notes'] ) ) {
+			return;
+		}
+
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$post_id = isset( $_GET['post'] ) ? (int) $_GET['post'] : 0;
+		if ( ! $post_id || ! \current_user_can( 'edit_post', $post_id ) ) {
+			return;
+		}
+
+		// Inject all note types.
+		$this->inject_image_review_notes( $post_id );
+		$this->inject_link_review_notes( $post_id );
+	}
+
+	/**
+	 * Enqueue the script that auto-opens the Notes sidebar,
+	 * when a post is opened via the "Review with Notes" action.
+	 *
+	 * @return void
+	 */
+	public function maybe_enqueue_notes_sidebar_script() {
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- No action taken, just opening the notes sidebar.
+		if ( ! isset( $_GET['prpl_inject_notes'] ) ) {
+			return;
+		}
+
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$post_id = isset( $_GET['post'] ) ? (int) $_GET['post'] : 0;
+		if ( ! $post_id || ! \current_user_can( 'edit_post', $post_id ) ) {
+			return;
+		}
+
+		// Bail if there are no open notes to show.
+		if ( empty( $this->get_notes( $post_id, 'open' ) ) ) {
+			return;
+		}
+
+		\progress_planner()->get_admin__enqueue()->enqueue_script( 'review-post-notes' );
 	}
 
 	/**
@@ -498,8 +561,33 @@ class Content_Review extends Tasks {
 
 		$data = $task->get_data();
 
-		return $data && isset( $data['target_post_id'] )
-			&& (int) \get_post_modified_time( 'U', false, (int) $data['target_post_id'] ) > \strtotime( '-12 months' );
+		if ( ! $data || ! isset( $data['target_post_id'] ) ) {
+			return false;
+		}
+
+		$target_post_id = (int) $data['target_post_id'];
+
+		// Check if notes-based completion is applicable (WP 6.9+ and notes exist).
+		if ( $this->supports_notes() ) {
+			$notes_resolved = $this->all_notes_resolved( $target_post_id );
+
+			// If notes exist and all are resolved, task is complete.
+			// Clean up the notes so new ones can be created in the next review cycle.
+			if ( true === $notes_resolved ) {
+				$this->delete_notes( $target_post_id );
+				return true;
+			}
+
+			// If notes exist but some are open, task is not complete.
+			if ( false === $notes_resolved ) {
+				return false;
+			}
+
+			// If no notes exist (null), fall back to modification time check.
+		}
+
+		// Original completion check: post was modified within the last 12 months.
+		return (int) \get_post_modified_time( 'U', false, $target_post_id ) > \strtotime( '-12 months' );
 	}
 
 	/**
@@ -576,8 +664,499 @@ class Content_Review extends Tasks {
 				'priority' => 10,
 				'html'     => '<a class="prpl-tooltip-action-text" href="' . \admin_url( 'post.php?action=edit&post=' . $task_data['target_post_id'] ) . '" target="_self">' . \esc_html__( 'Review', 'progress-planner' ) . '</a>',
 			];
+
+			// Add "Review with Notes" action for WordPress 6.9+.
+			if ( $this->supports_notes() ) {
+				$actions[] = [
+					'priority' => 11,
+					'html'     => '<a class="prpl-tooltip-action-text" href="' . \admin_url( 'post.php?action=edit&post=' . $task_data['target_post_id'] . '&prpl_inject_notes=1' ) . '" target="_self">' . \esc_html__( 'Review with Notes', 'progress-planner' ) . '</a>',
+				];
+			}
 		}
 
 		return $actions;
+	}
+
+	/**
+	 * Check if WordPress supports the Notes feature (6.9+).
+	 *
+	 * @return bool
+	 */
+	public function supports_notes() {
+		global $wp_version;
+		return \version_compare( $wp_version, '6.9', '>=' );
+	}
+
+	/**
+	 * Filter avatar data for PRPL notes to show Progress Planner logo.
+	 *
+	 * @param array $args        Arguments passed to get_avatar_data().
+	 * @param mixed $id_or_email User ID, email, WP_User, WP_Post, or WP_Comment.
+	 *
+	 * @return array Modified arguments.
+	 */
+	public function filter_note_avatar( $args, $id_or_email ) {
+		// Only process WP_Comment objects.
+		if ( ! $id_or_email instanceof \WP_Comment ) {
+			return $args;
+		}
+
+		// Check if this is a note with our prefix.
+		if ( 'note' !== $id_or_email->comment_type ) {
+			return $args;
+		}
+
+		if ( false === \strpos( $id_or_email->comment_content, static::NOTE_PREFIX ) ) {
+			return $args;
+		}
+
+		// Use Progress Planner logo as avatar.
+		$args['url']          = \constant( 'PROGRESS_PLANNER_URL' ) . '/assets/images/icon_progress_planner.svg';
+		$args['found_avatar'] = true;
+
+		return $args;
+	}
+
+	/**
+	 * Add CSS styles for PRPL note avatars in the editor.
+	 *
+	 * @return void
+	 */
+	public function add_note_avatar_styles() {
+		$screen = \get_current_screen();
+		if ( ! $screen || 'post' !== $screen->base ) {
+			return;
+		}
+
+		$logo_url = \constant( 'PROGRESS_PLANNER_URL' ) . '/assets/images/icon_progress_planner.svg';
+		?>
+		<style>
+			/* Fix Progress Planner note avatars to be perfect circles */
+			img[src="<?php echo \esc_url( $logo_url ); ?>"] {
+				width: 32px !important;
+				height: 32px !important;
+				object-fit: contain !important;
+				background: #f0f0f1 !important;
+				padding: 4px !important;
+				box-sizing: border-box !important;
+				border-radius: 50% !important;
+			}
+		</style>
+		<?php
+	}
+
+	/**
+	 * Create a note on a specific post.
+	 *
+	 * @param int    $post_id   The post ID to attach the note to.
+	 * @param string $content   The note content.
+	 * @param int    $parent_id Parent note ID for threading (0 for top-level).
+	 *
+	 * @return int|false The note (comment) ID or false on failure.
+	 */
+	public function create_note( $post_id, $content, $parent_id = 0 ) {
+		$note_data = [
+			'comment_post_ID'  => $post_id,
+			'comment_content'  => $content,
+			'comment_type'     => 'note',
+			'comment_approved' => 0, // 0 = open, 1 = resolved.
+			'comment_parent'   => $parent_id,
+			'user_id'          => \get_current_user_id(),
+		];
+
+		// Bypass filters that might interfere with note creation.
+		\add_filter( 'duplicate_comment_id', '__return_false' );
+		\add_filter( 'comment_flood_filter', '__return_false' );
+
+		$note_id = \wp_insert_comment( $note_data );
+
+		\remove_filter( 'duplicate_comment_id', '__return_false' );
+		\remove_filter( 'comment_flood_filter', '__return_false' );
+
+		return $note_id;
+	}
+
+	/**
+	 * Get all Progress Planner notes for a post.
+	 *
+	 * @param int    $post_id The post ID.
+	 * @param string $status  'open' for unresolved, 'resolved' for resolved, 'all' for both.
+	 *
+	 * @return array Array of note comments.
+	 */
+	public function get_notes( $post_id, $status = 'all' ) {
+		$args = [
+			'post_id' => $post_id,
+			'type'    => 'note',
+			'search'  => static::NOTE_PREFIX, // Only get our notes.
+		];
+
+		if ( 'open' === $status ) {
+			$args['status'] = 'hold'; // WordPress maps 0 to 'hold'.
+		} elseif ( 'resolved' === $status ) {
+			$args['status'] = 'approve'; // WordPress maps 1 to 'approve'.
+		}
+
+		return \get_comments( $args );
+	}
+
+	/**
+	 * Check if all Progress Planner notes are resolved for a post.
+	 *
+	 * @param int $post_id The post ID.
+	 *
+	 * @return bool|null True if all resolved, false if open notes exist, null if no notes.
+	 */
+	public function all_notes_resolved( $post_id ) {
+		$all_notes = $this->get_notes( $post_id, 'all' );
+
+		if ( empty( $all_notes ) ) {
+			return null; // No notes created yet.
+		}
+
+		$open_notes = $this->get_notes( $post_id, 'open' );
+
+		return empty( $open_notes );
+	}
+
+	/**
+	 * Find image blocks in a post.
+	 *
+	 * @param int $post_id The post ID.
+	 *
+	 * @return array Array of image block data.
+	 */
+	public function find_image_blocks( $post_id ) {
+		$post = \get_post( $post_id );
+		if ( ! $post || ! \has_blocks( $post->post_content ) ) {
+			return [];
+		}
+
+		$blocks       = \parse_blocks( $post->post_content );
+		$image_blocks = [];
+
+		foreach ( $blocks as $index => $block ) {
+			if ( 'core/image' === $block['blockName'] ) {
+				$image_blocks[] = [
+					'index' => $index,
+					'block' => $block,
+					'alt'   => $block['attrs']['alt'] ?? '',
+					'id'    => $block['attrs']['id'] ?? 0,
+				];
+			}
+
+			// Also check inner blocks (for groups, columns, etc.).
+			if ( ! empty( $block['innerBlocks'] ) ) {
+				$inner_images = $this->find_image_blocks_recursive( $block['innerBlocks'], $index );
+				$image_blocks = \array_merge( $image_blocks, $inner_images );
+			}
+		}
+
+		return $image_blocks;
+	}
+
+	/**
+	 * Recursively find image blocks in inner blocks.
+	 *
+	 * @param array  $blocks       The blocks to search.
+	 * @param string $parent_index The parent block index.
+	 *
+	 * @return array Array of image block data.
+	 */
+	protected function find_image_blocks_recursive( $blocks, $parent_index ) {
+		$image_blocks = [];
+
+		foreach ( $blocks as $index => $block ) {
+			if ( 'core/image' === $block['blockName'] ) {
+				$image_blocks[] = [
+					'index' => "{$parent_index}.{$index}",
+					'block' => $block,
+					'alt'   => $block['attrs']['alt'] ?? '',
+					'id'    => $block['attrs']['id'] ?? 0,
+				];
+			}
+
+			if ( ! empty( $block['innerBlocks'] ) ) {
+				$inner        = $this->find_image_blocks_recursive( $block['innerBlocks'], "{$parent_index}.{$index}" );
+				$image_blocks = \array_merge( $image_blocks, $inner );
+			}
+		}
+
+		return $image_blocks;
+	}
+
+	/**
+	 * Inject review notes for images on a post.
+	 *
+	 * @param int $post_id The post ID to inject notes on.
+	 *
+	 * @return array Array of created note IDs.
+	 */
+	public function inject_image_review_notes( $post_id ) {
+		$post = \get_post( $post_id );
+		if ( ! $post || ! \has_blocks( $post->post_content ) ) {
+			return [];
+		}
+
+		$blocks        = \parse_blocks( $post->post_content );
+		$created_notes = [];
+		$image_num     = 0;
+		$modified      = false;
+
+		$blocks = $this->process_blocks_for_notes( $blocks, $post_id, $created_notes, $image_num, $modified );
+
+		// Update post content with block metadata if we created notes.
+		if ( $modified && ! empty( $created_notes ) ) {
+			$new_content = \serialize_blocks( $blocks );
+
+			\wp_update_post(
+				[
+					'ID'           => $post_id,
+					'post_content' => $new_content,
+				]
+			);
+		}
+
+		return $created_notes;
+	}
+
+	/**
+	 * Process blocks recursively to add notes to image blocks.
+	 *
+	 * @param array $blocks        The blocks to process.
+	 * @param int   $post_id       The post ID.
+	 * @param array $created_notes Array to collect created note IDs (passed by reference).
+	 * @param int   $image_num     Image counter (passed by reference).
+	 * @param bool  $modified      Whether any blocks were modified (passed by reference).
+	 *
+	 * @return array The processed blocks.
+	 */
+	protected function process_blocks_for_notes( $blocks, $post_id, &$created_notes, &$image_num, &$modified ) {
+		foreach ( $blocks as $index => $block ) {
+			if ( 'core/image' === $block['blockName'] ) {
+				++$image_num;
+
+				// Skip if block already has a valid note (exists in database).
+				$existing_note_id = $block['attrs']['metadata']['noteId'] ?? 0;
+				if ( $existing_note_id && \get_comment( $existing_note_id ) ) {
+					continue;
+				}
+
+				$alt_text     = $block['attrs']['alt'] ?? '';
+				$alt_text_str = $alt_text ? " (alt: \"{$alt_text}\")" : ' (no alt text)';
+				$is_linked    = $this->image_block_has_link( $block );
+
+				if ( $is_linked ) {
+					$note_content = \sprintf(
+						/* translators: %1$s: Note prefix, %2$d: Image number, %3$s: Alt text info. */
+						\__( '%1$s Review Image %2$d%3$s: This image is linked. Check that both the image and link are still relevant and working.', 'progress-planner' ),
+						static::NOTE_PREFIX,
+						$image_num,
+						$alt_text_str
+					);
+				} else {
+					$note_content = \sprintf(
+						/* translators: %1$s: Note prefix, %2$d: Image number, %3$s: Alt text info. */
+						\__( '%1$s Review Image %2$d%3$s: Is this image still relevant and displaying correctly?', 'progress-planner' ),
+						static::NOTE_PREFIX,
+						$image_num,
+						$alt_text_str
+					);
+				}
+
+				$note_id = $this->create_note( $post_id, $note_content );
+
+				if ( $note_id ) {
+					$created_notes[] = $note_id;
+
+					// Add note ID to block metadata.
+					if ( ! isset( $blocks[ $index ]['attrs']['metadata'] ) ) {
+						$blocks[ $index ]['attrs']['metadata'] = [];
+					}
+					$blocks[ $index ]['attrs']['metadata']['noteId'] = $note_id;
+
+					$modified = true;
+				}
+			}
+
+			// Process inner blocks recursively.
+			if ( ! empty( $block['innerBlocks'] ) ) {
+				$blocks[ $index ]['innerBlocks'] = $this->process_blocks_for_notes(
+					$block['innerBlocks'],
+					$post_id,
+					$created_notes,
+					$image_num,
+					$modified
+				);
+			}
+		}
+
+		return $blocks;
+	}
+
+	/**
+	 * Inject review notes for paragraphs with links on a post.
+	 *
+	 * @param int $post_id The post ID to inject notes on.
+	 *
+	 * @return array Array of created note IDs.
+	 */
+	public function inject_link_review_notes( $post_id ) {
+		$post = \get_post( $post_id );
+		if ( ! $post || ! \has_blocks( $post->post_content ) ) {
+			return [];
+		}
+
+		$blocks        = \parse_blocks( $post->post_content );
+		$created_notes = [];
+		$paragraph_num = 0;
+		$modified      = false;
+
+		$blocks = $this->process_blocks_for_link_notes( $blocks, $post_id, $created_notes, $paragraph_num, $modified );
+
+		// Update post content with block metadata if we created notes.
+		if ( $modified && ! empty( $created_notes ) ) {
+			$new_content = \serialize_blocks( $blocks );
+
+			\wp_update_post(
+				[
+					'ID'           => $post_id,
+					'post_content' => $new_content,
+				]
+			);
+		}
+
+		return $created_notes;
+	}
+
+	/**
+	 * Process blocks recursively to add notes to paragraphs with links.
+	 *
+	 * @param array $blocks         The blocks to process.
+	 * @param int   $post_id        The post ID.
+	 * @param array $created_notes  Array to collect created note IDs (passed by reference).
+	 * @param int   $paragraph_num  Paragraph counter (passed by reference).
+	 * @param bool  $modified       Whether any blocks were modified (passed by reference).
+	 *
+	 * @return array The processed blocks.
+	 */
+	protected function process_blocks_for_link_notes( $blocks, $post_id, &$created_notes, &$paragraph_num, &$modified ) {
+		foreach ( $blocks as $index => $block ) {
+			// Check if this is a paragraph block with links.
+			if ( 'core/paragraph' === $block['blockName'] && $this->block_has_links( $block ) ) {
+				++$paragraph_num;
+
+				// Skip if block already has a valid note (exists in database).
+				$existing_note_id = $block['attrs']['metadata']['noteId'] ?? 0;
+				if ( $existing_note_id && \get_comment( $existing_note_id ) ) {
+					continue;
+				}
+
+				$link_count = $this->count_links_in_block( $block );
+
+				$note_content = \sprintf(
+					/* translators: %1$s: Note prefix, %2$d: Paragraph number, %3$d: Number of links. */
+					\_n(
+						'%1$s Review Paragraph %2$d: Check the %3$d link - is it still working and relevant?',
+						'%1$s Review Paragraph %2$d: Check the %3$d links - are they still working and relevant?',
+						$link_count,
+						'progress-planner'
+					),
+					static::NOTE_PREFIX,
+					$paragraph_num,
+					$link_count
+				);
+
+				$note_id = $this->create_note( $post_id, $note_content );
+
+				if ( $note_id ) {
+					$created_notes[] = $note_id;
+
+					// Add note ID to block metadata.
+					if ( ! isset( $blocks[ $index ]['attrs']['metadata'] ) ) {
+						$blocks[ $index ]['attrs']['metadata'] = [];
+					}
+					$blocks[ $index ]['attrs']['metadata']['noteId'] = $note_id;
+
+					$modified = true;
+				}
+			}
+
+			// Process inner blocks recursively.
+			if ( ! empty( $block['innerBlocks'] ) ) {
+				$blocks[ $index ]['innerBlocks'] = $this->process_blocks_for_link_notes(
+					$block['innerBlocks'],
+					$post_id,
+					$created_notes,
+					$paragraph_num,
+					$modified
+				);
+			}
+		}
+
+		return $blocks;
+	}
+
+	/**
+	 * Check if a block contains links.
+	 *
+	 * @param array $block The block to check.
+	 *
+	 * @return bool True if block contains links.
+	 */
+	protected function block_has_links( $block ) {
+		$inner_html = $block['innerHTML'] ?? '';
+		return false !== \strpos( $inner_html, '<a ' ) || false !== \strpos( $inner_html, '<a>' );
+	}
+
+	/**
+	 * Check if an image block is wrapped in a link.
+	 *
+	 * @param array $block The image block to check.
+	 *
+	 * @return bool True if image is linked.
+	 */
+	protected function image_block_has_link( $block ) {
+		// Check block attributes for link destination.
+		if ( ! empty( $block['attrs']['linkDestination'] ) && 'none' !== $block['attrs']['linkDestination'] ) {
+			return true;
+		}
+
+		// Also check innerHTML for anchor tags.
+		$inner_html = $block['innerHTML'] ?? '';
+		return false !== \strpos( $inner_html, '<a ' );
+	}
+
+	/**
+	 * Count the number of links in a block.
+	 *
+	 * @param array $block The block to check.
+	 *
+	 * @return int Number of links found.
+	 */
+	protected function count_links_in_block( $block ) {
+		$inner_html = $block['innerHTML'] ?? '';
+		return \preg_match_all( '/<a\s/', $inner_html );
+	}
+
+	/**
+	 * Delete all Progress Planner notes for a post.
+	 *
+	 * @param int  $post_id      The post ID.
+	 * @param bool $force_delete Whether to bypass trash.
+	 *
+	 * @return int Number of notes deleted.
+	 */
+	public function delete_notes( $post_id, $force_delete = true ) {
+		$notes   = $this->get_notes( $post_id, 'all' );
+		$deleted = 0;
+
+		foreach ( $notes as $note ) {
+			if ( $note instanceof \WP_Comment && \wp_delete_comment( $note->comment_ID, $force_delete ) ) {
+				++$deleted;
+			}
+		}
+
+		return $deleted;
 	}
 }
