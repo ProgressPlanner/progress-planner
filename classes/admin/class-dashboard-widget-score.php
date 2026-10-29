@@ -102,7 +102,7 @@ class Dashboard_Widget_Score extends Dashboard_Widget {
 		];
 
 		if ( $result['progress']['progress'] > 50 ) {
-			$result['color'] = 'var(--prpl-color-monthly)';
+			$result['color'] = 'var(--prpl-graph-color-2)';
 		}
 		if ( $result['progress']['progress'] > 75 ) {
 			$result['color'] = 'var(--prpl-graph-color-3)';

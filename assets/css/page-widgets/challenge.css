@@ -25,7 +25,7 @@
 				background-color: #fff;
 				border: 1px solid var(--prpl-color-border);
 				padding: var(--prpl-padding);
-				border-radius: var(--prpl-border-radius);
+				border-radius: var(--prpl-radius-paper);
 
 				.prpl-button-primary {
 					margin-bottom: 0;

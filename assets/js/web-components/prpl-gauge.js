@@ -213,13 +213,13 @@ customElements.define(
 			this.shadowRoot.innerHTML = `
 		<div style="padding: ${ contentPadding }; background: ${ background }; border-radius:var(--prpl-border-radius-big); aspect-ratio: 2 / 1; overflow: hidden; position: relative; margin-bottom: ${ marginBottom };">
 			<div style="width: 100%; aspect-ratio: 1 / 1; border-radius: 100%; position: relative; background: radial-gradient(${ background } 0 ${ cutout }, transparent ${ cutout } 100%), conic-gradient(from ${ start }, ${ colorTransitions }, transparent ${ maxDeg }); text-align: center;">
-			<span style="font-size: var(--prpl-font-size-small); position: absolute; top: 50%; color: var(--prpl-color-text); width: 10%; text-align: center; left:0;">0</span>
-			<span style="font-size: ${ contentFontSize }; ${ contentSpecificStyles } display: block; font-weight: 600; text-align: center; position: absolute; color: var(--prpl-color-text); width: 100%; line-height: 1.2;">
+			<span style="font-size: var(--prpl-font-size-small); position: absolute; top: 50%; color: var(--prpl-color-text-score-small); width: 10%; text-align: center; left:0;">0</span>
+			<span style="font-size: ${ contentFontSize }; ${ contentSpecificStyles } display: block; font-weight: 600; text-align: center; position: absolute; color: var(--prpl-color-text-score); width: 100%; line-height: 1.2;">
 				<span style="display:inline-block;width: 50%;">
 				<slot></slot>
 				</span>
 			</span>
-			<span style="font-size: var(--prpl-font-size-small); position: absolute; top: 50%; color: var(--prpl-color-text); width: 10%; text-align: center; right:0;">${ max }</span>
+			<span style="font-size: var(--prpl-font-size-small); position: absolute; top: 50%; color: var(--prpl-color-text-score-small); width: 10%; text-align: center; right:0;">${ max }</span>
 			</div>
 		</div>
 		`;

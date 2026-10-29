@@ -22,7 +22,7 @@
 	padding: 0.75rem 1.5rem 0.75rem 0.75rem;
 	width: 150px;
 	background: var(--prpl-background-activity);
-	border-radius: var(--prpl-border-radius);
+	border-radius: var(--prpl-radius-paper);
 	z-index: 2; /* above the gauges */
 	visibility: hidden; /* hidden by default */
 

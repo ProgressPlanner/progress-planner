@@ -2,3 +2,10 @@ composer check-cs -- --warning-severity=6
 composer phpstan
 npm run lint:css
 npm run lint:js
+
+# Shared --prpl-* names: check against tokens.json in a your-branding checkout.
+if [ -n "$YOUR_BRANDING_DIR" ]; then
+	node "$YOUR_BRANDING_DIR/tools/check-tokens.mjs" --plugin progress-planner=. || exit 1
+else
+	echo "Token check skipped: set YOUR_BRANDING_DIR to a your-branding checkout."
+fi

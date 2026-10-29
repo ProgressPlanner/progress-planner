@@ -14,7 +14,7 @@ $prpl_widget = \progress_planner()->get_admin__widgets__content_activity();
 $prpl_activity_types = [
 	'publish' => [
 		'label' => \__( 'published', 'progress-planner' ),
-		'color' => 'var(--prpl-color-monthly)',
+		'color' => 'var(--prpl-graph-color-2)',
 	],
 	'update'  => [
 		'label' => \__( 'updated', 'progress-planner' ),
@@ -22,7 +22,7 @@ $prpl_activity_types = [
 	],
 	'delete'  => [
 		'label' => \__( 'deleted', 'progress-planner' ),
-		'color' => 'var(--prpl-color-headings)',
+		'color' => 'var(--prpl-graph-color-4)',
 	],
 ];
 
