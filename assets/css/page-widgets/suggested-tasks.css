@@ -187,6 +187,7 @@
 			font-size: var(--prpl-font-size-small);
 			border-radius: 6px;
 			background-color: var(--prpl-background-alert-warning);
+		border: 1px solid var(--prpl-color-border-alert-warning);
 
 			.prpl-note-icon {
 				display: flex;
@@ -206,6 +207,7 @@
 			&.prpl-note-error {
 				color: var(--prpl-color-alert-error-text);
 				background-color: var(--prpl-background-alert-error);
+				border-color: var(--prpl-color-border-alert-error);
 				margin-bottom: 0;
 
 				order: 98; /* One less than the spinner. */
@@ -251,7 +253,7 @@
 			border: none;
 			color: var(--prpl-color-text);
 			font-weight: 600;
-			border-radius: var(--prpl-border-radius);
+			border-radius: var(--prpl-radius-button);
 			background-color: var(--prpl-background-banner);
 			cursor: pointer;
 
@@ -315,9 +317,6 @@
 				align-items: center;
 			}
 
-			--prpl-input-green: #3bb3a6;
-			--prpl-input-gray: #8b99a6;
-
 			/* Hide the default input, because WP has it's own styles (which include pseudo-elements). */
 			.prpl-custom-checkbox input[type="checkbox"],
 			.prpl-custom-radio input[type="radio"] {
@@ -353,7 +352,7 @@
 			.prpl-custom-checkbox {
 
 				.prpl-custom-control {
-					border: 1px solid var(--prpl-input-gray);
+					border: 1px solid var(--prpl-color-selection-controls);
 					border-radius: 6px;
 					background: #fff;
 				}
@@ -362,14 +361,14 @@
 
 					/* Checkbox hover (off) */
 					&:hover + .prpl-custom-control {
-						box-shadow: 0 0 0 2px #f7f8fa, 0 0 0 3px var(--prpl-input-green);
+						box-shadow: 0 0 0 2px #f7f8fa, 0 0 0 3px var(--prpl-color-selection-controls-active);
 					}
 
 					/* Checkbox checked (on) */
 					&:checked + .prpl-custom-control {
-						background: var(--prpl-input-green);
-						border-color: var(--prpl-input-green);
-						box-shadow: 0 0 0 2px #f7f8fa, 0 0 0 3px var(--prpl-input-green);
+						background: var(--prpl-color-selection-controls-active);
+						border-color: var(--prpl-color-selection-controls-active);
+						box-shadow: 0 0 0 2px #f7f8fa, 0 0 0 3px var(--prpl-color-selection-controls-active);
 					}
 				}
 
@@ -398,7 +397,7 @@
 			.prpl-custom-radio {
 
 				.prpl-custom-control {
-					border: 1px solid var(--prpl-input-gray);
+					border: 1px solid var(--prpl-color-selection-controls);
 					border-radius: 50%;
 					background: #fff;
 				}
@@ -407,14 +406,14 @@
 				input[type="radio"] {
 
 					&:hover + .prpl-custom-control {
-						box-shadow: 0 0 0 2px #f7f8fa, 0 0 0 3px var(--prpl-input-green);
+						box-shadow: 0 0 0 2px #f7f8fa, 0 0 0 3px var(--prpl-color-selection-controls-active);
 					}
 
 					/* Radio checked (on) */
 					&:checked + .prpl-custom-control {
-						background: var(--prpl-input-green);
-						border-color: var(--prpl-input-green);
-						box-shadow: 0 0 0 2px #f7f8fa, 0 0 0 3px var(--prpl-input-green);
+						background: var(--prpl-color-selection-controls-active);
+						border-color: var(--prpl-color-selection-controls-active);
+						box-shadow: 0 0 0 2px #f7f8fa, 0 0 0 3px var(--prpl-color-selection-controls-active);
 					}
 				}
 
