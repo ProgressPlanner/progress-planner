@@ -8,6 +8,9 @@
 	--prpl-background-paper: #fff;
 	--prpl-color-border: #d1d5db;
 	--prpl-color-divider: #d1d5db;
+
+	/* Paper border and shadow: a brand sets either to transparent to turn it off */
+	--prpl-color-border-paper: var(--prpl-color-border);
 	--prpl-color-shadow-paper: #000;
 
 	/* Graph */
@@ -97,7 +100,7 @@
 
 	/* Input field dropdown */
 	--prpl-color-field-border: var(--prpl-color-border);
-	--prpl-color-field-shadow: var(--prpl-color-shadow-paper);
+	--prpl-color-field-shadow: #000;
 
 	/* Badge */
 	--prpl-color-icon-missed-badge: var(--prpl-color-alert-error);
