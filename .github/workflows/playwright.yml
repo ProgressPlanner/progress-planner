@@ -16,7 +16,7 @@ on:
 jobs:
   # Main E2E tests using WP Playground (fast, no Docker)
   e2e-tests:
-    runs-on: ubuntu-24.04 # Playwright 1.54 has no Chromium for ubuntu-26.04 (ubuntu-latest since Nov 2026)
+    runs-on: ubuntu-24.04 # Playwright 1.54 has no Chromium for ubuntu-26.04, which ubuntu-latest now is
 
     steps:
       - name: Checkout code
