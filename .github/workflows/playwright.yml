@@ -16,7 +16,7 @@ on:
 jobs:
   # Main E2E tests using WP Playground (fast, no Docker)
   e2e-tests:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04 # Playwright 1.54 has no Chromium for ubuntu-26.04 (ubuntu-latest since Nov 2026)
 
     steps:
       - name: Checkout code
@@ -58,7 +58,7 @@ jobs:
   # Yoast Premium tests require Docker (for Composer/premium plugin installation)
   # Runs in parallel with e2e-tests - Docker spins up while Playground tests run
   yoast-premium-tests:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04 # see e2e-tests
 
     services:
       mysql:
