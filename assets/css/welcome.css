@@ -1,7 +1,7 @@
 .prpl-wrap.prpl-pp-not-accepted {
 	padding: 0;
 	background-color: var(--prpl-background-paper);
-	border: 1px solid var(--prpl-color-border);
+	border: 1px solid var(--prpl-color-border-paper);
 	border-radius: var(--prpl-radius-paper);
 }
 
