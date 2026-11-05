@@ -101,6 +101,8 @@
 	/* Input field dropdown */
 	--prpl-color-field-border: var(--prpl-color-border);
 	--prpl-color-field-shadow: #000;
+	--prpl-color-text-placeholder: #6b7280;
+	--prpl-color-text-dropdown: #374151;
 
 	/* Badge */
 	--prpl-color-icon-missed-badge: var(--prpl-color-alert-error);
