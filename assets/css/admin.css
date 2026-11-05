@@ -126,6 +126,7 @@ body.toplevel_page_progress-planner {
 
 .prpl-wrap select {
 	border-color: var(--prpl-color-field-border);
+	color: var(--prpl-color-text-dropdown);
 
 	/* box-shadow: 1px 2px 4px 0 var(--prpl-color-field-shadow); */
 }
@@ -438,6 +439,12 @@ button.prpl-info-icon {
 .prpl-wrap input[type="search"] {
 	height: 40px;
 	box-shadow: 1px 2px 4px 0 rgba(0, 0, 0, 0.05);
+}
+
+.prpl-wrap input::placeholder,
+.prpl-wrap textarea::placeholder {
+	color: var(--prpl-color-text-placeholder);
+	opacity: 1;
 }
 
 /*------------------------------------*\
