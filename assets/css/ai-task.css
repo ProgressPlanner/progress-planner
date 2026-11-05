@@ -1,0 +1,113 @@
+/**
+ * AI Task Styles
+ *
+ * Styles for AI-powered task execution and display.
+ */
+
+/* AI Task Popover */
+.prpl-popover-ai-task {
+	max-width: 600px;
+}
+
+.prpl-ai-task-content {
+	min-height: 100px;
+}
+
+/* Loading State */
+.prpl-ai-task-loading {
+	text-align: center;
+	padding: 30px 20px;
+}
+
+.prpl-ai-task-loading .prpl-spinner {
+	margin: 0 auto 20px;
+	width: 40px;
+	height: 40px;
+	border: 4px solid #f3f4f6;
+	border-top-color: #534786;
+	border-radius: 50%;
+	animation: prpl-spin 1s linear infinite;
+}
+
+@keyframes prpl-spin {
+
+	to {
+		transform: rotate(360deg);
+	}
+}
+
+.prpl-ai-task-loading p {
+	color: #666;
+	font-size: 14px;
+	margin: 0;
+}
+
+/* Result State */
+.prpl-ai-task-result {
+	padding: 20px;
+	background: #f9fafb;
+	border-radius: 6px;
+	margin-bottom: 20px;
+}
+
+.prpl-ai-task-response {
+	line-height: 1.6;
+	color: #1f2937;
+}
+
+.prpl-ai-task-response p {
+	margin: 0 0 15px 0;
+}
+
+.prpl-ai-task-response p:last-child {
+	margin-bottom: 0;
+}
+
+.prpl-ai-cached-indicator {
+	font-style: italic;
+	border-top: 1px solid #e5e7eb;
+	padding-top: 10px;
+	margin-top: 15px !important;
+}
+
+/* Error State */
+.prpl-ai-task-error {
+	padding: 15px;
+	background: #fef2f2;
+	border: 1px solid #fecaca;
+	border-radius: 6px;
+	margin-bottom: 20px;
+}
+
+.prpl-ai-task-error .prpl-error-message {
+	color: #dc2626;
+	margin: 0;
+	font-size: 14px;
+}
+
+/* Buttons */
+.prpl-ai-task-execute,
+.prpl-ai-task-retry {
+	min-width: 120px;
+}
+
+/* Task List Integration */
+.prpl-suggested-task[data-provider-id="ai-tasks"] {
+	border-left: 3px solid #8b5cf6;
+}
+
+.prpl-suggested-task[data-provider-id="ai-tasks"] .prpl-task-title {
+	color: #7c3aed;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+
+	.prpl-popover-ai-task {
+		max-width: 90vw;
+	}
+
+	.prpl-ai-task-result {
+		padding: 15px;
+	}
+}
