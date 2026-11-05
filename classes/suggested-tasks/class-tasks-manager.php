@@ -42,6 +42,7 @@ use Progress_Planner\Suggested_Tasks\Providers\Improve_Pdf_Handling;
 use Progress_Planner\Suggested_Tasks\Providers\Set_Page_About;
 use Progress_Planner\Suggested_Tasks\Providers\Set_Page_FAQ;
 use Progress_Planner\Suggested_Tasks\Providers\Set_Page_Contact;
+use Progress_Planner\Suggested_Tasks\Providers\Spec_Audit;
 
 /**
  * Tasks_Manager class.
@@ -93,6 +94,7 @@ class Tasks_Manager {
 			new Set_Page_About(),
 			new Set_Page_FAQ(),
 			new Set_Page_Contact(),
+			new Spec_Audit(),
 		];
 
 		// Add the plugin integration.
