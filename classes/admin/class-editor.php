@@ -25,6 +25,12 @@ class Editor {
 	 * @return void
 	 */
 	public function enqueue_editor_script() {
+		// Assigning a page-type is an editorial decision, so require the capability
+		// to edit others' posts. Authors editing their own posts don't get the sidebar.
+		if ( ! \current_user_can( 'edit_others_posts' ) ) {
+			return;
+		}
+
 		$page_types = \progress_planner()->get_page_types()->get_page_types();
 
 		// Check if the page-type is set in the URL (user is coming from the Settings page).
