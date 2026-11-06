@@ -155,7 +155,7 @@ customElements.define(
 				}
 				.progress {
 					height: 100%;
-					background-color: var(--prpl-color-monthly);
+					background: linear-gradient(to right, var(--prpl-color-gradient-start, var(--prpl-color-monthly)), var(--prpl-color-monthly));
 					border-radius: 0.5rem;
 					transition: width 0.4s ease;
 				}

@@ -24,7 +24,7 @@ customElements.define(
 				'maxdeg',
 				'background',
 				'color',
-				'color2',
+				'gradient-start',
 				'start',
 				'cutout',
 				'contentfontsize',
@@ -47,7 +47,8 @@ customElements.define(
 				maxDeg: '180deg',
 				background: 'var(--prpl-background-monthly)',
 				color: 'var(--prpl-color-monthly)',
-				color2: 'var(--prpl-color-monthly-2)',
+				// Empty = start from the brand's --prpl-color-gradient-start, or solid if the brand has none.
+				gradientStart: '',
 				start: '270deg',
 				cutout: '57%',
 				contentFontSize: 'var(--prpl-font-size-6xl)',
@@ -177,7 +178,7 @@ customElements.define(
 				maxDeg,
 				background,
 				color,
-				color2,
+				gradientStart,
 				start,
 				cutout,
 				contentFontSize,
@@ -190,25 +191,12 @@ customElements.define(
 				? 'bottom: 50%;'
 				: 'top: -1em; padding-top: 50%;';
 
-			let colorTransitions;
-
-			// If the progress is less than 50%, we have only one color, no gradient.
-			if ( value / max <= 0.5 ) {
-				colorTransitions = `${ color } calc(${ maxDeg } * ${
-					value / max
-				})`;
-			} else {
-				// Otherwise we show first color for 0.5 and then the second color.
-				colorTransitions = `${ color } calc(${ maxDeg } * ${ 0.5 })`;
-				colorTransitions += `, ${ color2 } calc(${ maxDeg } * ${
-					value / max
-				})`;
-			}
-
-			// Add the remaining color.
-			colorTransitions += `,var(--prpl-color-gauge-remain) calc(${ maxDeg } * ${
-				value / max
-			}) ${ maxDeg }`;
+			// The filled part fades from the start color to the gauge color.
+			// A brand without --prpl-color-gradient-start gets a solid gauge.
+			const startColor =
+				gradientStart || `var(--prpl-color-gradient-start, ${ color })`;
+			const fillDeg = `calc(${ maxDeg } * ${ value / max })`;
+			const colorTransitions = `${ startColor } 0deg, ${ color } ${ fillDeg }, var(--prpl-color-gauge-remain) ${ fillDeg } ${ maxDeg }`;
 
 			this.shadowRoot.innerHTML = `
 		<div style="padding: ${ contentPadding }; background: ${ background }; border-radius:var(--prpl-border-radius-big); aspect-ratio: 2 / 1; overflow: hidden; position: relative; margin-bottom: ${ marginBottom };">
