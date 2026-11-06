@@ -52,11 +52,13 @@
 
 	/* Topics */
 	--prpl-color-monthly: #faa310;
-	--prpl-color-monthly-2: #faa310;
 	--prpl-color-streak: var(--prpl-color-monthly);
 	--prpl-color-content-badge: var(--prpl-color-monthly);
 	--prpl-color-publish: var(--prpl-color-monthly);
 	--prpl-color-flying-start: var(--prpl-color-monthly);
+
+	/* --prpl-color-gradient-start is left unset on purpose: brands that set it get
+	   gradient gauges (start color → topic color); without it gauges are solid. */
 
 	/* Topic backgrounds: 10% of the topic color */
 	--prpl-background-monthly: color-mix(in srgb, var(--prpl-color-monthly) 10%, var(--prpl-background-paper));
