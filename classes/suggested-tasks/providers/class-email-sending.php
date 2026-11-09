@@ -111,6 +111,34 @@ class Email_Sending extends Tasks_Interactive {
 	}
 
 	/**
+	 * Build the test email body.
+	 *
+	 * The body carries two ways to confirm the message arrived: a link, which
+	 * carries the full token and is what a person clicks, and a short code,
+	 * which is what a person can read out to an AI assistant that has no
+	 * access to their mailbox. Both prove the same thing -- that the message
+	 * was delivered -- because neither value exists anywhere the recipient
+	 * could reach without receiving it. See
+	 * Suggested_Tasks::generate_task_confirmation_code() for the reasoning.
+	 *
+	 * @param string $token   The completion token.
+	 * @param int    $user_id The user the token and code belong to.
+	 *
+	 * @return string
+	 */
+	protected function get_email_content( $token, $user_id ) {
+		$code = \progress_planner()->get_suggested_tasks()->generate_task_confirmation_code( $this->get_task_id(), $user_id );
+
+		return \sprintf(
+			/* translators: %1$s: the admin URL, %2$s: the assistant's name, %3$s: a short confirmation code. */
+			\__( 'You just used Progress Planner to verify if sending email works on your website. <br><br> The good news; it does! <a href="%1$s" target="_self">Click here to mark %2$s\'s Recommendation as completed</a>. <br><br> Using an AI assistant? Give it this confirmation code instead: <strong>%3$s</strong>', 'progress-planner' ),
+			\admin_url( 'admin.php?page=progress-planner&prpl_complete_task=' . $this->get_task_id() . '&token=' . $token ),
+			\esc_html( \progress_planner()->get_ui__branding()->get_ravi_name() ),
+			\esc_html( $code )
+		);
+	}
+
+	/**
 	 * Get the troubleshooting guide URL.
 	 *
 	 * @return string
@@ -273,12 +301,7 @@ class Email_Sending extends Tasks_Interactive {
 		$user_id = \get_current_user_id();
 		$token   = \progress_planner()->get_suggested_tasks()->generate_task_completion_token( $this->get_task_id(), $user_id );
 
-		$email_content = \sprintf(
-			// translators: %1$s the admin URL.
-			\__( 'You just used Progress Planner to verify if sending email works on your website. <br><br> The good news; it does! <a href="%1$s" target="_self">Click here to mark %2$s\'s Recommendation as completed</a>.', 'progress-planner' ),
-			\admin_url( 'admin.php?page=progress-planner&prpl_complete_task=' . $this->get_task_id() . '&token=' . $token ),
-			\esc_html( \progress_planner()->get_ui__branding()->get_ravi_name() )
-		);
+		$email_content = $this->get_email_content( $token, $user_id );
 
 		$headers = [ 'Content-Type: text/html; charset=UTF-8' ];
 
