@@ -34,7 +34,7 @@
 	--prpl-background-point: var(--prpl-background-banner);
 	--prpl-text-point: var(--prpl-color-headings);
 	--prpl-background-point-inactive: var(--prpl-color-border);
-	--prpl-text-point-inactive: var(--prpl-color-headings);
+	--prpl-text-point-inactive: var(--prpl-color-text-dropdown);
 
 	/* Border around the points badge; none unless a brand sets it */
 	--prpl-color-border-point: transparent;
