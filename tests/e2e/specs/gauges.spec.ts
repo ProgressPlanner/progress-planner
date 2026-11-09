@@ -124,9 +124,9 @@ test.describe( 'Gauge colors', () => {
 		expect( remain ).not.toBe( '' );
 		expect( stops ).toMatch(
 			new RegExp(
-				`^${ esc( RED ) } 0deg, ${ esc(
-					RED
-				) } 90deg, rgb\\([^)]+\\) 90deg, rgb\\([^)]+\\) 180deg`
+				`^${ esc( RED ) } 0deg, ${ esc( RED ) } ${ deg(
+					90
+				) }, rgb\\([^)]+\\) ${ deg( 90 ) }, rgb\\([^)]+\\) 180deg`
 			)
 		);
 	} );
@@ -141,7 +141,9 @@ test.describe( 'Gauge colors', () => {
 		} );
 		// Starts BLUE, reaches RED exactly where the fill ends (half of 180deg).
 		expect( stops ).toMatch(
-			new RegExp( `^${ esc( BLUE ) } 0deg, ${ esc( RED ) } 90deg, ` )
+			new RegExp(
+				`^${ esc( BLUE ) } 0deg, ${ esc( RED ) } ${ deg( 90 ) }, `
+			)
 		);
 	} );
 
@@ -154,7 +156,9 @@ test.describe( 'Gauge colors', () => {
 			max: 10,
 		} );
 		expect( stops ).toMatch(
-			new RegExp( `^${ esc( BLUE ) } 0deg, ${ esc( RED ) } 180deg, ` )
+			new RegExp(
+				`^${ esc( BLUE ) } 0deg, ${ esc( RED ) } ${ deg( 180 ) }, `
+			)
 		);
 	} );
 
@@ -168,7 +172,9 @@ test.describe( 'Gauge colors', () => {
 			max: 10,
 		} );
 		expect( stops ).toMatch(
-			new RegExp( `^${ esc( GREEN ) } 0deg, ${ esc( RED ) } 54deg, ` )
+			new RegExp(
+				`^${ esc( GREEN ) } 0deg, ${ esc( RED ) } ${ deg( 54 ) }, `
+			)
 		);
 	} );
 
@@ -190,4 +196,15 @@ test.describe( 'Gauge colors', () => {
  */
 function esc( value: string ) {
 	return value.replace( /[.*+?^${}()|[\]\\]/g, '\\$&' );
+}
+
+/**
+ * Pattern for an angle in a computed gradient. Older Chromium versions keep
+ * the calc() around a resolved angle ("calc(90deg)"), newer ones don't.
+ *
+ * @param degrees The angle in degrees.
+ * @return The pattern.
+ */
+function deg( degrees: number ) {
+	return `(?:calc\\()?${ degrees }deg\\)?`;
 }
