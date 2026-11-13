@@ -71,8 +71,7 @@ class Test_API_Get_Stats extends \WP_UnitTestCase {
 
 		$url = \add_query_arg(
 			[
-				'site'        => \get_site_url(),
-				'license_key' => \progress_planner()->get_license_key(),
+				'site' => \get_site_url(),
 			],
 			$url
 		);
@@ -119,7 +118,8 @@ class Test_API_Get_Stats extends \WP_UnitTestCase {
 	 * @return void.
 	 */
 	public function testEndpoint() {
-		$request  = new WP_REST_Request( 'GET', '/progress-planner/v1/get-stats/' . $this->token );
+		$request = new WP_REST_Request( 'GET', '/progress-planner/v1/get-stats' );
+		$request->set_header( 'Authorization', 'Bearer ' . $this->token );
 		$response = $this->server->dispatch( $request );
 
 		// Check if the response is successful.

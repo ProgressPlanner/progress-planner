@@ -145,6 +145,29 @@ class Recommendations_Controller extends \WP_REST_Posts_Controller {
 	}
 
 	/**
+	 * Give plain new to-dos a resolvable provider before WordPress saves them.
+	 *
+	 * @param \WP_REST_Request $request The REST request.
+	 * @return \WP_REST_Response|\WP_Error
+	 */
+	public function create_item( $request ) {
+		if ( empty( $request['prpl_recommendations_provider'] ) ) {
+			$term = \get_term_by( 'slug', 'user', 'prpl_recommendations_provider' );
+			if ( $term ) {
+				$term_id = (int) $term->term_id;
+			} else {
+				$created = \wp_insert_term( 'user', 'prpl_recommendations_provider' );
+				if ( \is_wp_error( $created ) ) {
+					return $created;
+				}
+				$term_id = (int) $created['term_id'];
+			}
+			$request->set_param( 'prpl_recommendations_provider', [ $term_id ] );
+		}
+		return parent::create_item( $request );
+	}
+
+	/**
 	 * Whether a create request is limited to a personal (`user`) to-do: it may
 	 * carry only the `user` provider term (or none) and must not set a slug.
 	 *
