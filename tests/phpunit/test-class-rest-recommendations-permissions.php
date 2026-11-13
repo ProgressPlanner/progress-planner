@@ -260,6 +260,19 @@ class Rest_Recommendations_Permissions_Test extends \WP_UnitTestCase {
 	}
 
 	/**
+	 * A plain to-do without URL metadata still has a valid REST response.
+	 *
+	 * @return void
+	 */
+	public function test_task_response_without_url_metadata() {
+		\wp_set_current_user( self::factory()->user->create( [ 'role' => 'editor' ] ) );
+		$post     = \get_post( $this->task_id );
+		$response = new \WP_REST_Response( [ 'slug' => $post->post_name ] );
+		$response = \progress_planner()->get_suggested_tasks()->rest_prepare_recommendation( $response, $post );
+		$this->assertSame( '', $response->get_data()['meta']['prpl_url'] );
+	}
+
+	/**
 	 * Legitimate flow: an Editor CAN assign the provider taxonomy term, which
 	 * the tightened `assign_terms` capability must not block.
 	 *

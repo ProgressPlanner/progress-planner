@@ -610,7 +610,7 @@ class Suggested_Tasks {
 		if ( $provider ) {
 			$response->data['prpl_provider'] = $provider_term[0];
 			// Link should be added during run time, since it is not added for users without required capability.
-			$response->data['meta']['prpl_url'] = $response->data['meta']['prpl_url'] && $provider->capability_required()
+			$response->data['meta']['prpl_url'] = ! empty( $response->data['meta']['prpl_url'] ) && $provider->capability_required()
 				? \esc_url( (string) $response->data['meta']['prpl_url'] )
 				: '';
 
