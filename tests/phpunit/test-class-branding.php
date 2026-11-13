@@ -80,7 +80,7 @@ class Branding_Test extends \WP_UnitTestCase {
 	 */
 	public function tearDown(): void {
 		\remove_filter( 'pre_http_request', [ $this, 'mock_branding_server' ], 10 );
-		unset( $_GET['pp_branding_id'] );
+		unset( $_GET['pp_branding_id'], $_GET['_pp_branding_nonce'] );
 		\wp_set_current_user( 0 );
 		\progress_planner()->get_utils__cache()->delete_all();
 		parent::tearDown();
@@ -125,7 +125,8 @@ class Branding_Test extends \WP_UnitTestCase {
 	 */
 	private function use_brand(): void {
 		\wp_set_current_user( self::factory()->user->create( [ 'role' => 'administrator' ] ) );
-		$_GET['pp_branding_id'] = (string) self::BRAND_ID;
+		$_GET['pp_branding_id']     = (string) self::BRAND_ID;
+		$_GET['_pp_branding_nonce'] = \wp_create_nonce( 'pp_branding_preview_' . self::BRAND_ID );
 	}
 
 	/**

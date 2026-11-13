@@ -107,7 +107,7 @@ class Base {
 		// `current_user_can()` is only reached on a branded, unlicensed site.
 		if ( ! \wp_doing_cron()
 			&& ! $this->get_license_key()
-			&& 0 !== (int) \progress_planner()->get_ui__branding()->get_branding_id()
+			&& 0 !== (int) \progress_planner()->get_ui__branding()->get_branding_id( false )
 			&& \current_user_can( 'manage_options' )
 		) {
 			$prpl_license_key = \progress_planner()->get_utils__onboard()->make_remote_onboarding_request();

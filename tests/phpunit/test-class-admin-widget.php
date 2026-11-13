@@ -77,8 +77,8 @@ class Admin_Widget_Test extends \WP_UnitTestCase {
 		$this->assertEquals( '-6 months', $this->widget_instance->get_range() );
 
 		// Test with GET parameter.
-		$_GET['range'] = '-1 year';
-		$this->assertEquals( '-1 year', $this->widget_instance->get_range() );
+		$_GET['range'] = '-12 months';
+		$this->assertEquals( '-12 months', $this->widget_instance->get_range() );
 
 		// Clean up.
 		unset( $_GET['range'] );
@@ -125,5 +125,19 @@ class Admin_Widget_Test extends \WP_UnitTestCase {
 		$this->assertStringNotContainsString( '<script>', $result );
 		$this->assertStringNotContainsString( 'alert', $result );
 		unset( $_GET['frequency'] );
+	}
+	/**
+	 * Crafted links cannot request invalid dates or unbounded chart periods.
+	 *
+	 * @return void
+	 */
+	public function test_chart_options_are_bounded() {
+		foreach ( [ '-5000 years', 'invalid date', [], '-1 year' ] as $range ) {
+			$_GET['range'] = $range;
+			$this->assertSame( '-6 months', $this->widget_instance->get_range() );
+		}
+		$_GET['frequency'] = 'daily';
+		$this->assertSame( 'monthly', $this->widget_instance->get_frequency() );
+		unset( $_GET['range'], $_GET['frequency'] );
 	}
 }

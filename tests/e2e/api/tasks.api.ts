@@ -40,19 +40,17 @@ export class TasksApi {
 		// Suppress unused variable warning - cookies kept for future auth needs
 		void this.getAuthCookies();
 
-		const params: Record< string, string > = {};
 		// Use test token from environment or fallback to the value set in blueprint.json
 		const testToken =
 			process.env.PRPL_TEST_TOKEN || '0220a2de67fc29094281088395939f58';
-		params.token = testToken;
 
 		const response = await this.request.get(
 			`${ this.baseUrl }/?rest_route=${ endpoint }`,
 			{
 				headers: {
 					'Content-Type': 'application/json',
+					Authorization: `Bearer ${ testToken }`,
 				},
-				params,
 			}
 		);
 

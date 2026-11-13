@@ -335,6 +335,10 @@ class Suggested_Tasks {
 			\wp_send_json_error( [ 'message' => \esc_html__( 'You do not have permission to complete this task.', 'progress-planner' ) ] );
 		}
 
+		if ( ! \in_array( $action, [ 'complete', 'pending', 'delete' ], true ) ) {
+			\wp_send_json_error( [ 'message' => \esc_html__( 'Invalid task action.', 'progress-planner' ) ] );
+		}
+
 		$updated = false;
 
 		switch ( $action ) {
@@ -358,10 +362,6 @@ class Suggested_Tasks {
 		 * @param bool   $updated Whether the action was successful.
 		 */
 		\do_action( "progress_planner_ajax_task_{$action}", $post_id, $updated );
-
-		if ( ! $updated ) {
-			\wp_send_json_error( [ 'message' => \esc_html__( 'Not saved.', 'progress-planner' ) ] );
-		}
 
 		\wp_send_json_success( [ 'message' => \esc_html__( 'Saved.', 'progress-planner' ) ] );
 	}
@@ -610,7 +610,7 @@ class Suggested_Tasks {
 		if ( $provider ) {
 			$response->data['prpl_provider'] = $provider_term[0];
 			// Link should be added during run time, since it is not added for users without required capability.
-			$response->data['meta']['prpl_url'] = $response->data['meta']['prpl_url'] && $provider->capability_required()
+			$response->data['meta']['prpl_url'] = ! empty( $response->data['meta']['prpl_url'] ) && $provider->capability_required()
 				? \esc_url( (string) $response->data['meta']['prpl_url'] )
 				: '';
 

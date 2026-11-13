@@ -34,38 +34,51 @@ abstract class Base {
 	 * @return string
 	 */
 	protected function get_client_ip() {
-		$ip_keys = [
-			'HTTP_CF_CONNECTING_IP', // Cloudflare.
-			'HTTP_X_REAL_IP',        // Nginx proxy.
-			'HTTP_X_FORWARDED_FOR',  // Standard proxy header.
-			'REMOTE_ADDR',           // Direct connection.
-		];
+		// Forwarded headers are client input unless a trusted proxy normalizes REMOTE_ADDR.
+		$ip = isset( $_SERVER['REMOTE_ADDR'] ) ? \sanitize_text_field( \wp_unslash( $_SERVER['REMOTE_ADDR'] ) ) : '';
+		return \filter_var( $ip, FILTER_VALIDATE_IP ) ? $ip : '0.0.0.0';
+	}
 
-		foreach ( $ip_keys as $key ) {
-			if ( isset( $_SERVER[ $key ] ) && ! empty( $_SERVER[ $key ] ) ) {
-				$ip = \sanitize_text_field( \wp_unslash( $_SERVER[ $key ] ) );
-				// Handle X-Forwarded-For which may contain multiple IPs.
-				if ( \strpos( $ip, ',' ) !== false ) {
-					$ip = \trim( \explode( ',', $ip )[0] );
-				}
-				// Validate IP address.
-				if ( \filter_var( $ip, FILTER_VALIDATE_IP ) ) {
-					return $ip;
-				}
-			}
+	/**
+	 * Authenticate a request using a bearer token, never a URL parameter.
+	 *
+	 * @param \WP_REST_Request $request The REST request.
+	 * @return bool
+	 */
+	public function permissions_check( $request ) {
+		$authorization = $request->get_header( 'authorization' );
+		// Apache may expose Authorization only through its original request headers
+		// when WordPress's rewrite rules have not populated HTTP_AUTHORIZATION.
+		if ( null === $authorization ) {
+			$headers       = \array_change_key_case( $this->get_http_request_headers(), CASE_LOWER );
+			$authorization = $headers['authorization'] ?? null;
 		}
+		return \is_string( $authorization )
+			&& 1 === \preg_match( '/^Bearer ([^\s]+)$/iD', $authorization, $matches )
+			&& $this->validate_token( $matches[1] );
+	}
 
-		return '0.0.0.0';
+	/**
+	 * Read original HTTP headers when the web server exposes them separately.
+	 *
+	 * @return array
+	 */
+	protected function get_http_request_headers() {
+		return \function_exists( 'getallheaders' ) ? \getallheaders() : [];
 	}
 
 	/**
 	 * Validate the token.
 	 *
-	 * @param string $token The token.
+	 * @param mixed $token The token.
 	 *
 	 * @return bool
 	 */
 	public function validate_token( $token ) {
+		if ( ! \is_string( $token ) || '' === $token ) {
+			return false;
+		}
+
 		// Rate limiting: Check for too many failed attempts.
 		$ip_address      = $this->get_client_ip();
 		$rate_limit_key  = 'prpl_api_rate_limit_' . \md5( $ip_address );
@@ -75,8 +88,6 @@ abstract class Base {
 		if ( $failed_attempts >= 10 ) {
 			return false;
 		}
-
-		$token = \str_replace( 'token/', '', $token );
 
 		// Check test token first (use hash_equals to prevent timing attacks).
 		$test_token = \get_option( 'progress_planner_test_token', '' );

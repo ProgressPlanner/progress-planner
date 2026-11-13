@@ -38,9 +38,11 @@ final class Branding {
 	/**
 	 * Get the branding ID.
 	 *
+	 * @param bool $allow_preview Whether to allow an authenticated preview.
+	 *
 	 * @return int
 	 */
-	public function get_branding_id(): int {
+	public function get_branding_id( bool $allow_preview = true ): int {
 		// Check for placeholder demo cookie.
 		if ( \defined( '\IS_PLAYGROUND_PREVIEW' )
 			&& \constant( '\IS_PLAYGROUND_PREVIEW' ) === true
@@ -54,12 +56,15 @@ final class Branding {
 		if ( \defined( 'PROGRESS_PLANNER_BRANDING_ID' ) ) {
 			return \constant( 'PROGRESS_PLANNER_BRANDING_ID' );
 		}
-		// The `pp_branding_id` URL param is a preview seam for branded-host
-		// rendering. Honour it only for administrators, so no lower-privileged
-		// or anonymous visitor can steer the branding ID and thereby trigger the
-		// auto-onboard remote call in `Base::init()` (1.10.0 audit S3).
-		if ( isset( $_GET['pp_branding_id'] ) && \current_user_can( 'manage_options' ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-			return (int) $_GET['pp_branding_id']; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		// A preview must never grant onboarding consent or be selected by a forged link.
+		if ( $allow_preview
+			&& isset( $_GET['pp_branding_id'], $_GET['_pp_branding_nonce'] )
+			&& \is_scalar( $_GET['pp_branding_id'] )
+			&& \is_string( $_GET['_pp_branding_nonce'] )
+			&& \current_user_can( 'manage_options' )
+			&& \wp_verify_nonce( \sanitize_text_field( \wp_unslash( $_GET['_pp_branding_nonce'] ) ), 'pp_branding_preview_' . \absint( $_GET['pp_branding_id'] ) )
+		) {
+			return \absint( $_GET['pp_branding_id'] );
 		}
 
 		$hostname = (string) \gethostname();
@@ -164,7 +169,7 @@ final class Branding {
 	 * @return string
 	 */
 	public function get_custom_css(): string {
-		return (string) ( $this->get_api_data()['css'] ?? '' );
+		return \wp_strip_all_tags( (string) ( $this->get_api_data()['css'] ?? '' ) );
 	}
 
 	/**
@@ -208,7 +213,7 @@ final class Branding {
 			// Inline the SVG: the URL carries a content hash, so a changed icon is a new cache entry.
 			$content = $this->get_remote_data( $admin_menu_icon_url );
 			if ( $content && \is_string( $content ) ) {
-				$svg = $content;
+				$svg = $this->sanitize_svg( $content );
 			}
 		}
 
@@ -221,12 +226,49 @@ final class Branding {
 	}
 
 	/**
+	 * Keep only inert SVG shapes and geometry, with no links, scripts or styles.
+	 *
+	 * @param string $svg Remote SVG markup.
+	 * @return string
+	 */
+	public function sanitize_svg( string $svg ): string {
+		$attributes = \array_fill_keys( [ 'd', 'x', 'y', 'x1', 'x2', 'y1', 'y2', 'cx', 'cy', 'r', 'rx', 'ry', 'width', 'height', 'viewbox', 'points', 'transform', 'fill-rule', 'clip-rule', 'stroke-width' ], true );
+		$allowed    = \array_fill_keys( [ 'svg', 'g', 'path', 'circle', 'ellipse', 'rect', 'line', 'polyline', 'polygon' ], $attributes );
+		// Paint attributes can contain URLs; retain only literal colors.
+		$allowed = \array_map(
+			fn( $attrs ) => \array_merge(
+				$attrs,
+				[
+					'fill'   => true,
+					'stroke' => true,
+				]
+			),
+			$allowed
+		);
+		$svg     = \wp_kses( $svg, $allowed );
+		$tags    = new \WP_HTML_Tag_Processor( $svg );
+		while ( $tags->next_tag() ) {
+			if ( 'SVG' === $tags->get_tag() ) {
+				// Required when the same icon is used as a standalone SVG data URI.
+				$tags->set_attribute( 'xmlns', 'http://www.w3.org/2000/svg' );
+			}
+			foreach ( [ 'fill', 'stroke' ] as $attribute ) {
+				$value = $tags->get_attribute( $attribute );
+				if ( null !== $value && ( ! \is_string( $value ) || ! \preg_match( '/^(?:#[a-f0-9]{3,8}|[a-z]+)$/iD', $value ) ) ) {
+					$tags->remove_attribute( $attribute );
+				}
+			}
+		}
+		return $tags->get_updated_html();
+	}
+
+	/**
 	 * Get the admin-menu name.
 	 *
 	 * @return string
 	 */
 	public function get_admin_menu_name(): string {
-		return (string) ( $this->get_api_data()['admin_menu']['name'] ?? 'Progress Planner' );
+		return \wp_kses_post( (string) ( $this->get_api_data()['admin_menu']['name'] ?? 'Progress Planner' ) );
 	}
 
 	/**
@@ -235,7 +277,7 @@ final class Branding {
 	 * @return string
 	 */
 	public function get_admin_submenu_name(): string {
-		return (string) ( $this->get_api_data()['admin_menu']['submenu'] ?? $this->get_admin_menu_name() );
+		return \wp_kses_post( (string) ( $this->get_api_data()['admin_menu']['submenu'] ?? $this->get_admin_menu_name() ) );
 	}
 
 	/**
@@ -267,6 +309,14 @@ final class Branding {
 	 * @return mixed
 	 */
 	public function get_remote_data( $url ) {
+		// Check before cache access too, so old responses cannot bypass the host restriction.
+		$host = \wp_parse_url( \progress_planner()->get_branding_server_url(), PHP_URL_HOST );
+		if ( ! $host || 'https' !== \wp_parse_url( $url, PHP_URL_SCHEME )
+			|| \strtolower( $host ) !== \strtolower( (string) \wp_parse_url( $url, PHP_URL_HOST ) )
+		) {
+			return false;
+		}
+
 		$cache_key = \md5( $url );
 		$cached    = \progress_planner()->get_utils__cache()->get( $cache_key );
 		// An empty array is a cached failure; only false means a cache miss.
@@ -274,7 +324,7 @@ final class Branding {
 			return $cached;
 		}
 
-		$response = \wp_remote_get( $url );
+		$response = \wp_safe_remote_get( $url, [ 'redirection' => 0 ] );
 		if ( \is_wp_error( $response ) ) {
 			\progress_planner()->get_utils__cache()->set( $cache_key, [], 5 * MINUTE_IN_SECONDS );
 			return false;
@@ -317,7 +367,7 @@ final class Branding {
 	 * @return string
 	 */
 	public function get_widget_title( $widget_id, $default_value = '' ) {
-		return (string) ( $this->get_api_data()['widget_titles'][ $widget_id ] ?? $default_value );
+		return \wp_kses_post( (string) ( $this->get_api_data()['widget_titles'][ $widget_id ] ?? $default_value ) );
 	}
 
 	/**

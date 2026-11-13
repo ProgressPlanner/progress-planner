@@ -13,8 +13,9 @@
  *   leaking pending-update state, draft titles, the active SEO plugin, etc.
  *
  * The fix requires `edit_others_posts` (the plugin's own UI gate) for every
- * read and write operation on the endpoint. Editors and admins keep full
- * access; everyone below is rejected.
+ * read and write operation on the endpoint. Each task also requires its
+ * provider's capability; editors can manage user to-dos, while administrator
+ * tasks remain restricted to administrators.
  *
  * @package Progress_Planner\Tests
  */
@@ -45,11 +46,11 @@ class Rest_Recommendations_Permissions_Test extends \WP_UnitTestCase {
 		$wp_rest_server = new \WP_REST_Server();
 		\do_action( 'rest_api_init' );
 
-		$this->task_id = self::factory()->post->create(
+		$this->task_id = \progress_planner()->get_suggested_tasks_db()->add(
 			[
-				'post_type'   => 'prpl_recommendations',
-				'post_title'  => 'Perform all updates',
-				'post_name'   => 'update-core-202638',
+				'provider_id' => 'user',
+				'post_title'  => 'Review the site content',
+				'task_id'     => 'user-review-content',
 				'post_status' => 'publish',
 			]
 		);
@@ -250,9 +251,25 @@ class Rest_Recommendations_Permissions_Test extends \WP_UnitTestCase {
 		);
 		$this->assertSame( 201, $create->get_status(), 'editor create should be allowed' );
 		$new_id = $create->get_data()['id'];
+		$this->assertTrue( \has_term( 'user', 'prpl_recommendations_provider', $new_id ) );
+		$read = $this->request_as( $editor, 'GET', '/wp/v2/prpl_recommendations/' . $new_id );
+		$this->assertSame( 200, $read->get_status(), 'new to-do should be readable' );
 
 		$delete = $this->request_as( $editor, 'DELETE', '/wp/v2/prpl_recommendations/' . $new_id, [ 'force' => true ] );
 		$this->assertSame( 200, $delete->get_status(), 'editor delete of own task should be allowed' );
+	}
+
+	/**
+	 * A plain to-do without URL metadata still has a valid REST response.
+	 *
+	 * @return void
+	 */
+	public function test_task_response_without_url_metadata() {
+		\wp_set_current_user( self::factory()->user->create( [ 'role' => 'editor' ] ) );
+		$post     = \get_post( $this->task_id );
+		$response = new \WP_REST_Response( [ 'slug' => $post->post_name ] );
+		$response = \progress_planner()->get_suggested_tasks()->rest_prepare_recommendation( $response, $post );
+		$this->assertSame( '', $response->get_data()['meta']['prpl_url'] );
 	}
 
 	/**
