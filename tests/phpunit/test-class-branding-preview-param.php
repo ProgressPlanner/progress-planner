@@ -1,13 +1,7 @@
 <?php
 /**
- * Test that the `pp_branding_id` preview URL param is honoured only for
- * logged-in users.
- *
- * Regression test for the 1.10.0 release audit finding S3: an anonymous
- * visitor could set `?pp_branding_id=N` to force a non-zero branding ID,
- * which in turn could trigger the auto-onboard remote call and a stored
- * license key in `Base::init()`. The param is a preview seam and must only
- * be honoured for logged-in users.
+ * Test that branding previews require an administrator and a nonce, and never
+ * select branding for automatic onboarding.
  *
  * @package Progress_Planner\Tests
  */
@@ -25,7 +19,7 @@ class Branding_Preview_Param_Test extends \WP_UnitTestCase {
 	 * @return void
 	 */
 	public function tearDown(): void {
-		unset( $_GET['pp_branding_id'] );
+		unset( $_GET['pp_branding_id'], $_GET['_pp_branding_nonce'] );
 		\wp_set_current_user( 0 );
 		parent::tearDown();
 	}
@@ -49,14 +43,15 @@ class Branding_Preview_Param_Test extends \WP_UnitTestCase {
 	}
 
 	/**
-	 * A logged-in admin can still use the param to preview branding.
+	 * An administrator can use a signed URL to preview branding.
 	 *
 	 * @return void
 	 */
 	public function test_logged_in_admin_param_is_honoured() {
 		$admin = self::factory()->user->create( [ 'role' => 'administrator' ] );
 		\wp_set_current_user( $admin );
-		$_GET['pp_branding_id'] = '4958';
+		$_GET['pp_branding_id']     = '4958';
+		$_GET['_pp_branding_nonce'] = \wp_create_nonce( 'pp_branding_preview_4958' );
 
 		$branding_id = \progress_planner()->get_ui__branding()->get_branding_id();
 
@@ -82,5 +77,21 @@ class Branding_Preview_Param_Test extends \WP_UnitTestCase {
 		$branding_id = \progress_planner()->get_ui__branding()->get_branding_id();
 
 		$this->assertSame( 0, $branding_id, 'a subscriber must not be able to set pp_branding_id' );
+	}
+	/**
+	 * An unsigned admin link cannot select branding or grant onboarding consent.
+	 *
+	 * @return void
+	 */
+	public function test_admin_preview_requires_nonce_and_never_auto_onboards() {
+		\wp_set_current_user( self::factory()->user->create( [ 'role' => 'administrator' ] ) );
+		$_GET['pp_branding_id'] = '4958';
+		$branding               = \progress_planner()->get_ui__branding();
+		$this->assertSame( 0, $branding->get_branding_id() );
+		$_GET['_pp_branding_nonce'] = \wp_create_nonce( 'pp_branding_preview_4958' );
+		$this->assertSame( 4958, $branding->get_branding_id() );
+		$this->assertSame( 0, $branding->get_branding_id( false ) );
+		$_GET['pp_branding_id'] = '5938';
+		$this->assertSame( 0, $branding->get_branding_id() );
 	}
 }

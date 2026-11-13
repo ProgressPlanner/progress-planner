@@ -453,6 +453,10 @@ class Remove_Terms_Without_Posts extends Tasks_Interactive {
 			\wp_send_json_error( [ 'message' => \esc_html__( 'Term not found.', 'progress-planner' ) ] );
 		}
 
+		if ( ! \current_user_can( 'delete_term', $term_id ) ) {
+			\wp_send_json_error( [ 'message' => \esc_html__( 'You do not have permission to delete terms.', 'progress-planner' ) ] );
+		}
+
 		// Only public taxonomies are tracked by this task, mirroring the check in
 		// maybe_remove_irrelevant_tasks().
 		$taxonomy_object = \get_taxonomy( $taxonomy );

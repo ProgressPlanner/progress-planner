@@ -28,13 +28,7 @@ class Tasks extends Base {
 				[
 					'methods'             => 'GET',
 					'callback'            => [ $this, 'get_tasks' ],
-					'permission_callback' => '__return_true',
-					'args'                => [
-						'token' => [
-							'required'          => true,
-							'validate_callback' => [ $this, 'validate_token' ],
-						],
-					],
+					'permission_callback' => [ $this, 'permissions_check' ],
 				],
 			]
 		);

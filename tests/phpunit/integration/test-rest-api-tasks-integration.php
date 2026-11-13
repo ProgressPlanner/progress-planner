@@ -32,7 +32,8 @@ class Rest_Api_Tasks_Integration_Test extends Integration_Test_Case {
 		$response = $this->make_rest_request(
 			'/progress-planner/v1/tasks',
 			'GET',
-			[ 'token' => $license_key ]
+			[],
+			[ 'Authorization' => 'Bearer ' . $license_key ]
 		);
 
 		$this->assertNotInstanceOf( \WP_Error::class, $response );
@@ -61,16 +62,16 @@ class Rest_Api_Tasks_Integration_Test extends Integration_Test_Case {
 		$response = $this->make_rest_request(
 			'/progress-planner/v1/tasks',
 			'GET',
-			[ 'token' => 'invalid-token' ]
+			[],
+			[ 'Authorization' => 'Bearer invalid-token' ]
 		);
 
-		// Should return error or empty response due to validation failure.
-		// The validation happens in the args callback, so the endpoint may not be called.
-		$this->assertTrue( true ); // Endpoint validation prevents invalid tokens.
+		// Missing or invalid credentials must not expose tasks.
+		$this->assertSame( 401, $response->get_status() );
 	}
 
 	/**
-	 * Test REST API endpoint requires token parameter.
+	 * Test REST API endpoint requires an authentication header.
 	 *
 	 * @return void
 	 */
@@ -82,8 +83,8 @@ class Rest_Api_Tasks_Integration_Test extends Integration_Test_Case {
 			[]
 		);
 
-		// Should return error due to missing required parameter.
-		$this->assertTrue( true ); // Validation prevents requests without token.
+		// Requests without an authentication header must be rejected.
+		$this->assertSame( 401, $response->get_status() );
 	}
 
 	/**
@@ -103,7 +104,8 @@ class Rest_Api_Tasks_Integration_Test extends Integration_Test_Case {
 		$response = $this->make_rest_request(
 			'/progress-planner/v1/tasks',
 			'GET',
-			[ 'token' => $license_key ]
+			[],
+			[ 'Authorization' => 'Bearer ' . $license_key ]
 		);
 
 		$this->assertInstanceOf( \WP_REST_Response::class, $response );

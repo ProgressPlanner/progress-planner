@@ -33,7 +33,7 @@ class Rest_Base_Test extends \WP_UnitTestCase {
 	}
 
 	/**
-	 * Test get_client_ip with Cloudflare header.
+	 * Test get_client_ip ignores an untrusted Cloudflare header.
 	 *
 	 * @return void
 	 */
@@ -49,11 +49,11 @@ class Rest_Base_Test extends \WP_UnitTestCase {
 
 		$ip = $method->invoke( $this->rest_instance );
 
-		$this->assertEquals( '192.168.1.100', $ip );
+		$this->assertEquals( '0.0.0.0', $ip );
 	}
 
 	/**
-	 * Test get_client_ip with X-Real-IP header.
+	 * Test get_client_ip ignores an untrusted X-Real-IP header.
 	 *
 	 * @return void
 	 */
@@ -69,7 +69,7 @@ class Rest_Base_Test extends \WP_UnitTestCase {
 
 		$ip = $method->invoke( $this->rest_instance );
 
-		$this->assertEquals( '192.168.1.101', $ip );
+		$this->assertEquals( '0.0.0.0', $ip );
 	}
 
 	/**
@@ -89,7 +89,7 @@ class Rest_Base_Test extends \WP_UnitTestCase {
 
 		$ip = $method->invoke( $this->rest_instance );
 
-		$this->assertEquals( '192.168.1.102', $ip );
+		$this->assertEquals( '0.0.0.0', $ip );
 	}
 
 	/**
@@ -109,7 +109,7 @@ class Rest_Base_Test extends \WP_UnitTestCase {
 
 		$ip = $method->invoke( $this->rest_instance );
 
-		$this->assertEquals( '192.168.1.103', $ip );
+		$this->assertEquals( '0.0.0.0', $ip );
 	}
 
 	/**
@@ -250,7 +250,7 @@ class Rest_Base_Test extends \WP_UnitTestCase {
 	}
 
 	/**
-	 * Test validate_token with token containing "token/" prefix.
+	 * Token validation compares the entire bearer token, including any prefix.
 	 *
 	 * @return void
 	 */
@@ -270,7 +270,7 @@ class Rest_Base_Test extends \WP_UnitTestCase {
 
 		$result = $this->rest_instance->validate_token( $token );
 
-		$this->assertTrue( $result );
+		$this->assertFalse( $result );
 	}
 
 	/**

@@ -268,8 +268,7 @@ const PrplLessonItemsHTML = () => {
 		if ( ! editor || typeof editor.getEditedPostAttribute !== 'function' ) {
 			return '';
 		}
-		const meta = editor.getEditedPostAttribute( 'meta' );
-		return meta ? meta.progress_planner_page_todos : '';
+		return editor.getEditedPostAttribute( 'progress_planner_page_todos' ) || '';
 	}, [] );
 	const pageTodos = pageTodosMeta || '';
 
@@ -596,9 +595,7 @@ const PrplCheckListItem = ( item, pageTodos ) =>
 						typeof editorDispatch.editPost === 'function'
 					) {
 						editorDispatch.editPost( {
-							meta: {
-								progress_planner_page_todos: toDos.join( ',' ),
-							},
+							progress_planner_page_todos: toDos.join( ',' ),
 						} );
 					}
 				}

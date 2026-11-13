@@ -13,7 +13,6 @@
  * @param {string} licenseKey The license key.
  */
 const progressPlannerSaveLicenseKey = ( licenseKey ) => {
-	console.log( 'License key: ' + licenseKey );
 	return progressPlannerAjaxRequest( {
 		url: progressPlanner.ajaxUrl,
 		data: {

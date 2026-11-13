@@ -27,9 +27,10 @@ class Rest_Api_Stats_Integration_Test extends Integration_Test_Case {
 
 		// Make REST API request.
 		$response = $this->make_rest_request(
-			'/progress-planner/v1/get-stats/' . $license_key,
+			'/progress-planner/v1/get-stats',
 			'GET',
-			[]
+			[],
+			[ 'Authorization' => 'Bearer ' . $license_key ]
 		);
 
 		$this->assertNotInstanceOf( \WP_Error::class, $response );
@@ -58,13 +59,14 @@ class Rest_Api_Stats_Integration_Test extends Integration_Test_Case {
 
 		// Make REST API request with invalid token.
 		$response = $this->make_rest_request(
-			'/progress-planner/v1/get-stats/invalid-token',
+			'/progress-planner/v1/get-stats',
 			'GET',
-			[]
+			[],
+			[ 'Authorization' => 'Bearer invalid-token' ]
 		);
 
 		// Should return error due to validation failure.
-		$this->assertTrue( true ); // Endpoint validation prevents invalid tokens.
+		$this->assertSame( 401, $response->get_status() );
 	}
 
 	/**
@@ -84,9 +86,10 @@ class Rest_Api_Stats_Integration_Test extends Integration_Test_Case {
 		);
 
 		$response = $this->make_rest_request(
-			'/progress-planner/v1/get-stats/' . $license_key,
+			'/progress-planner/v1/get-stats',
 			'GET',
-			[]
+			[],
+			[ 'Authorization' => 'Bearer ' . $license_key ]
 		);
 
 		$this->assertInstanceOf( \WP_REST_Response::class, $response );

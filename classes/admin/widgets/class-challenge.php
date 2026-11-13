@@ -90,8 +90,7 @@ final class Challenge extends Widget {
 	public function get_remote_api_url() {
 		return \add_query_arg(
 			[
-				'license_key' => \progress_planner()->get_license_key(),
-				'site'        => \get_site_url(),
+				'site' => \get_site_url(),
 			],
 			\progress_planner()->get_remote_server_root_url() . '/wp-json/progress-planner-saas/v1/challenges'
 		);

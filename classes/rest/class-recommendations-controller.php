@@ -46,7 +46,7 @@ class Recommendations_Controller extends \WP_REST_Posts_Controller {
 	 * as `update-core` requires `update_core`, so an editor cannot read, trash
 	 * or delete it over REST even though they clear the surface-level
 	 * `edit_others_posts` gate (audit S1, review gap 2). Tasks whose provider
-	 * cannot be resolved fall back to the surface gate.
+	 * cannot be resolved are denied.
 	 *
 	 * @param \WP_REST_Request $request The REST request.
 	 *
@@ -55,17 +55,17 @@ class Recommendations_Controller extends \WP_REST_Posts_Controller {
 	protected function current_user_can_manage_requested_task( $request ) {
 		$post = $this->get_post( $request['id'] );
 		if ( \is_wp_error( $post ) ) {
-			return true;
+			return false;
 		}
 
 		$task = \progress_planner()->get_suggested_tasks_db()->get_post( $post->ID );
 		if ( ! $task ) {
-			return true;
+			return false;
 		}
 
 		$provider = \progress_planner()->get_suggested_tasks()->get_tasks_manager()->get_task_provider( $task->get_provider_id() );
 		if ( ! $provider ) {
-			return true;
+			return false;
 		}
 
 		return (bool) $provider->capability_required();
@@ -192,6 +192,29 @@ class Recommendations_Controller extends \WP_REST_Posts_Controller {
 			|| ! $this->current_user_can_manage_requested_task( $request )
 		) {
 			return $this->forbidden_error();
+		}
+		// Task identity is immutable for non-admins, including when they can edit its content.
+		if ( ! \current_user_can( 'manage_options' ) ) {
+			$post = $this->get_post( $request['id'] );
+			if ( \is_wp_error( $post ) ) {
+				return $this->forbidden_error();
+			}
+			if ( $request->has_param( 'slug' ) && $request['slug'] !== $post->post_name ) {
+				return $this->forbidden_error();
+			}
+			if ( $request->has_param( 'prpl_recommendations_provider' ) ) {
+				$existing = \wp_get_object_terms( $post->ID, 'prpl_recommendations_provider', [ 'fields' => 'ids' ] );
+				if ( \is_wp_error( $existing ) ) {
+					return $this->forbidden_error();
+				}
+				$requested = \array_map( 'intval', (array) $request['prpl_recommendations_provider'] );
+				$existing  = \array_map( 'intval', $existing );
+				\sort( $requested );
+				\sort( $existing );
+				if ( $requested !== $existing ) {
+					return $this->forbidden_error();
+				}
+			}
 		}
 		return parent::update_item_permissions_check( $request );
 	}

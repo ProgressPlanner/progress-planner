@@ -56,9 +56,8 @@ class Lessons {
 		$url = \progress_planner()->get_remote_server_root_url() . '/wp-json/progress-planner-saas/v1/lessons';
 		$url = \add_query_arg(
 			[
-				'site'        => \get_site_url(),
-				'license_key' => \progress_planner()->get_license_key(),
-				'locale'      => \apply_filters( 'prpl_lesson_locale', \get_locale() ),
+				'site'   => \get_site_url(),
+				'locale' => \apply_filters( 'prpl_lesson_locale', \get_locale() ),
 			],
 			$url
 		);
@@ -67,7 +66,7 @@ class Lessons {
 
 		$cached = \progress_planner()->get_utils__cache()->get( $cache_key );
 		if ( \is_array( $cached ) ) {
-			return $cached;
+			return $this->sanitize_items( $cached );
 		}
 
 		$response = \wp_remote_get( $url );
@@ -94,7 +93,48 @@ class Lessons {
 		// Cache successful response for one week.
 		\progress_planner()->get_utils__cache()->set( $cache_key, $json, WEEK_IN_SECONDS );
 
-		return $json;
+		return $this->sanitize_items( $json );
+	}
+
+	/**
+	 * Sanitize remote content on every read, including previously cached lessons.
+	 *
+	 * @param array $items Lesson data.
+	 * @return array
+	 */
+	public function sanitize_items( array $items ): array {
+		foreach ( $items as $key => $value ) {
+			if ( \is_array( $value ) ) {
+				$items[ $key ] = $this->sanitize_items( $value );
+			} elseif ( \is_string( $value ) ) {
+				$items[ $key ] = 'video' === $key ? $this->sanitize_video( $value ) : \wp_kses_post( $value );
+			}
+		}
+		return $items;
+	}
+
+	/**
+	 * Allow video embeds only from known video players, without active attributes.
+	 *
+	 * @param string $html Video markup.
+	 * @return string
+	 */
+	public function sanitize_video( string $html ): string {
+		$allowed           = \wp_kses_allowed_html( 'post' );
+		$allowed['iframe'] = \array_fill_keys( [ 'src', 'title', 'width', 'height', 'allowfullscreen', 'frameborder' ], true );
+		$html              = \wp_kses( $html, $allowed );
+		$tags              = new \WP_HTML_Tag_Processor( $html );
+		while ( $tags->next_tag( 'iframe' ) ) {
+			$src  = $tags->get_attribute( 'src' );
+			$host = \is_string( $src ) ? \wp_parse_url( $src, PHP_URL_HOST ) : '';
+			if ( ! \is_string( $src ) || 'https' !== \wp_parse_url( $src, PHP_URL_SCHEME )
+				|| ! \in_array( \strtolower( (string) $host ), [ 'www.youtube.com', 'www.youtube-nocookie.com', 'player.vimeo.com', 'iframe.mediadelivery.net' ], true )
+			) {
+				$tags->remove_attribute( 'src' );
+			}
+			$tags->set_attribute( 'sandbox', 'allow-scripts allow-same-origin allow-presentation' );
+		}
+		return $tags->get_updated_html();
 	}
 
 	/**

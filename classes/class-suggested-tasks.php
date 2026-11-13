@@ -335,6 +335,10 @@ class Suggested_Tasks {
 			\wp_send_json_error( [ 'message' => \esc_html__( 'You do not have permission to complete this task.', 'progress-planner' ) ] );
 		}
 
+		if ( ! \in_array( $action, [ 'complete', 'pending', 'delete' ], true ) ) {
+			\wp_send_json_error( [ 'message' => \esc_html__( 'Invalid task action.', 'progress-planner' ) ] );
+		}
+
 		$updated = false;
 
 		switch ( $action ) {
@@ -358,10 +362,6 @@ class Suggested_Tasks {
 		 * @param bool   $updated Whether the action was successful.
 		 */
 		\do_action( "progress_planner_ajax_task_{$action}", $post_id, $updated );
-
-		if ( ! $updated ) {
-			\wp_send_json_error( [ 'message' => \esc_html__( 'Not saved.', 'progress-planner' ) ] );
-		}
 
 		\wp_send_json_success( [ 'message' => \esc_html__( 'Saved.', 'progress-planner' ) ] );
 	}

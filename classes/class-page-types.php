@@ -54,15 +54,22 @@ class Page_Types {
 			self::TAXONOMY_NAME,
 			\array_keys( \get_post_types( [ 'public' => true ] ) ),
 			[
-				'public'            => false,
-				'hierarchical'      => false,
-				'labels'            => [], // Hidden taxonomy, no need for labels.
-				'show_ui'           => false,
-				'show_admin_column' => false,
-				'query_var'         => true,
-				'rewrite'           => [ 'slug' => 'site-type' ],
-				'show_in_rest'      => true,
-				'show_in_menu'      => false,
+				'public'                => false,
+				'hierarchical'          => false,
+				'labels'                => [], // Hidden taxonomy, no need for labels.
+				'show_ui'               => false,
+				'show_admin_column'     => false,
+				'query_var'             => true,
+				'rewrite'               => [ 'slug' => 'site-type' ],
+				'show_in_rest'          => true,
+				'rest_controller_class' => \Progress_Planner\Rest\Page_Types_Controller::class,
+				'capabilities'          => [
+					'manage_terms' => 'manage_options',
+					'edit_terms'   => 'manage_options',
+					'delete_terms' => 'manage_options',
+					'assign_terms' => 'edit_posts',
+				],
+				'show_in_menu'          => false,
 			]
 		);
 	}
