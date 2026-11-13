@@ -47,9 +47,24 @@ abstract class Base {
 	 */
 	public function permissions_check( $request ) {
 		$authorization = $request->get_header( 'authorization' );
+		// Apache may expose Authorization only through its original request headers
+		// when WordPress's rewrite rules have not populated HTTP_AUTHORIZATION.
+		if ( null === $authorization ) {
+			$headers       = \array_change_key_case( $this->get_http_request_headers(), CASE_LOWER );
+			$authorization = $headers['authorization'] ?? null;
+		}
 		return \is_string( $authorization )
 			&& 1 === \preg_match( '/^Bearer ([^\s]+)$/iD', $authorization, $matches )
 			&& $this->validate_token( $matches[1] );
+	}
+
+	/**
+	 * Read original HTTP headers when the web server exposes them separately.
+	 *
+	 * @return array
+	 */
+	protected function get_http_request_headers() {
+		return \function_exists( 'getallheaders' ) ? \getallheaders() : [];
 	}
 
 	/**

@@ -33,6 +33,47 @@ class Rest_Base_Test extends \WP_UnitTestCase {
 	}
 
 	/**
+	 * Apache's original headers authenticate only when REST has no header.
+	 *
+	 * @return void
+	 */
+	public function test_original_authorization_header_fallback() {
+		\update_option( 'progress_planner_license_key', 'fixture-license' );
+		\delete_transient( 'prpl_api_rate_limit_' . \md5( '0.0.0.0' ) );
+		unset( $_SERVER['REMOTE_ADDR'] );
+		$api = $this->getMockBuilder( Tasks::class )
+			->disableOriginalConstructor()
+			->onlyMethods( [ 'get_http_request_headers' ] )
+			->getMock();
+		$api->method( 'get_http_request_headers' )->willReturn( [ 'aUtHoRiZaTiOn' => 'Bearer fixture-license' ] );
+		$request = new \WP_REST_Request( 'GET', '/progress-planner/v1/tasks' );
+		$this->assertTrue( $api->permissions_check( $request ) );
+		$request->set_header( 'Authorization', 'Bearer wrong-key' );
+		$this->assertFalse( $api->permissions_check( $request ) );
+	}
+
+	/**
+	 * A raw header fallback still rejects a bad token and URL credentials.
+	 *
+	 * @return void
+	 */
+	public function test_original_headers_do_not_bypass_token_validation() {
+		\update_option( 'progress_planner_license_key', 'fixture-license' );
+		$api = $this->getMockBuilder( Tasks::class )
+			->disableOriginalConstructor()
+			->onlyMethods( [ 'get_http_request_headers' ] )
+			->getMock();
+		$api->method( 'get_http_request_headers' )->willReturnOnConsecutiveCalls(
+			[ 'Authorization' => 'Bearer wrong-key' ],
+			[]
+		);
+		$request = new \WP_REST_Request( 'GET', '/progress-planner/v1/tasks' );
+		$request->set_param( 'token', 'fixture-license' );
+		$this->assertFalse( $api->permissions_check( $request ) );
+		$this->assertFalse( $api->permissions_check( $request ) );
+	}
+
+	/**
 	 * Test get_client_ip ignores an untrusted Cloudflare header.
 	 *
 	 * @return void
