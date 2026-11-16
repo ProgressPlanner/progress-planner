@@ -376,9 +376,14 @@ final class Branding {
 	 * @return mixed
 	 */
 	public function get_remote_data( $url ) {
-		// Check before cache access too, so old responses cannot bypass the host restriction.
-		$host = \wp_parse_url( \progress_planner()->get_branding_server_url(), PHP_URL_HOST );
-		if ( ! $host || 'https' !== \wp_parse_url( $url, PHP_URL_SCHEME )
+		// Only fetch from the configured branding server (scheme and host), so a URL in
+		// the remote brand document cannot point anywhere else. Checked before cache
+		// access too, so old responses cannot bypass the restriction.
+		$server = \progress_planner()->get_branding_server_url();
+		$host   = \wp_parse_url( $server, PHP_URL_HOST );
+		$scheme = \wp_parse_url( $server, PHP_URL_SCHEME );
+		if ( ! $host || ! $scheme
+			|| \strtolower( $scheme ) !== \strtolower( (string) \wp_parse_url( $url, PHP_URL_SCHEME ) )
 			|| \strtolower( $host ) !== \strtolower( (string) \wp_parse_url( $url, PHP_URL_HOST ) )
 		) {
 			return false;
@@ -391,7 +396,9 @@ final class Branding {
 			return $cached;
 		}
 
-		$response = \wp_safe_remote_get( $url, [ 'redirection' => 0 ] );
+		// Not wp_safe_remote_get(): the host is pinned above to the site owner's own
+		// configuration, which may be a local or private development server.
+		$response = \wp_remote_get( $url, [ 'redirection' => 0 ] );
 		if ( \is_wp_error( $response ) ) {
 			\progress_planner()->get_utils__cache()->set( $cache_key, [], 5 * MINUTE_IN_SECONDS );
 			return false;

@@ -155,6 +155,34 @@ class Security_Review_Test extends \WP_UnitTestCase {
 	}
 
 	/**
+	 * Requests to the configured remote and branding servers allow local development hosts.
+	 *
+	 * @return void
+	 */
+	public function test_configured_servers_allow_local_hosts() {
+		$requests = [];
+		$mock     = function ( $response, $args, $url ) use ( &$requests ) {
+			$requests[ $url ] = $args;
+			return [
+				'response' => [ 'code' => 200 ],
+				'body'     => '{}',
+			];
+		};
+		\add_filter( 'pre_http_request', $mock, 20, 3 );
+		try {
+			\progress_planner()->get_utils__onboard()->make_remote_onboarding_request( [ 'nonce' => 'fixture' ] );
+			\progress_planner()->get_ui__branding()->get_remote_data( \progress_planner()->get_branding_server_url() . '/v1/brands/local-test.json' );
+		} finally {
+			\remove_filter( 'pre_http_request', $mock, 20 );
+		}
+		$this->assertCount( 2, $requests );
+		foreach ( $requests as $args ) {
+			$this->assertEmpty( $args['reject_unsafe_urls'] );
+			$this->assertSame( 0, $args['redirection'] );
+		}
+	}
+
+	/**
 	 * Onboarding retries authenticate with the current key without forwarding it on redirects.
 	 *
 	 * @return void
