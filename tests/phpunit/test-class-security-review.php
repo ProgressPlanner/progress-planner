@@ -270,6 +270,34 @@ class Security_Review_Test extends \WP_UnitTestCase {
 	}
 
 	/**
+	 * Plain-text lesson fields keep their characters; only HTML fields keep markup.
+	 *
+	 * @return void
+	 */
+	public function test_lesson_text_fields_are_not_html_encoded() {
+		$data = ( new \Progress_Planner\Lessons() )->sanitize_items(
+			[
+				[
+					'name'     => 'Terms & Conditions',
+					'settings' => [
+						'id'    => 'terms-&-conditions',
+						'title' => 'Terms & <script>alert(1)</script>Conditions',
+					],
+					'intro'    => [
+						'heading' => 'Q&A <b>now</b>',
+						'text'    => '<p>Read &amp; <strong>learn</strong></p>',
+					],
+				],
+			]
+		);
+		$this->assertSame( 'Terms & Conditions', $data[0]['name'] );
+		$this->assertSame( 'terms-&-conditions', $data[0]['settings']['id'] );
+		$this->assertSame( 'Terms & Conditions', $data[0]['settings']['title'] );
+		$this->assertSame( 'Q&A now', $data[0]['intro']['heading'] );
+		$this->assertSame( '<p>Read &amp; <strong>learn</strong></p>', $data[0]['intro']['text'] );
+	}
+
+	/**
 	 * Inert icon structure survives sanitizing, including case-sensitive XML names.
 	 *
 	 * @return void

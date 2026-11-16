@@ -15,6 +15,11 @@ namespace Progress_Planner;
 class Lessons {
 
 	/**
+	 * Lesson fields that contain HTML; every other string field is plain text.
+	 */
+	private const HTML_FIELDS = [ 'text', 'todo_description' ];
+
+	/**
 	 * The ID for this API object.
 	 *
 	 * @var string
@@ -99,6 +104,9 @@ class Lessons {
 	/**
 	 * Sanitize remote content on every read, including previously cached lessons.
 	 *
+	 * Only fields that carry markup keep (filtered) HTML. Everything else is plain
+	 * text: running it through kses would HTML-encode `&` in names and IDs.
+	 *
 	 * @param array $items Lesson data.
 	 * @return array
 	 */
@@ -107,7 +115,13 @@ class Lessons {
 			if ( \is_array( $value ) ) {
 				$items[ $key ] = $this->sanitize_items( $value );
 			} elseif ( \is_string( $value ) ) {
-				$items[ $key ] = 'video' === $key ? $this->sanitize_video( $value ) : \wp_kses_post( $value );
+				if ( 'video' === $key ) {
+					$items[ $key ] = $this->sanitize_video( $value );
+				} elseif ( \in_array( $key, self::HTML_FIELDS, true ) ) {
+					$items[ $key ] = \wp_kses_post( $value );
+				} else {
+					$items[ $key ] = \sanitize_text_field( $value );
+				}
 			}
 		}
 		return $items;
