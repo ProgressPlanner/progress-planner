@@ -89,19 +89,19 @@ class Security_Review_Test extends \WP_UnitTestCase {
 	}
 
 	/**
-	 * Bearer authentication works without credentials in the URL.
+	 * Header authentication works without credentials in the URL.
 	 *
 	 * @return void
 	 */
-	public function test_bearer_authentication() {
+	public function test_token_header_authentication() {
 		\update_option( 'progress_planner_license_key', 'fixture-license' );
 		\wp_set_current_user( 0 );
 		foreach ( [ '/tasks', '/get-stats' ] as $endpoint ) {
 			$request = new \WP_REST_Request( 'GET', '/progress-planner/v1' . $endpoint );
 			$this->assertSame( 401, \rest_do_request( $request )->get_status() );
-			$request->set_header( 'Authorization', 'Bearer fixture-license' );
+			$request->set_header( 'X-Progress-Planner-Token', 'fixture-license' );
 			$this->assertSame( 200, \rest_do_request( $request )->get_status() );
-			$request->set_header( 'Authorization', 'Bearer incorrect' );
+			$request->set_header( 'X-Progress-Planner-Token', 'incorrect' );
 			$request->set_param( 'token', 'fixture-license' );
 			$this->assertSame( 401, \rest_do_request( $request )->get_status() );
 		}

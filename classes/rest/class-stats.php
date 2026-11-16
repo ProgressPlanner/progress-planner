@@ -3,7 +3,7 @@
  * Progress_Planner REST-API.
  *
  * Adds a REST-API endpoint to get stats, in a URL like:
- * <site-url>/wp-json/progress-planner/v1/get-stats (Authorization: Bearer <site-token>)
+ * <site-url>/wp-json/progress-planner/v1/get-stats (X-Progress-Planner-Token: <site-token>)
  *
  * The token is generated and saved in the settings.
  *

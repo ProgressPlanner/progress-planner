@@ -13,6 +13,11 @@ namespace Progress_Planner\Rest;
 abstract class Base {
 
 	/**
+	 * HTTP header that carries the site token.
+	 */
+	const TOKEN_HEADER = 'X-Progress-Planner-Token';
+
+	/**
 	 * Constructor.
 	 */
 	public function __construct() {
@@ -40,31 +45,18 @@ abstract class Base {
 	}
 
 	/**
-	 * Authenticate a request using a bearer token, never a URL parameter.
+	 * Authenticate a request using the site token header, never a URL parameter.
+	 *
+	 * A dedicated header, not `Authorization: Bearer`: bearer-auth plugins (JWT
+	 * and OAuth) try to decode every bearer token and reject the request before
+	 * this check runs, and some Apache setups strip `Authorization` entirely.
 	 *
 	 * @param \WP_REST_Request $request The REST request.
 	 * @return bool
 	 */
 	public function permissions_check( $request ) {
-		$authorization = $request->get_header( 'authorization' );
-		// Apache may expose Authorization only through its original request headers
-		// when WordPress's rewrite rules have not populated HTTP_AUTHORIZATION.
-		if ( null === $authorization ) {
-			$headers       = \array_change_key_case( $this->get_http_request_headers(), CASE_LOWER );
-			$authorization = $headers['authorization'] ?? null;
-		}
-		return \is_string( $authorization )
-			&& 1 === \preg_match( '/^Bearer ([^\s]+)$/iD', $authorization, $matches )
-			&& $this->validate_token( $matches[1] );
-	}
-
-	/**
-	 * Read original HTTP headers when the web server exposes them separately.
-	 *
-	 * @return array
-	 */
-	protected function get_http_request_headers() {
-		return \function_exists( 'getallheaders' ) ? \getallheaders() : [];
+		$token = $request->get_header( self::TOKEN_HEADER );
+		return \is_string( $token ) && $this->validate_token( \trim( $token ) );
 	}
 
 	/**

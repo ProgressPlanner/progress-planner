@@ -49,7 +49,7 @@ export class TasksApi {
 			{
 				headers: {
 					'Content-Type': 'application/json',
-					Authorization: `Bearer ${ testToken }`,
+					'X-Progress-Planner-Token': testToken,
 				},
 			}
 		);
