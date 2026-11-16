@@ -270,6 +270,40 @@ class Security_Review_Test extends \WP_UnitTestCase {
 	}
 
 	/**
+	 * Lessons are sanitized once before caching, and pre-sanitizer cache entries are not read.
+	 *
+	 * @return void
+	 */
+	public function test_lessons_are_sanitized_before_caching() {
+		$lessons = \progress_planner()->get_lessons();
+		$cache   = \progress_planner()->get_utils__cache();
+		// An entry stored under the old, unversioned key must be ignored.
+		$cache->set( \md5( $lessons->get_remote_api_url() ), [ [ 'name' => '<script>stale</script>' ] ], MINUTE_IN_SECONDS );
+		$cache->delete( $lessons->get_cache_key() );
+
+		$requests = 0;
+		$mock     = function () use ( &$requests ) {
+			++$requests;
+			return [
+				'response' => [ 'code' => 200 ],
+				'body'     => \wp_json_encode( [ [ 'intro' => [ 'text' => '<p onclick="x()">Hi</p>' ] ] ] ),
+			];
+		};
+		\add_filter( 'pre_http_request', $mock, 20, 3 );
+		try {
+			$first  = $lessons->get_remote_api_items();
+			$second = $lessons->get_remote_api_items();
+		} finally {
+			\remove_filter( 'pre_http_request', $mock, 20 );
+			$cache->delete( $lessons->get_cache_key() );
+		}
+
+		$this->assertSame( 1, $requests );
+		$this->assertSame( '<p>Hi</p>', $first[0]['intro']['text'] );
+		$this->assertSame( $first, $second );
+	}
+
+	/**
 	 * The Cloudflare Stream embed used by the real lessons keeps its source and layout.
 	 *
 	 * @return void

@@ -20,6 +20,11 @@ class Lessons {
 	private const HTML_FIELDS = [ 'text', 'todo_description' ];
 
 	/**
+	 * Version of the sanitized lessons cache. Bump it whenever `sanitize_items()` changes.
+	 */
+	private const CACHE_VERSION = 2;
+
+	/**
 	 * The ID for this API object.
 	 *
 	 * @var string
@@ -58,20 +63,13 @@ class Lessons {
 	 *               - Additional fields as provided by remote API
 	 */
 	public function get_remote_api_items() {
-		$url = \progress_planner()->get_remote_server_root_url() . '/wp-json/progress-planner-saas/v1/lessons';
-		$url = \add_query_arg(
-			[
-				'site'   => \get_site_url(),
-				'locale' => \apply_filters( 'prpl_lesson_locale', \get_locale() ),
-			],
-			$url
-		);
+		$url       = $this->get_remote_api_url();
+		$cache_key = $this->get_cache_key();
 
-		$cache_key = \md5( $url );
-
+		// Cached lessons were sanitized before they were stored (see CACHE_VERSION).
 		$cached = \progress_planner()->get_utils__cache()->get( $cache_key );
 		if ( \is_array( $cached ) ) {
-			return $this->sanitize_items( $cached );
+			return $cached;
 		}
 
 		$response = \wp_remote_get( $url );
@@ -95,14 +93,42 @@ class Lessons {
 			return [];
 		}
 
-		// Cache successful response for one week.
-		\progress_planner()->get_utils__cache()->set( $cache_key, $json, WEEK_IN_SECONDS );
+		// Sanitize once, then cache the successful response for one week.
+		$items = $this->sanitize_items( $json );
+		\progress_planner()->get_utils__cache()->set( $cache_key, $items, WEEK_IN_SECONDS );
 
-		return $this->sanitize_items( $json );
+		return $items;
 	}
 
 	/**
-	 * Sanitize remote content on every read, including previously cached lessons.
+	 * Get the URL of the remote lessons endpoint for this site and locale.
+	 *
+	 * @return string
+	 */
+	public function get_remote_api_url() {
+		return \add_query_arg(
+			[
+				'site'   => \get_site_url(),
+				'locale' => \apply_filters( 'prpl_lesson_locale', \get_locale() ),
+			],
+			\progress_planner()->get_remote_server_root_url() . '/wp-json/progress-planner-saas/v1/lessons'
+		);
+	}
+
+	/**
+	 * Get the cache key for the lessons.
+	 *
+	 * The key includes CACHE_VERSION, so entries cached before sanitizing (or before
+	 * a sanitizer change) are never read and are fetched again once.
+	 *
+	 * @return string
+	 */
+	public function get_cache_key() {
+		return \md5( $this->get_remote_api_url() . '|v' . self::CACHE_VERSION );
+	}
+
+	/**
+	 * Sanitize remote lesson content before it is cached.
 	 *
 	 * Only fields that carry markup keep (filtered) HTML. Everything else is plain
 	 * text: running it through kses would HTML-encode `&` in names and IDs.
