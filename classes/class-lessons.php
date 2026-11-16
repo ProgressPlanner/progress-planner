@@ -134,15 +134,18 @@ class Lessons {
 	 * @return string
 	 */
 	public function sanitize_video( string $html ): string {
-		$allowed           = \wp_kses_allowed_html( 'post' );
-		$allowed['iframe'] = \array_fill_keys( [ 'src', 'title', 'width', 'height', 'allowfullscreen', 'frameborder' ], true );
+		$allowed = \wp_kses_allowed_html( 'post' );
+		// `style` is filtered by kses (safecss); `allow` and `loading` are needed by the Cloudflare Stream embed.
+		$allowed['iframe'] = \array_fill_keys( [ 'src', 'title', 'width', 'height', 'allowfullscreen', 'frameborder', 'style', 'allow', 'loading' ], true );
 		$html              = \wp_kses( $html, $allowed );
 		$tags              = new \WP_HTML_Tag_Processor( $html );
 		while ( $tags->next_tag( 'iframe' ) ) {
 			$src  = $tags->get_attribute( 'src' );
-			$host = \is_string( $src ) ? \wp_parse_url( $src, PHP_URL_HOST ) : '';
+			$host = \is_string( $src ) ? \strtolower( (string) \wp_parse_url( $src, PHP_URL_HOST ) ) : '';
 			if ( ! \is_string( $src ) || 'https' !== \wp_parse_url( $src, PHP_URL_SCHEME )
-				|| ! \in_array( \strtolower( (string) $host ), [ 'www.youtube.com', 'www.youtube-nocookie.com', 'player.vimeo.com', 'iframe.mediadelivery.net' ], true )
+				|| ( ! \in_array( $host, [ 'www.youtube.com', 'www.youtube-nocookie.com', 'player.vimeo.com', 'iframe.mediadelivery.net' ], true )
+					// Lesson videos are served from per-account Cloudflare Stream subdomains.
+					&& ! \str_ends_with( $host, '.cloudflarestream.com' ) )
 			) {
 				$tags->remove_attribute( 'src' );
 			}

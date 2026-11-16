@@ -270,6 +270,25 @@ class Security_Review_Test extends \WP_UnitTestCase {
 	}
 
 	/**
+	 * The Cloudflare Stream embed used by the real lessons keeps its source and layout.
+	 *
+	 * @return void
+	 */
+	public function test_cloudflare_stream_lesson_video_is_kept() {
+		$video = ( new \Progress_Planner\Lessons() )->sanitize_video(
+			'<div style="position: relative; padding-top: 56.25%;"><iframe src="https://customer-abc123.cloudflarestream.com/0292a4e6/iframe?poster=x" loading="lazy" style="border: none; position: absolute; top: 0; left: 0; height: 100%; width: 100%;" allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture;" allowfullscreen="true" onload="alert(1)"></iframe></div>'
+			. '<iframe src="https://cloudflarestream.com.evil.example/x"></iframe>'
+		);
+		$this->assertStringContainsString( 'src="https://customer-abc123.cloudflarestream.com/0292a4e6/iframe?poster=x"', $video );
+		$this->assertStringContainsString( 'position: absolute', $video );
+		$this->assertStringContainsString( 'allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture;"', $video );
+		$this->assertStringContainsString( 'loading="lazy"', $video );
+		$this->assertStringContainsString( 'sandbox=', $video );
+		$this->assertStringNotContainsString( 'onload', $video );
+		$this->assertStringNotContainsString( 'evil.example', $video );
+	}
+
+	/**
 	 * Plain-text lesson fields keep their characters; only HTML fields keep markup.
 	 *
 	 * @return void
