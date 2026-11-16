@@ -270,6 +270,42 @@ class Security_Review_Test extends \WP_UnitTestCase {
 	}
 
 	/**
+	 * Inert icon structure survives sanitizing, including case-sensitive XML names.
+	 *
+	 * @return void
+	 */
+	public function test_svg_sanitizer_keeps_inert_icon_structure() {
+		$branding = \progress_planner()->get_ui__branding();
+		$svg      = $branding->sanitize_svg(
+			'<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" role="img" aria-hidden="true" focusable="false" viewBox="0 0 10 10">'
+			. '<title>Icon</title>'
+			. '<defs><linearGradient id="g" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#f00" stop-opacity=".5"/></linearGradient><clipPath id="c"><rect width="10" height="10"/></clipPath></defs>'
+			. '<path fill="url(#g)" clip-path="url(#c)" d="M0 0h10v10z"/>'
+			. '<path fill="rgb(1, 2, 3)" opacity=".5" style="fill:url(https://evil.example)" d="M0 0"/>'
+			. '<use xlink:href="https://evil.example/x.svg#a"/><image href="https://evil.example/x.png"/>'
+			. '<path fill="url(https://evil.example/#g)" stroke="url( #g )" d="M1 1"/>'
+			. '</svg>'
+		);
+		$this->assertStringContainsString( 'viewBox="0 0 10 10"', $svg );
+		$this->assertStringContainsString( '<linearGradient id="g" gradientUnits="userSpaceOnUse">', $svg );
+		$this->assertStringContainsString( '<clipPath id="c">', $svg );
+		$this->assertStringContainsString( 'fill="url(#g)" clip-path="url(#c)"', $svg );
+		$this->assertStringContainsString( 'fill="rgb(1, 2, 3)" opacity=".5"', $svg );
+		$this->assertStringContainsString( 'role="img" aria-hidden="true" focusable="false"', $svg );
+		$this->assertStringContainsString( '<title>Icon</title>', $svg );
+		$this->assertStringContainsString( 'stroke="url( #g )"', $svg );
+		$this->assertStringNotContainsString( 'evil.example', $svg );
+		$this->assertStringNotContainsString( 'style=', $svg );
+		$this->assertStringNotContainsString( '<use', $svg );
+		$this->assertStringNotContainsString( '<image', $svg );
+
+		// Entity declarations and markup that is not an SVG are refused outright.
+		$this->assertSame( '', $branding->sanitize_svg( '<!DOCTYPE svg [<!ENTITY a "x">]><svg>&a;</svg>' ) );
+		$this->assertSame( '', $branding->sanitize_svg( '<html><svg/></html>' ) );
+		$this->assertSame( '', $branding->sanitize_svg( 'not markup' ) );
+	}
+
+	/**
 	 * Previously cached branding is sanitized and foreign-host fetches are rejected.
 	 *
 	 * @return void

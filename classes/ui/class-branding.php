@@ -29,6 +29,36 @@ final class Branding {
 	private static $inline_css_attached = [];
 
 	/**
+	 * SVG elements a remote icon may use (lowercase local names).
+	 *
+	 * Anything that can run script, load a resource or carry CSS
+	 * (`script`, `style`, `foreignObject`, `use`, `image`, `a`, ...) is left out.
+	 */
+	private const SVG_ELEMENTS = [ 'svg', 'g', 'path', 'circle', 'ellipse', 'rect', 'line', 'polyline', 'polygon', 'defs', 'lineargradient', 'radialgradient', 'stop', 'clippath', 'title' ];
+
+	/**
+	 * SVG attributes a remote icon may use (lowercase names). No `on*`, `style`, `href` or `xlink:href`.
+	 */
+	private const SVG_ATTRIBUTES = [ 'id', 'd', 'x', 'y', 'x1', 'x2', 'y1', 'y2', 'cx', 'cy', 'r', 'rx', 'ry', 'fx', 'fy', 'width', 'height', 'viewbox', 'preserveaspectratio', 'points', 'transform', 'fill', 'fill-rule', 'fill-opacity', 'stroke', 'stroke-width', 'stroke-opacity', 'stroke-linecap', 'stroke-linejoin', 'stroke-miterlimit', 'clip-rule', 'clip-path', 'clippathunits', 'opacity', 'offset', 'stop-color', 'stop-opacity', 'gradientunits', 'gradienttransform', 'role', 'aria-hidden', 'focusable', 'version' ];
+
+	/**
+	 * Attributes that accept paint or references; their values are checked against `SVG_PAINT_PATTERN`.
+	 */
+	private const SVG_PAINT_ATTRIBUTES = [ 'fill', 'stroke', 'stop-color', 'clip-path' ];
+
+	/**
+	 * Literal colors, or a reference to an element inside the same SVG (`url(#id)`), never an external URL.
+	 */
+	private const SVG_PAINT_PATTERN = '/^(?:#[0-9a-f]{3,8}|[a-z]+|rgba?\(\s*[0-9.%\s,\/]+\)|url\(\s*#[a-z_][\w.:-]*\s*\))$/iD';
+
+	/**
+	 * Sanitized SVGs for this request, keyed by the hash of the remote markup.
+	 *
+	 * @var array<string, string>
+	 */
+	private $sanitized_svgs = [];
+
+	/**
 	 * Constructor.
 	 */
 	public function __construct() {
@@ -211,9 +241,10 @@ final class Branding {
 
 		if ( $admin_menu_icon_url ) {
 			// Inline the SVG: the URL carries a content hash, so a changed icon is a new cache entry.
-			$content = $this->get_remote_data( $admin_menu_icon_url );
-			if ( $content && \is_string( $content ) ) {
-				$svg = $this->sanitize_svg( $content );
+			$content   = $this->get_remote_data( $admin_menu_icon_url );
+			$sanitized = $content && \is_string( $content ) ? $this->sanitize_svg( $content ) : '';
+			if ( '' !== $sanitized ) {
+				$svg = $sanitized;
 			}
 		}
 
@@ -225,42 +256,77 @@ final class Branding {
 		return 'data:image/svg+xml;base64,' . \base64_encode( $svg );
 	}
 
+	// phpcs:disable WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- DOM properties are camelCase.
+
 	/**
-	 * Keep only inert SVG shapes and geometry, with no links, scripts or styles.
+	 * Keep only inert SVG shapes, gradients and clip paths, with no scripts, styles or external references.
+	 *
+	 * The markup is parsed as XML, so case-sensitive names such as `viewBox` and
+	 * `linearGradient` survive (the result is also used as an XML data URI).
 	 *
 	 * @param string $svg Remote SVG markup.
-	 * @return string
+	 * @return string Sanitized markup, or an empty string when it is not a usable SVG.
 	 */
 	public function sanitize_svg( string $svg ): string {
-		$attributes = \array_fill_keys( [ 'd', 'x', 'y', 'x1', 'x2', 'y1', 'y2', 'cx', 'cy', 'r', 'rx', 'ry', 'width', 'height', 'viewbox', 'points', 'transform', 'fill-rule', 'clip-rule', 'stroke-width' ], true );
-		$allowed    = \array_fill_keys( [ 'svg', 'g', 'path', 'circle', 'ellipse', 'rect', 'line', 'polyline', 'polygon' ], $attributes );
-		// Paint attributes can contain URLs; retain only literal colors.
-		$allowed = \array_map(
-			fn( $attrs ) => \array_merge(
-				$attrs,
-				[
-					'fill'   => true,
-					'stroke' => true,
-				]
-			),
-			$allowed
-		);
-		$svg     = \wp_kses( $svg, $allowed );
-		$tags    = new \WP_HTML_Tag_Processor( $svg );
-		while ( $tags->next_tag() ) {
-			if ( 'SVG' === $tags->get_tag() ) {
-				// Required when the same icon is used as a standalone SVG data URI.
-				$tags->set_attribute( 'xmlns', 'http://www.w3.org/2000/svg' );
-			}
-			foreach ( [ 'fill', 'stroke' ] as $attribute ) {
-				$value = $tags->get_attribute( $attribute );
-				if ( null !== $value && ( ! \is_string( $value ) || ! \preg_match( '/^(?:#[a-f0-9]{3,8}|[a-z]+)$/iD', $value ) ) ) {
-					$tags->remove_attribute( $attribute );
-				}
+		$hash = \md5( $svg );
+		if ( isset( $this->sanitized_svgs[ $hash ] ) ) {
+			return $this->sanitized_svgs[ $hash ];
+		}
+		$this->sanitized_svgs[ $hash ] = '';
+
+		// DTDs can declare entities (billion laughs, external files); an icon never needs one.
+		if ( ! \class_exists( '\DOMDocument' ) || false !== \stripos( $svg, '<!DOCTYPE' ) || false !== \stripos( $svg, '<!ENTITY' ) ) {
+			return '';
+		}
+
+		$previous = \libxml_use_internal_errors( true );
+		$dom      = new \DOMDocument();
+		$loaded   = $dom->loadXML( $svg, LIBXML_NONET );
+		\libxml_clear_errors();
+		\libxml_use_internal_errors( $previous );
+
+		$root = $dom->documentElement;
+		if ( ! $loaded || ! $root || 'svg' !== \strtolower( (string) $root->localName ) ) {
+			return '';
+		}
+
+		$this->sanitize_svg_element( $root );
+		// Required when the icon is used as a standalone SVG data URI.
+		if ( 'http://www.w3.org/2000/svg' !== $root->namespaceURI ) {
+			$root->setAttributeNS( 'http://www.w3.org/2000/xmlns/', 'xmlns', 'http://www.w3.org/2000/svg' );
+		}
+
+		$this->sanitized_svgs[ $hash ] = (string) $dom->saveXML( $root );
+		return $this->sanitized_svgs[ $hash ];
+	}
+
+	/**
+	 * Remove disallowed attributes and children from an SVG element, recursively.
+	 *
+	 * @param \DOMElement $element The element to clean.
+	 * @return void
+	 */
+	private function sanitize_svg_element( \DOMElement $element ): void {
+		foreach ( \iterator_to_array( $element->attributes ) as $attribute ) {
+			$name = \strtolower( $attribute->nodeName );
+			if ( ! \in_array( $name, self::SVG_ATTRIBUTES, true )
+				|| ( \in_array( $name, self::SVG_PAINT_ATTRIBUTES, true ) && ! \preg_match( self::SVG_PAINT_PATTERN, \trim( $attribute->value ) ) )
+			) {
+				$element->removeAttributeNode( $attribute );
 			}
 		}
-		return $tags->get_updated_html();
+
+		$is_title = 'title' === \strtolower( (string) $element->localName );
+		foreach ( \iterator_to_array( $element->childNodes ) as $child ) {
+			if ( $child instanceof \DOMElement && \in_array( \strtolower( (string) $child->localName ), self::SVG_ELEMENTS, true ) ) {
+				$this->sanitize_svg_element( $child );
+			} elseif ( ! ( $is_title && XML_TEXT_NODE === $child->nodeType ) ) {
+				// Drops disallowed elements with their content, comments, CDATA and processing instructions.
+				$element->removeChild( $child );
+			}
+		}
 	}
+	// phpcs:enable WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase
 
 	/**
 	 * Get the admin-menu name.
