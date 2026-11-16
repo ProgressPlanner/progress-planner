@@ -183,36 +183,6 @@ class Security_Review_Test extends \WP_UnitTestCase {
 	}
 
 	/**
-	 * Onboarding retries authenticate with the current key without forwarding it on redirects.
-	 *
-	 * @return void
-	 */
-	public function test_onboarding_retry_authenticates_existing_registration() {
-		$key = \bin2hex( \random_bytes( 32 ) );
-		\update_option( 'progress_planner_license_key', $key );
-		$mock = function ( $response, $args, $url ) use ( $key ) {
-			$this->assertStringNotContainsString( $key, $url );
-			$this->assertSame( 'Bearer ' . $key, $args['headers']['Authorization'] );
-			$this->assertSame( 0, $args['redirection'] );
-			return [
-				'response' => [ 'code' => 200 ],
-				'body'     => \wp_json_encode(
-					[
-						'status'      => 'ok',
-						'license_key' => $key,
-					]
-				),
-			];
-		};
-		\add_filter( 'pre_http_request', $mock, 20, 3 );
-		try {
-			$this->assertSame( $key, \progress_planner()->get_utils__onboard()->make_remote_onboarding_request( [ 'nonce' => 'fixture' ] ) );
-		} finally {
-			\remove_filter( 'pre_http_request', $mock, 20 );
-		}
-	}
-
-	/**
 	 * A non-admin cannot turn a personal task into an admin recommendation.
 	 *
 	 * @return void

@@ -150,17 +150,12 @@ class Onboard {
 			]
 		);
 
-		$license_key = \progress_planner()->get_license_key();
-		$headers     = $license_key && 'no-license' !== $license_key
-			? [ 'Authorization' => 'Bearer ' . $license_key ] : [];
-
 		// Make the request. Not wp_safe_remote_post(): the URL is hardcoded or set by the
 		// site owner in wp-config.php, and may be a local development server.
 		$response = \wp_remote_post(
 			$this->get_remote_url( 'onboard' ),
 			[
 				'timeout'     => 10,
-				'headers'     => $headers,
 				'redirection' => 0,
 				'body'        => $data,
 			]

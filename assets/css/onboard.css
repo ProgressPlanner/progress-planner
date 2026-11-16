@@ -21,3 +21,12 @@
 	display: flex;
 	align-items: center;
 }
+
+.prpl-onboarding-error {
+	margin: 0 0 1rem;
+	padding: 0.75rem 1rem;
+	color: var(--prpl-color-alert-error-text);
+	background: var(--prpl-background-alert-error);
+	border: 1px solid var(--prpl-color-border-alert-error);
+	border-radius: var(--prpl-radius-paper);
+}
