@@ -392,10 +392,9 @@ class Security_Review_Test extends \WP_UnitTestCase {
 	 * @return void
 	 */
 	public function test_cached_branding_is_untrusted() {
-		$_GET['pp_branding_id']     = '4958';
-		$_GET['_pp_branding_nonce'] = \wp_create_nonce( 'pp_branding_preview_4958' );
-		$branding                   = \progress_planner()->get_ui__branding();
-		$url                        = \progress_planner()->get_branding_server_url() . '/v1/brands/4958.json';
+		$_GET['pp_branding_id'] = '4958';
+		$branding               = \progress_planner()->get_ui__branding();
+		$url                    = \progress_planner()->get_branding_server_url() . '/v1/brands/4958.json';
 		\progress_planner()->get_utils__cache()->set(
 			\md5( $url ),
 			\wp_json_encode(

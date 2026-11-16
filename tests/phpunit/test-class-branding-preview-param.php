@@ -43,15 +43,14 @@ class Branding_Preview_Param_Test extends \WP_UnitTestCase {
 	}
 
 	/**
-	 * An administrator can use a signed URL to preview branding.
+	 * An administrator can preview branding with a plain, shareable URL.
 	 *
 	 * @return void
 	 */
 	public function test_logged_in_admin_param_is_honoured() {
 		$admin = self::factory()->user->create( [ 'role' => 'administrator' ] );
 		\wp_set_current_user( $admin );
-		$_GET['pp_branding_id']     = '4958';
-		$_GET['_pp_branding_nonce'] = \wp_create_nonce( 'pp_branding_preview_4958' );
+		$_GET['pp_branding_id'] = '4958';
 
 		$branding_id = \progress_planner()->get_ui__branding()->get_branding_id();
 
@@ -79,19 +78,15 @@ class Branding_Preview_Param_Test extends \WP_UnitTestCase {
 		$this->assertSame( 0, $branding_id, 'a subscriber must not be able to set pp_branding_id' );
 	}
 	/**
-	 * An unsigned admin link cannot select branding or grant onboarding consent.
+	 * A preview link changes the branding for the page but never grants onboarding consent.
 	 *
 	 * @return void
 	 */
-	public function test_admin_preview_requires_nonce_and_never_auto_onboards() {
+	public function test_admin_preview_never_auto_onboards() {
 		\wp_set_current_user( self::factory()->user->create( [ 'role' => 'administrator' ] ) );
 		$_GET['pp_branding_id'] = '4958';
 		$branding               = \progress_planner()->get_ui__branding();
-		$this->assertSame( 0, $branding->get_branding_id() );
-		$_GET['_pp_branding_nonce'] = \wp_create_nonce( 'pp_branding_preview_4958' );
 		$this->assertSame( 4958, $branding->get_branding_id() );
 		$this->assertSame( 0, $branding->get_branding_id( false ) );
-		$_GET['pp_branding_id'] = '5938';
-		$this->assertSame( 0, $branding->get_branding_id() );
 	}
 }

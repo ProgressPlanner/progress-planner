@@ -86,15 +86,16 @@ final class Branding {
 		if ( \defined( 'PROGRESS_PLANNER_BRANDING_ID' ) ) {
 			return \constant( 'PROGRESS_PLANNER_BRANDING_ID' );
 		}
-		// A preview must never grant onboarding consent or be selected by a forged link.
+		// Administrator-only preview seam for branded-host rendering. A preview only
+		// changes how the current page looks; `Base::init()` passes false, so it can
+		// never trigger the auto-onboard remote call (1.10.0 audit S3). No nonce:
+		// preview links are shared and bookmarked, and a nonce is user-bound and expires.
 		if ( $allow_preview
-			&& isset( $_GET['pp_branding_id'], $_GET['_pp_branding_nonce'] )
-			&& \is_scalar( $_GET['pp_branding_id'] )
-			&& \is_string( $_GET['_pp_branding_nonce'] )
+			&& isset( $_GET['pp_branding_id'] ) // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			&& \is_scalar( $_GET['pp_branding_id'] ) // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 			&& \current_user_can( 'manage_options' )
-			&& \wp_verify_nonce( \sanitize_text_field( \wp_unslash( $_GET['_pp_branding_nonce'] ) ), 'pp_branding_preview_' . \absint( $_GET['pp_branding_id'] ) )
 		) {
-			return \absint( $_GET['pp_branding_id'] );
+			return \absint( $_GET['pp_branding_id'] ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		}
 
 		$hostname = (string) \gethostname();

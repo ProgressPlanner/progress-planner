@@ -125,8 +125,7 @@ class Branding_Test extends \WP_UnitTestCase {
 	 */
 	private function use_brand(): void {
 		\wp_set_current_user( self::factory()->user->create( [ 'role' => 'administrator' ] ) );
-		$_GET['pp_branding_id']     = (string) self::BRAND_ID;
-		$_GET['_pp_branding_nonce'] = \wp_create_nonce( 'pp_branding_preview_' . self::BRAND_ID );
+		$_GET['pp_branding_id'] = (string) self::BRAND_ID;
 	}
 
 	/**
