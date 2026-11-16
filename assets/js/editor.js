@@ -268,7 +268,9 @@ const PrplLessonItemsHTML = () => {
 		if ( ! editor || typeof editor.getEditedPostAttribute !== 'function' ) {
 			return '';
 		}
-		return editor.getEditedPostAttribute( 'progress_planner_page_todos' ) || '';
+		return (
+			editor.getEditedPostAttribute( 'progress_planner_page_todos' ) || ''
+		);
 	}, [] );
 	const pageTodos = pageTodosMeta || '';
 
