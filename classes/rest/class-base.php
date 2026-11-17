@@ -75,7 +75,7 @@ abstract class Base {
 	public function permissions_check( $request ) {
 		$token = $request->get_header( self::TOKEN_HEADER );
 		if ( null !== $token ) {
-			return \is_string( $token ) && $this->validate_token( \trim( $token ) );
+			return $this->validate_token( \trim( $token ) );
 		}
 
 		$token = $request->get_param( 'token' );
