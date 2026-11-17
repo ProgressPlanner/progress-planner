@@ -20,6 +20,11 @@ use Progress_Planner\Admin\Widgets\Activity_Scores;
 class Stats extends Base {
 
 	/**
+	 * Route of the endpoint, relative to the namespace.
+	 */
+	const ROUTE = '/get-stats';
+
+	/**
 	 * Register the REST-API endpoint.
 	 *
 	 * @return void
