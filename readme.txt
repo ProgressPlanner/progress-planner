@@ -80,6 +80,8 @@ https://youtu.be/e1bmxZYyXFY
 5. Maintain a simple to-do list per site on your dashboard or your Progress Planner page.
 6. See your Website activity score.
 7. Get a weekly email with stats on how well you're doing on your site!
+8. Work through website improvement challenges with Progress Planner Pro.
+9. Watch practical mini courses from the WordPress editor sidebar with Progress Planner Pro.
 
 == Changelog ==
 
