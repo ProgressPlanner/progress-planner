@@ -67,6 +67,13 @@ class Rest_Token_Compatibility_Test extends \WP_UnitTestCase {
 			} else {
 				$this->assertSame( 'rest_forbidden', $response->get_data()['code'] );
 			}
+
+			// Accepted and rejected responses alike must stay out of caches.
+			$litespeed = \did_action( 'litespeed_control_set_nocache' );
+			$headers   = $api->prevent_caching( $response, $wp_rest_server, $request )->get_headers();
+			$this->assertStringContainsString( 'no-store', $headers['Cache-Control'] ?? '' );
+			$this->assertStringContainsString( 'private', $headers['Cache-Control'] ?? '' );
+			$this->assertSame( $litespeed + 1, \did_action( 'litespeed_control_set_nocache' ) );
 		} finally {
 			\remove_action( 'rest_api_init', $register, PHP_INT_MAX );
 			$wp_rest_server = $previous_server;
@@ -109,5 +116,57 @@ class Rest_Token_Compatibility_Test extends \WP_UnitTestCase {
 			$cases[ $route . ' prefixed header rejected' ]  = [ $route, [], [ 'X-Progress-Planner-Token' => 'token/fixture-key' ], 401 ];
 		}
 		return $cases;
+	}
+
+	/**
+	 * Both endpoints register the no-cache filter when the plugin boots.
+	 *
+	 * @return void
+	 */
+	public function test_prevent_caching_is_registered() {
+		$this->assertNotFalse( \has_filter( 'rest_post_dispatch', [ \progress_planner()->get_rest__stats(), 'prevent_caching' ] ) );
+		$this->assertNotFalse( \has_filter( 'rest_post_dispatch', [ \progress_planner()->get_rest__tasks(), 'prevent_caching' ] ) );
+	}
+
+	/**
+	 * Other routes, including look-alikes, keep their own cache headers.
+	 *
+	 * @dataProvider other_routes
+	 *
+	 * @param string $class_name The endpoint class.
+	 * @param string $route      The requested route.
+	 *
+	 * @return void
+	 */
+	public function test_prevent_caching_leaves_other_routes_alone( $class_name, $route ) {
+		$api = $this->getMockBuilder( $class_name )
+			->disableOriginalConstructor()
+			->onlyMethods( [] )
+			->getMock();
+
+		$litespeed = \did_action( 'litespeed_control_set_nocache' );
+		$response  = $api->prevent_caching(
+			new \WP_REST_Response( [] ),
+			\rest_get_server(),
+			new \WP_REST_Request( 'GET', $route )
+		);
+
+		$this->assertArrayNotHasKey( 'Cache-Control', $response->get_headers() );
+		$this->assertSame( $litespeed, \did_action( 'litespeed_control_set_nocache' ) );
+	}
+
+	/**
+	 * Routes the no-cache filter must not touch.
+	 *
+	 * @return array<string, array{string, string}>
+	 */
+	public static function other_routes() {
+		return [
+			'core posts route'       => [ Stats::class, '/wp/v2/posts' ],
+			'other plugin route'     => [ Stats::class, '/progress-planner/v1/recommendations' ],
+			'look-alike stats route' => [ Stats::class, '/progress-planner/v1/get-stats-extra' ],
+			'look-alike tasks route' => [ Tasks::class, '/progress-planner/v1/tasks-extra' ],
+			'other endpoint route'   => [ Tasks::class, '/progress-planner/v1/get-stats' ],
+		];
 	}
 }

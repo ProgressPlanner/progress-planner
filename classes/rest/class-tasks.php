@@ -16,6 +16,11 @@ namespace Progress_Planner\Rest;
 class Tasks extends Base {
 
 	/**
+	 * Route of the endpoint, relative to the namespace.
+	 */
+	const ROUTE = '/tasks';
+
+	/**
 	 * Register the REST-API endpoint.
 	 *
 	 * @return void
