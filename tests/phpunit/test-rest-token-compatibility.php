@@ -28,7 +28,7 @@ class Rest_Token_Compatibility_Test extends \WP_UnitTestCase {
 	 */
 	public function test_authentication( $route, $query, $headers, $status ) {
 		global $wp_rest_server;
-		$previous_server = $wp_rest_server;
+		$previous_server = \rest_get_server();
 		$wp_rest_server  = new \WP_REST_Server();
 		\wp_set_current_user( 0 );
 		\update_option( 'progress_planner_license_key', 'fixture-key' );
