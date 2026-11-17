@@ -56,8 +56,8 @@ Currently, Progress Planner supports tracking for one website per WordPress inst
 If you've found a bug, please follow the following steps:
 
 1. If it's a security report, please report it through our [PatchStack Vulnerability Disclosure Program](https://patchstack.com/database/vdp/progress-planner).
-2. If it's not a security report, search through the open issues on [our GitHub repository](https://github.com/emilia-Capital/progress-planner/issues/) to see if there's already an issue for this problem.
-3. If no issue exists yet, file a [bug report on GitHub](https://github.com/Emilia-Capital/progress-planner/issues/new/choose).
+2. If it's not a security report, search through the open issues on [our GitHub repository](https://github.com/ProgressPlanner/progress-planner/issues/) to see if there's already an issue for this problem.
+3. If no issue exists yet, file a [bug report on GitHub](https://github.com/ProgressPlanner/progress-planner/issues/new/choose).
 
 == Installation ==
 
