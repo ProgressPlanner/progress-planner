@@ -109,7 +109,7 @@ class Test_API_Get_Stats extends \WP_UnitTestCase {
 	 */
 	public function testEndpoint() {
 		$request = new WP_REST_Request( 'GET', '/progress-planner/v1/get-stats' );
-		$request->set_header( 'Authorization', 'Bearer ' . $this->token );
+		$request->set_header( 'X-Progress-Planner-Token', $this->token );
 		$response = $this->server->dispatch( $request );
 
 		// Check if the response is successful.

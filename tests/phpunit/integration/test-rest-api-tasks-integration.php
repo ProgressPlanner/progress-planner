@@ -33,7 +33,7 @@ class Rest_Api_Tasks_Integration_Test extends Integration_Test_Case {
 			'/progress-planner/v1/tasks',
 			'GET',
 			[],
-			[ 'Authorization' => 'Bearer ' . $license_key ]
+			[ 'X-Progress-Planner-Token' => $license_key ]
 		);
 
 		$this->assertNotInstanceOf( \WP_Error::class, $response );
@@ -63,7 +63,7 @@ class Rest_Api_Tasks_Integration_Test extends Integration_Test_Case {
 			'/progress-planner/v1/tasks',
 			'GET',
 			[],
-			[ 'Authorization' => 'Bearer invalid-token' ]
+			[ 'X-Progress-Planner-Token' => 'invalid-token' ]
 		);
 
 		// Missing or invalid credentials must not expose tasks.
@@ -105,7 +105,7 @@ class Rest_Api_Tasks_Integration_Test extends Integration_Test_Case {
 			'/progress-planner/v1/tasks',
 			'GET',
 			[],
-			[ 'Authorization' => 'Bearer ' . $license_key ]
+			[ 'X-Progress-Planner-Token' => $license_key ]
 		);
 
 		$this->assertInstanceOf( \WP_REST_Response::class, $response );

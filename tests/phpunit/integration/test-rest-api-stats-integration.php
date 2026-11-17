@@ -30,7 +30,7 @@ class Rest_Api_Stats_Integration_Test extends Integration_Test_Case {
 			'/progress-planner/v1/get-stats',
 			'GET',
 			[],
-			[ 'Authorization' => 'Bearer ' . $license_key ]
+			[ 'X-Progress-Planner-Token' => $license_key ]
 		);
 
 		$this->assertNotInstanceOf( \WP_Error::class, $response );
@@ -62,7 +62,7 @@ class Rest_Api_Stats_Integration_Test extends Integration_Test_Case {
 			'/progress-planner/v1/get-stats',
 			'GET',
 			[],
-			[ 'Authorization' => 'Bearer invalid-token' ]
+			[ 'X-Progress-Planner-Token' => 'invalid-token' ]
 		);
 
 		// Should return error due to validation failure.
@@ -89,7 +89,7 @@ class Rest_Api_Stats_Integration_Test extends Integration_Test_Case {
 			'/progress-planner/v1/get-stats',
 			'GET',
 			[],
-			[ 'Authorization' => 'Bearer ' . $license_key ]
+			[ 'X-Progress-Planner-Token' => $license_key ]
 		);
 
 		$this->assertInstanceOf( \WP_REST_Response::class, $response );
