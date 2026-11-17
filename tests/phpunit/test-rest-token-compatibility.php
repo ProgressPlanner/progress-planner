@@ -28,7 +28,7 @@ class Rest_Token_Compatibility_Test extends \WP_UnitTestCase {
 	 */
 	public function test_authentication( $route, $query, $headers, $status ) {
 		global $wp_rest_server;
-		$previous_server = \rest_get_server();
+		$previous_server = $wp_rest_server;
 		$wp_rest_server  = new \WP_REST_Server();
 		\wp_set_current_user( 0 );
 		\update_option( 'progress_planner_license_key', 'fixture-key' );
@@ -44,7 +44,14 @@ class Rest_Token_Compatibility_Test extends \WP_UnitTestCase {
 		$api->expects( 200 === $status ? $this->once() : $this->never() )
 			->method( $callback )
 			->willReturn( new \WP_REST_Response( [ 'authenticated' => true ] ) );
-		$api->register_rest_endpoint();
+		$register = function () use ( $api, $is_stats ) {
+			$routes = $is_stats ? [ '/get-stats', '/get-stats/(?P<token>\S+)' ] : [ '/tasks' ];
+			foreach ( $routes as $registered_route ) {
+				\unregister_rest_route( 'progress-planner/v1', $registered_route );
+			}
+			$api->register_rest_endpoint();
+		};
+		\add_action( 'rest_api_init', $register, PHP_INT_MAX );
 
 		$request = new \WP_REST_Request( 'GET', '/progress-planner/v1' . $route );
 		$request->set_query_params( $query );
@@ -53,6 +60,7 @@ class Rest_Token_Compatibility_Test extends \WP_UnitTestCase {
 		}
 
 		try {
+			\do_action( 'rest_api_init', $wp_rest_server );
 			$response = $wp_rest_server->dispatch( $request );
 			$this->assertSame( $status, $response->get_status() );
 			if ( 200 === $status ) {
@@ -61,6 +69,7 @@ class Rest_Token_Compatibility_Test extends \WP_UnitTestCase {
 				$this->assertSame( 'rest_forbidden', $response->get_data()['code'] );
 			}
 		} finally {
+			\remove_action( 'rest_api_init', $register, PHP_INT_MAX );
 			$wp_rest_server = $previous_server;
 		}
 	}
