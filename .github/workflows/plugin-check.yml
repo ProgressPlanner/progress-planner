@@ -56,3 +56,13 @@ jobs:
             build-dir: './build/${{ github.event.repository.name }}'
             exclude-checks: |
               direct_file_access
+            # classes/class-translations.php adds TranslationsPress language
+            # packs through pre_set_site_transient_update_plugins, which these
+            # two codes flag. The rule only applies to plugins hosted on
+            # WordPress.org, and this plugin was closed there on 2026-10-26.
+            # Only these codes are ignored, so the rest of the plugin_updater
+            # check still runs. Remove both if the plugin returns to
+            # WordPress.org, together with that class.
+            ignore-codes: |
+              plugin_updater_detected
+              update_modification_detected
