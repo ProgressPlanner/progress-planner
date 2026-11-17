@@ -13,6 +13,11 @@ namespace Progress_Planner\Rest;
 abstract class Base {
 
 	/**
+	 * HTTP header shared with the server's new credential transport.
+	 */
+	const TOKEN_HEADER = 'X-Progress-Planner-Token';
+
+	/**
 	 * Constructor.
 	 */
 	public function __construct() {
@@ -59,13 +64,45 @@ abstract class Base {
 	}
 
 	/**
-	 * Validate the token.
+	 * Authenticate with the new header or a legacy URL token during rollout.
 	 *
-	 * @param string $token The token.
+	 * An explicitly supplied header always wins, including an empty or invalid one.
+	 * Remove the URL fallback after the server and installed plugins use the header.
+	 *
+	 * @param \WP_REST_Request $request The REST request.
+	 * @return bool
+	 */
+	public function permissions_check( $request ) {
+		$token = $request->get_header( self::TOKEN_HEADER );
+		if ( null !== $token ) {
+			return \is_string( $token ) && $this->validate_token( \trim( $token ) );
+		}
+
+		$token = $request->get_param( 'token' );
+		if ( ! \is_string( $token ) ) {
+			return false;
+		}
+
+		// The old stats route captures "token/<key>" as one route parameter.
+		if ( 0 === \strpos( $token, 'token/' ) ) {
+			$token = \substr( $token, 6 );
+		}
+
+		return $this->validate_token( $token );
+	}
+
+	/**
+	 * Validate the complete credential, without transport-specific prefixes.
+	 *
+	 * @param mixed $token The token.
 	 *
 	 * @return bool
 	 */
 	public function validate_token( $token ) {
+		if ( ! \is_string( $token ) || '' === $token ) {
+			return false;
+		}
+
 		// Rate limiting: Check for too many failed attempts.
 		$ip_address      = $this->get_client_ip();
 		$rate_limit_key  = 'prpl_api_rate_limit_' . \md5( $ip_address );
@@ -75,8 +112,6 @@ abstract class Base {
 		if ( $failed_attempts >= 10 ) {
 			return false;
 		}
-
-		$token = \str_replace( 'token/', '', $token );
 
 		// Check test token first (use hash_equals to prevent timing attacks).
 		$test_token = \get_option( 'progress_planner_test_token', '' );
