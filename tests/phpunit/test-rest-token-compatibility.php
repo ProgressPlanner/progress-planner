@@ -44,11 +44,10 @@ class Rest_Token_Compatibility_Test extends \WP_UnitTestCase {
 		$api->expects( 200 === $status ? $this->once() : $this->never() )
 			->method( $callback )
 			->willReturn( new \WP_REST_Response( [ 'authenticated' => true ] ) );
-		$register = function () use ( $api, $is_stats ) {
-			$routes = $is_stats ? [ '/get-stats', '/get-stats/(?P<token>\S+)' ] : [ '/tasks' ];
-			foreach ( $routes as $registered_route ) {
-				\unregister_rest_route( 'progress-planner/v1', $registered_route );
-			}
+		$register = function () use ( $api ) {
+			global $wp_rest_server;
+			// Keep only this fixture's routes, while still registering on the real hook.
+			$wp_rest_server = new \WP_REST_Server();
 			$api->register_rest_endpoint();
 		};
 		\add_action( 'rest_api_init', $register, PHP_INT_MAX );
