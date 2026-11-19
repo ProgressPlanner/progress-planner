@@ -1,0 +1,47 @@
+name: Generate SBOM
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: read
+
+jobs:
+  generate_sbom:
+    name: Generate and attach SBOM
+    runs-on: ubuntu-latest
+    permissions:
+      # Needed to upload the SBOM to the release.
+      contents: write
+    steps:
+      - name: Checkout release
+        uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          persist-credentials: false
+
+      - name: Install Syft
+        env:
+          DOWNLOAD_TAG_INSTALL_SCRIPT: "false"
+        run: |
+          curl -sSfL https://raw.githubusercontent.com/anchore/syft/a0c0d3890a9d79421c403e8fcadec50a2e55bf21/install.sh -o "$RUNNER_TEMP/install-syft.sh"
+          sh "$RUNNER_TEMP/install-syft.sh" -b "$RUNNER_TEMP/bin" v1.57.1
+          echo "$RUNNER_TEMP/bin" >> "$GITHUB_PATH"
+
+      # Scan the release source, including the Composer and npm lock files.
+      # deploy.yml alone deploys to WordPress.org and uploads the plugin ZIP;
+      # this workflow only adds the SBOM file to the same release.
+      - name: Generate SBOM
+        env:
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
+        run: syft . -o "cyclonedx-json=sbom-$RELEASE_TAG.json"
+
+      - name: Upload SBOM to release
+        uses: softprops/action-gh-release@8a0cd651e5b2365bd640854a3fa5dfc70e4875f3 # v3.0.4
+        with:
+          files: sbom-${{ github.event.release.tag_name }}.json
+          fail_on_unmatched_files: true
+          append_body: true
+          body: |
+            SBOM Format: CycloneDX JSON
+            Generated with: Syft

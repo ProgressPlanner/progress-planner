@@ -34,7 +34,7 @@
 	--prpl-background-point: var(--prpl-background-banner);
 	--prpl-text-point: var(--prpl-color-headings);
 	--prpl-background-point-inactive: var(--prpl-color-border);
-	--prpl-text-point-inactive: var(--prpl-color-headings);
+	--prpl-text-point-inactive: var(--prpl-color-text-dropdown);
 
 	/* Border around the points badge; none unless a brand sets it */
 	--prpl-color-border-point: transparent;
@@ -99,6 +99,11 @@
 	--prpl-color-button-primary-text: var(--prpl-background-paper);
 	--prpl-color-button-secondary-border: #faa310;
 	--prpl-color-button-secondary-text: #374151;
+	--prpl-color-button-secondary: var(--prpl-background-paper);
+	--prpl-color-button-secondary-hover: color-mix(in srgb, var(--prpl-color-button-secondary-border) 6%, var(--prpl-color-button-secondary));
+
+	/* Glow around an input field that has focus */
+	--prpl-color-focus-glow: color-mix(in srgb, var(--prpl-color-button-primary) 20%, transparent);
 
 	/* Input field dropdown */
 	--prpl-color-field-border: var(--prpl-color-border);

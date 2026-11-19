@@ -1,0 +1,50 @@
+name: Lint JS and CSS
+
+on:
+  # Run on pushes to develop and on all pull requests.
+  push:
+    branches:
+      - develop
+  pull_request:
+  # Allow manually triggering the workflow.
+  workflow_dispatch:
+
+# Cancels all previous workflow runs for the same branch that have not yet completed.
+concurrency:
+  # The concurrency group contains the workflow name and the branch name.
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  lint-js-css:
+    name: "Lint: JS and CSS"
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          persist-credentials: false
+
+      - name: Setup Node.js
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install dependencies
+        env:
+          # No git hooks needed in CI.
+          HUSKY: 0
+        run: npm ci
+
+      - name: Lint JavaScript
+        run: npm run lint:js
+
+      # Run the CSS lint even when the JS lint fails, so one run reports both.
+      - name: Lint CSS
+        if: ${{ !cancelled() }}
+        run: npm run lint:css

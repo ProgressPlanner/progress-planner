@@ -62,8 +62,8 @@ composer lint        # Check PHP syntax
 
 `npm install` sets up the husky pre-commit hook: coding standards, PHPStan and the CSS/JS linters.
 It also checks the shared `--prpl-*` names against `tokens.json` in
-[your-branding](https://github.com/ProgressPlanner/your-branding) when `YOUR_BRANDING_DIR` points
-at a checkout of it (`export YOUR_BRANDING_DIR=~/path/to/your-branding`). A name the plugin reads
+[branding-api](https://git.your.online/branding/branding-api) when `YOUR_BRANDING_DIR` points
+at a checkout of it (`export YOUR_BRANDING_DIR=~/path/to/branding-api`). A name the plugin reads
 must be listed there; without the variable the check is skipped.
 
 ## Branches on this repository
