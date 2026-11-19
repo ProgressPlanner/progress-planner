@@ -66,6 +66,35 @@ It also checks the shared `--prpl-*` names against `tokens.json` in
 at a checkout of it (`export YOUR_BRANDING_DIR=~/path/to/branding-api`). A name the plugin reads
 must be listed there; without the variable the check is skipped.
 
+## Authentication transport rollout
+
+The compatibility release accepts `X-Progress-Planner-Token` on `/get-stats` and
+`/tasks`, while retaining the legacy stats URLs (`/get-stats/token/<key>` and
+`/get-stats/<key>`) and `token` query parameter. A supplied custom header takes
+precedence: an empty or incorrect header is rejected even with a valid URL token.
+`Authorization: Bearer` is not used for Progress Planner authentication.
+
+1. Ship this compatibility release first and verify its installation on every
+   site the server will switch. Old server requests must continue to work, and a
+   header-only statistics request must succeed without a key in the URL. An
+   unreachable or older site is not ready for the switch.
+2. Deploy the server security and custom-header changes together
+   ([server #68](https://github.com/ProgressPlanner/progress-planner-server/pull/68)
+   and [server #69](https://github.com/ProgressPlanner/progress-planner-server/pull/69)).
+   Verify statistics retrieval through the server. If it fails, the server can
+   return to its previous URL transport while the compatibility plugin is installed.
+3. After all server callers use the custom header, ship the strict plugin changes
+   ([#802](https://github.com/ProgressPlanner/progress-planner/pull/802) and
+   [#803](https://github.com/ProgressPlanner/progress-planner/pull/803)). Remove the
+   URL fallback and legacy route, and change the compatibility tests to expect
+   legacy authentication to fail. Reconcile these overlapping REST changes when
+   updating those branches. After this stage, reverting the server to URL tokens
+   requires restoring the compatibility plugin first.
+
+This is a transport bridge, not key rotation or the full security release.
+Existing credentials are unchanged. Preparing this branch does not deploy it or
+establish that installed sites have received it.
+
 ## Branches on this repository
 
 We use a couple of branches in this repository to keep things clean:

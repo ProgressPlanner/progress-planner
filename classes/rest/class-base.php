@@ -13,10 +13,64 @@ namespace Progress_Planner\Rest;
 abstract class Base {
 
 	/**
+	 * HTTP header shared with the server's new credential transport.
+	 */
+	const TOKEN_HEADER = 'X-Progress-Planner-Token';
+
+	/**
+	 * REST namespace of the token-authenticated endpoints.
+	 */
+	const REST_NAMESPACE = '/progress-planner/v1';
+
+	/**
+	 * Route of the endpoint, relative to the namespace. Empty means no route.
+	 */
+	const ROUTE = '';
+
+	/**
 	 * Constructor.
 	 */
 	public function __construct() {
 		\add_action( 'rest_api_init', [ $this, 'register_rest_endpoint' ] );
+		\add_filter( 'rest_post_dispatch', [ $this, 'prevent_caching' ], 10, 3 );
+	}
+
+	/**
+	 * Keep responses of this endpoint out of every cache.
+	 *
+	 * With header authentication every caller requests the same URL. A cache
+	 * that stored an authenticated response would hand it to anyone requesting
+	 * that URL, and the server would get stale data back. WordPress only sends
+	 * no-cache headers to logged-in users, and the server is not logged in.
+	 * Runs for successful and rejected requests alike.
+	 *
+	 * @param mixed $response The response.
+	 * @param mixed $server   The REST server.
+	 * @param mixed $request  The request.
+	 *
+	 * @return mixed
+	 */
+	public function prevent_caching( $response, $server, $request ) { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.FoundAfterLastUsed
+		if ( '' === static::ROUTE
+			|| ! $response instanceof \WP_HTTP_Response
+			|| ! $request instanceof \WP_REST_Request
+		) {
+			return $response;
+		}
+
+		$route = self::REST_NAMESPACE . static::ROUTE;
+		if ( $route !== $request->get_route() && 0 !== \strpos( $request->get_route(), $route . '/' ) ) {
+			return $response;
+		}
+
+		$response->header( 'Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0, private' );
+		$response->header( 'Expires', 'Wed, 11 Jan 1984 05:00:00 GMT' );
+
+		// LiteSpeed Cache caches REST responses for guests by default and sends
+		// its own cache header, so the headers above alone do not stop it.
+		\do_action( 'litespeed_control_set_nocache', 'Progress Planner token-authenticated endpoint' ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- LiteSpeed Cache's public API.
+
+		return $response;
 	}
 
 	/**
@@ -59,13 +113,45 @@ abstract class Base {
 	}
 
 	/**
-	 * Validate the token.
+	 * Authenticate with the new header or a legacy URL token during rollout.
 	 *
-	 * @param string $token The token.
+	 * An explicitly supplied header always wins, including an empty or invalid one.
+	 * Remove the URL fallback after the server and installed plugins use the header.
+	 *
+	 * @param \WP_REST_Request $request The REST request.
+	 * @return bool
+	 */
+	public function permissions_check( $request ) {
+		$token = $request->get_header( self::TOKEN_HEADER );
+		if ( null !== $token ) {
+			return $this->validate_token( \trim( $token ) );
+		}
+
+		$token = $request->get_param( 'token' );
+		if ( ! \is_string( $token ) ) {
+			return false;
+		}
+
+		// The old stats route captures "token/<key>" as one route parameter.
+		if ( 0 === \strpos( $token, 'token/' ) ) {
+			$token = \substr( $token, 6 );
+		}
+
+		return $this->validate_token( $token );
+	}
+
+	/**
+	 * Validate the complete credential, without transport-specific prefixes.
+	 *
+	 * @param mixed $token The token.
 	 *
 	 * @return bool
 	 */
 	public function validate_token( $token ) {
+		if ( ! \is_string( $token ) || '' === $token ) {
+			return false;
+		}
+
 		// Rate limiting: Check for too many failed attempts.
 		$ip_address      = $this->get_client_ip();
 		$rate_limit_key  = 'prpl_api_rate_limit_' . \md5( $ip_address );
@@ -75,8 +161,6 @@ abstract class Base {
 		if ( $failed_attempts >= 10 ) {
 			return false;
 		}
-
-		$token = \str_replace( 'token/', '', $token );
 
 		// Check test token first (use hash_equals to prevent timing attacks).
 		$test_token = \get_option( 'progress_planner_test_token', '' );

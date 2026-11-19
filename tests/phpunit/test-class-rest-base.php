@@ -250,7 +250,7 @@ class Rest_Base_Test extends \WP_UnitTestCase {
 	}
 
 	/**
-	 * Test validate_token with token containing "token/" prefix.
+	 * Token validation does not strip a transport prefix from the credential.
 	 *
 	 * @return void
 	 */
@@ -270,7 +270,7 @@ class Rest_Base_Test extends \WP_UnitTestCase {
 
 		$result = $this->rest_instance->validate_token( $token );
 
-		$this->assertTrue( $result );
+		$this->assertFalse( $result );
 	}
 
 	/**
