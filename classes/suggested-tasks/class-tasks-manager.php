@@ -25,6 +25,7 @@ use Progress_Planner\Suggested_Tasks\Providers\Search_Engine_Visibility;
 use Progress_Planner\Suggested_Tasks\Tasks_Interface;
 use Progress_Planner\Suggested_Tasks\Providers\Integrations\Yoast\Add_Yoast_Providers;
 use Progress_Planner\Suggested_Tasks\Providers\Integrations\AIOSEO\Add_AIOSEO_Providers;
+use Progress_Planner\Suggested_Tasks\Providers\Integrations\Litespeed_Cache\Add_Litespeed_Cache_Providers;
 use Progress_Planner\Suggested_Tasks\Providers\User as User_Tasks;
 use Progress_Planner\Suggested_Tasks\Providers\Email_Sending;
 use Progress_Planner\Suggested_Tasks\Providers\Set_Valuable_Post_Types;
@@ -119,6 +120,9 @@ class Tasks_Manager {
 
 		// All in One SEO integration.
 		new Add_AIOSEO_Providers();
+
+		// LiteSpeed Cache integration.
+		new Add_Litespeed_Cache_Providers();
 	}
 
 	/**
