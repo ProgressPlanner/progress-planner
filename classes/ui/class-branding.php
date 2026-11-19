@@ -29,6 +29,36 @@ final class Branding {
 	private static $inline_css_attached = [];
 
 	/**
+	 * SVG elements a remote icon may use (lowercase local names).
+	 *
+	 * Anything that can run script, load a resource or carry CSS
+	 * (`script`, `style`, `foreignObject`, `use`, `image`, `a`, ...) is left out.
+	 */
+	private const SVG_ELEMENTS = [ 'svg', 'g', 'path', 'circle', 'ellipse', 'rect', 'line', 'polyline', 'polygon', 'defs', 'lineargradient', 'radialgradient', 'stop', 'clippath', 'title' ];
+
+	/**
+	 * SVG attributes a remote icon may use (lowercase names). No `on*`, `style`, `href` or `xlink:href`.
+	 */
+	private const SVG_ATTRIBUTES = [ 'id', 'd', 'x', 'y', 'x1', 'x2', 'y1', 'y2', 'cx', 'cy', 'r', 'rx', 'ry', 'fx', 'fy', 'width', 'height', 'viewbox', 'preserveaspectratio', 'points', 'transform', 'fill', 'fill-rule', 'fill-opacity', 'stroke', 'stroke-width', 'stroke-opacity', 'stroke-linecap', 'stroke-linejoin', 'stroke-miterlimit', 'clip-rule', 'clip-path', 'clippathunits', 'opacity', 'offset', 'stop-color', 'stop-opacity', 'gradientunits', 'gradienttransform', 'role', 'aria-hidden', 'focusable', 'version' ];
+
+	/**
+	 * Attributes that accept paint or references; their values are checked against `SVG_PAINT_PATTERN`.
+	 */
+	private const SVG_PAINT_ATTRIBUTES = [ 'fill', 'stroke', 'stop-color', 'clip-path' ];
+
+	/**
+	 * Literal colors, or a reference to an element inside the same SVG (`url(#id)`), never an external URL.
+	 */
+	private const SVG_PAINT_PATTERN = '/^(?:#[0-9a-f]{3,8}|[a-z]+|rgba?\(\s*[0-9.%\s,\/]+\)|url\(\s*#[a-z_][\w.:-]*\s*\))$/iD';
+
+	/**
+	 * Sanitized SVGs for this request, keyed by the hash of the remote markup.
+	 *
+	 * @var array<string, string>
+	 */
+	private $sanitized_svgs = [];
+
+	/**
 	 * Constructor.
 	 */
 	public function __construct() {
@@ -38,9 +68,11 @@ final class Branding {
 	/**
 	 * Get the branding ID.
 	 *
+	 * @param bool $allow_preview Whether to allow an authenticated preview.
+	 *
 	 * @return int
 	 */
-	public function get_branding_id(): int {
+	public function get_branding_id( bool $allow_preview = true ): int {
 		// Check for placeholder demo cookie.
 		if ( \defined( '\IS_PLAYGROUND_PREVIEW' )
 			&& \constant( '\IS_PLAYGROUND_PREVIEW' ) === true
@@ -54,12 +86,16 @@ final class Branding {
 		if ( \defined( 'PROGRESS_PLANNER_BRANDING_ID' ) ) {
 			return \constant( 'PROGRESS_PLANNER_BRANDING_ID' );
 		}
-		// The `pp_branding_id` URL param is a preview seam for branded-host
-		// rendering. Honour it only for administrators, so no lower-privileged
-		// or anonymous visitor can steer the branding ID and thereby trigger the
-		// auto-onboard remote call in `Base::init()` (1.10.0 audit S3).
-		if ( isset( $_GET['pp_branding_id'] ) && \current_user_can( 'manage_options' ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-			return (int) $_GET['pp_branding_id']; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		// Administrator-only preview seam for branded-host rendering. A preview only
+		// changes how the current page looks; `Base::init()` passes false, so it can
+		// never trigger the auto-onboard remote call (1.10.0 audit S3). No nonce:
+		// preview links are shared and bookmarked, and a nonce is user-bound and expires.
+		if ( $allow_preview
+			&& isset( $_GET['pp_branding_id'] ) // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			&& \is_scalar( $_GET['pp_branding_id'] ) // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			&& \current_user_can( 'manage_options' )
+		) {
+			return \absint( $_GET['pp_branding_id'] ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		}
 
 		$hostname = (string) \gethostname();
@@ -164,7 +200,7 @@ final class Branding {
 	 * @return string
 	 */
 	public function get_custom_css(): string {
-		return (string) ( $this->get_api_data()['css'] ?? '' );
+		return \wp_strip_all_tags( (string) ( $this->get_api_data()['css'] ?? '' ) );
 	}
 
 	/**
@@ -206,9 +242,10 @@ final class Branding {
 
 		if ( $admin_menu_icon_url ) {
 			// Inline the SVG: the URL carries a content hash, so a changed icon is a new cache entry.
-			$content = $this->get_remote_data( $admin_menu_icon_url );
-			if ( $content && \is_string( $content ) ) {
-				$svg = $content;
+			$content   = $this->get_remote_data( $admin_menu_icon_url );
+			$sanitized = $content && \is_string( $content ) ? $this->sanitize_svg( $content ) : '';
+			if ( '' !== $sanitized ) {
+				$svg = $sanitized;
 			}
 		}
 
@@ -220,13 +257,85 @@ final class Branding {
 		return 'data:image/svg+xml;base64,' . \base64_encode( $svg );
 	}
 
+	// phpcs:disable WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- DOM properties are camelCase.
+
+	/**
+	 * Keep only inert SVG shapes, gradients and clip paths, with no scripts, styles or external references.
+	 *
+	 * The markup is parsed as XML, so case-sensitive names such as `viewBox` and
+	 * `linearGradient` survive (the result is also used as an XML data URI).
+	 *
+	 * @param string $svg Remote SVG markup.
+	 * @return string Sanitized markup, or an empty string when it is not a usable SVG.
+	 */
+	public function sanitize_svg( string $svg ): string {
+		$hash = \md5( $svg );
+		if ( isset( $this->sanitized_svgs[ $hash ] ) ) {
+			return $this->sanitized_svgs[ $hash ];
+		}
+		$this->sanitized_svgs[ $hash ] = '';
+
+		// DTDs can declare entities (billion laughs, external files); an icon never needs one.
+		if ( ! \class_exists( '\DOMDocument' ) || false !== \stripos( $svg, '<!DOCTYPE' ) || false !== \stripos( $svg, '<!ENTITY' ) ) {
+			return '';
+		}
+
+		$previous = \libxml_use_internal_errors( true );
+		$dom      = new \DOMDocument();
+		$loaded   = $dom->loadXML( $svg, LIBXML_NONET );
+		\libxml_clear_errors();
+		\libxml_use_internal_errors( $previous );
+
+		$root = $dom->documentElement;
+		if ( ! $loaded || ! $root || 'svg' !== \strtolower( (string) $root->localName ) ) {
+			return '';
+		}
+
+		$this->sanitize_svg_element( $root );
+		// Required when the icon is used as a standalone SVG data URI.
+		if ( 'http://www.w3.org/2000/svg' !== $root->namespaceURI ) {
+			$root->setAttributeNS( 'http://www.w3.org/2000/xmlns/', 'xmlns', 'http://www.w3.org/2000/svg' );
+		}
+
+		$this->sanitized_svgs[ $hash ] = (string) $dom->saveXML( $root );
+		return $this->sanitized_svgs[ $hash ];
+	}
+
+	/**
+	 * Remove disallowed attributes and children from an SVG element, recursively.
+	 *
+	 * @param \DOMElement $element The element to clean.
+	 * @return void
+	 */
+	private function sanitize_svg_element( \DOMElement $element ): void {
+		foreach ( \iterator_to_array( $element->attributes ) as $attribute ) {
+			$name = \strtolower( $attribute->nodeName );
+			if ( ! \in_array( $name, self::SVG_ATTRIBUTES, true )
+				|| ( \in_array( $name, self::SVG_PAINT_ATTRIBUTES, true ) && ! \preg_match( self::SVG_PAINT_PATTERN, \trim( $attribute->value ) ) )
+			) {
+				$element->removeAttributeNode( $attribute );
+			}
+		}
+
+		$is_title = 'title' === \strtolower( (string) $element->localName );
+		foreach ( \iterator_to_array( $element->childNodes ) as $child ) {
+			if ( $child instanceof \DOMElement && \in_array( \strtolower( (string) $child->localName ), self::SVG_ELEMENTS, true ) ) {
+				$this->sanitize_svg_element( $child );
+			} elseif ( ! ( $is_title && XML_TEXT_NODE === $child->nodeType ) ) {
+				// Drops disallowed elements with their content, comments, CDATA and processing instructions.
+				$element->removeChild( $child );
+			}
+		}
+	}
+	// phpcs:enable WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase
+
 	/**
 	 * Get the admin-menu name.
 	 *
 	 * @return string
 	 */
 	public function get_admin_menu_name(): string {
-		return (string) ( $this->get_api_data()['admin_menu']['name'] ?? 'Progress Planner' );
+		return \wp_kses_post( (string) ( $this->get_api_data()['admin_menu']['name'] ?? 'Progress Planner' ) );
 	}
 
 	/**
@@ -235,7 +344,7 @@ final class Branding {
 	 * @return string
 	 */
 	public function get_admin_submenu_name(): string {
-		return (string) ( $this->get_api_data()['admin_menu']['submenu'] ?? $this->get_admin_menu_name() );
+		return \wp_kses_post( (string) ( $this->get_api_data()['admin_menu']['submenu'] ?? $this->get_admin_menu_name() ) );
 	}
 
 	/**
@@ -267,6 +376,19 @@ final class Branding {
 	 * @return mixed
 	 */
 	public function get_remote_data( $url ) {
+		// Only fetch from the configured branding server (scheme and host), so a URL in
+		// the remote brand document cannot point anywhere else. Checked before cache
+		// access too, so old responses cannot bypass the restriction.
+		$server = \progress_planner()->get_branding_server_url();
+		$host   = \wp_parse_url( $server, PHP_URL_HOST );
+		$scheme = \wp_parse_url( $server, PHP_URL_SCHEME );
+		if ( ! $host || ! $scheme
+			|| \strtolower( $scheme ) !== \strtolower( (string) \wp_parse_url( $url, PHP_URL_SCHEME ) )
+			|| \strtolower( $host ) !== \strtolower( (string) \wp_parse_url( $url, PHP_URL_HOST ) )
+		) {
+			return false;
+		}
+
 		$cache_key = \md5( $url );
 		$cached    = \progress_planner()->get_utils__cache()->get( $cache_key );
 		// An empty array is a cached failure; only false means a cache miss.
@@ -274,7 +396,9 @@ final class Branding {
 			return $cached;
 		}
 
-		$response = \wp_remote_get( $url );
+		// Not wp_safe_remote_get(): the host is pinned above to the site owner's own
+		// configuration, which may be a local or private development server.
+		$response = \wp_remote_get( $url, [ 'redirection' => 0 ] );
 		if ( \is_wp_error( $response ) ) {
 			\progress_planner()->get_utils__cache()->set( $cache_key, [], 5 * MINUTE_IN_SECONDS );
 			return false;
@@ -317,7 +441,7 @@ final class Branding {
 	 * @return string
 	 */
 	public function get_widget_title( $widget_id, $default_value = '' ) {
-		return (string) ( $this->get_api_data()['widget_titles'][ $widget_id ] ?? $default_value );
+		return \wp_kses_post( (string) ( $this->get_api_data()['widget_titles'][ $widget_id ] ?? $default_value ) );
 	}
 
 	/**

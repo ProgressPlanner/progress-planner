@@ -445,6 +445,10 @@ class Update_Term_Description extends Tasks_Interactive {
 			\wp_send_json_error( [ 'message' => \esc_html__( 'Term not found.', 'progress-planner' ) ] );
 		}
 
+		if ( ! \current_user_can( 'edit_term', $term_id ) ) {
+			\wp_send_json_error( [ 'message' => \esc_html__( 'You do not have permission to update terms.', 'progress-planner' ) ] );
+		}
+
 		// Only public taxonomies are tracked by this task.
 		$taxonomy_object = \get_taxonomy( $taxonomy );
 		if ( ! $taxonomy_object || ! $taxonomy_object->public ) {

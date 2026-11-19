@@ -56,12 +56,17 @@ abstract class Integration_Test_Case extends \WP_UnitTestCase {
 	 * @param string $endpoint Endpoint path.
 	 * @param string $method HTTP method.
 	 * @param array  $params Request parameters.
+	 * @param array  $headers Request headers.
 	 * @return \WP_REST_Response|\WP_Error
 	 */
-	protected function make_rest_request( $endpoint, $method = 'GET', $params = [] ) {
+	protected function make_rest_request( $endpoint, $method = 'GET', $params = [], $headers = [] ) {
 		$request = new \WP_REST_Request( $method, $endpoint );
 		foreach ( $params as $key => $value ) {
 			$request->set_param( $key, $value );
+		}
+
+		foreach ( $headers as $key => $value ) {
+			$request->set_header( $key, $value );
 		}
 
 		$server = \rest_get_server();

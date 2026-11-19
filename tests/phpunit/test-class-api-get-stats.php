@@ -66,18 +66,7 @@ class Test_API_Get_Stats extends \WP_UnitTestCase {
 	 * @return void
 	 */
 	public static function set_lessons_cache() {
-		// Mimic the URL building and caching of the lessons, see Progress_Planner\Lessons::get_remote_api_items .
-		$url = \progress_planner()->get_remote_server_root_url() . '/wp-json/progress-planner-saas/v1/lessons';
-
-		$url = \add_query_arg(
-			[
-				'site'        => \get_site_url(),
-				'license_key' => \progress_planner()->get_license_key(),
-			],
-			$url
-		);
-
-		$cache_key = \md5( $url );
+		$cache_key = \progress_planner()->get_lessons()->get_cache_key();
 
 		\progress_planner()->get_utils__cache()->set( $cache_key, self::get_lessons(), WEEK_IN_SECONDS );
 	}
@@ -119,7 +108,8 @@ class Test_API_Get_Stats extends \WP_UnitTestCase {
 	 * @return void.
 	 */
 	public function testEndpoint() {
-		$request  = new WP_REST_Request( 'GET', '/progress-planner/v1/get-stats/' . $this->token );
+		$request = new WP_REST_Request( 'GET', '/progress-planner/v1/get-stats' );
+		$request->set_header( 'Authorization', 'Bearer ' . $this->token );
 		$response = $this->server->dispatch( $request );
 
 		// Check if the response is successful.

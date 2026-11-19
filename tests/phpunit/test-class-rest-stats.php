@@ -43,7 +43,7 @@ class Rest_Stats_Test extends \WP_UnitTestCase {
 		\do_action( 'rest_api_init' );
 
 		$routes = $wp_rest_server->get_routes();
-		$this->assertArrayHasKey( '/progress-planner/v1/get-stats/(?P<token>\S+)', $routes );
+		$this->assertArrayHasKey( '/progress-planner/v1/get-stats', $routes );
 	}
 
 	/**
