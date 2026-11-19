@@ -404,24 +404,23 @@ button.prpl-info-icon {
 .prpl-wrap button.prpl-button-secondary,
 .prpl-wrap a.prpl-button-secondary,
 #progress_planner_dashboard_widget_score a.prpl-button-secondary {
-	--prpl-button-secondary-tint: color-mix(in srgb, var(--prpl-color-button-secondary-border) 6%, var(--prpl-background-paper));
 	color: var(--prpl-color-button-secondary-text);
-	background: var(--prpl-background-paper);
+	background: var(--prpl-color-button-secondary);
 
 	/* The outline sits on ::after, which covers the button's own background. */
 	&::after {
-		background: var(--prpl-background-paper);
+		background: var(--prpl-color-button-secondary);
 		box-shadow: inset 0 0 0 1px var(--prpl-color-button-secondary-border);
 	}
 
 	&:not([disabled]):hover,
 	&:not([disabled]):focus {
 		color: var(--prpl-color-button-secondary-text);
-		background: var(--prpl-button-secondary-tint);
+		background: var(--prpl-color-button-secondary-hover);
 		box-shadow: none;
 
 		&::after {
-			background: var(--prpl-button-secondary-tint);
+			background: var(--prpl-color-button-secondary-hover);
 			box-shadow: inset 0 0 0 1px var(--prpl-color-button-secondary-border);
 		}
 	}
@@ -439,6 +438,21 @@ button.prpl-info-icon {
 .prpl-wrap input[type="search"] {
 	height: 40px;
 	box-shadow: 1px 2px 4px 0 rgba(0, 0, 0, 0.05);
+}
+
+.prpl-wrap input[type="text"]:focus,
+.prpl-wrap input[type="email"]:focus,
+.prpl-wrap input[type="number"]:focus,
+.prpl-wrap input[type="url"]:focus,
+.prpl-wrap input[type="tel"]:focus,
+.prpl-wrap input[type="search"]:focus,
+.prpl-wrap textarea:focus,
+.prpl-wrap select:focus {
+	border-color: var(--prpl-color-button-primary);
+	box-shadow: 0 0 0 2px var(--prpl-color-focus-glow);
+
+	/* Keeps a visible outline in Windows high contrast mode. */
+	outline: 2px solid transparent;
 }
 
 .prpl-wrap input::placeholder,
