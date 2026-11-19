@@ -27,6 +27,13 @@ class Page_Types {
 	const TAXONOMY_NAME = 'progress_planner_page_types';
 
 	/**
+	 * Posts per page type, memoised for the request by get_posts_by_type().
+	 *
+	 * @var array<string, array<string, \WP_Post[]>>
+	 */
+	private $posts_by_type_cache = [];
+
+	/**
 	 * Constructor
 	 */
 	public function __construct() {
@@ -41,6 +48,20 @@ class Page_Types {
 		\add_action( 'post_updated', [ $this, 'post_updated' ], 10, 2 );
 		\add_action( 'wp_insert_post', [ $this, 'post_updated' ], 10, 2 );
 		\add_action( 'transition_post_status', [ $this, 'transition_post_status' ], 10, 3 );
+
+		// A page's type is a term, so any change to term relationships can
+		// change what get_posts_by_type() should return in this request.
+		\add_action( 'set_object_terms', [ $this, 'flush_posts_by_type_cache' ] );
+		\add_action( 'deleted_term_relationships', [ $this, 'flush_posts_by_type_cache' ] );
+	}
+
+	/**
+	 * Forget the posts memoised by get_posts_by_type().
+	 *
+	 * @return void
+	 */
+	public function flush_posts_by_type_cache() {
+		$this->posts_by_type_cache = [];
 	}
 
 	/**
@@ -190,12 +211,11 @@ class Page_Types {
 	 * @return \WP_Post[] Return the posts.
 	 */
 	public function get_posts_by_type( $post_type, $slug ) {
-		static $cache = [];
-		if ( isset( $cache[ $post_type ][ $slug ] ) ) {
-			return $cache[ $post_type ][ $slug ];
+		if ( isset( $this->posts_by_type_cache[ $post_type ][ $slug ] ) ) {
+			return $this->posts_by_type_cache[ $post_type ][ $slug ];
 		}
-		if ( ! isset( $cache[ $post_type ] ) ) {
-			$cache[ $post_type ] = [];
+		if ( ! isset( $this->posts_by_type_cache[ $post_type ] ) ) {
+			$this->posts_by_type_cache[ $post_type ] = [];
 		}
 		$posts = \get_posts(
 			[
@@ -220,8 +240,8 @@ class Page_Types {
 			}
 		}
 
-		$cache[ $post_type ][ $slug ] = empty( $posts ) ? [] : $posts;
-		return $cache[ $post_type ][ $slug ];
+		$this->posts_by_type_cache[ $post_type ][ $slug ] = empty( $posts ) ? [] : $posts;
+		return $this->posts_by_type_cache[ $post_type ][ $slug ];
 	}
 
 	/**
