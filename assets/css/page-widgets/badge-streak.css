@@ -92,6 +92,11 @@
 /*------------------------------------*\
 	Streak and content badges popovers.
 \*------------------------------------*/
+#prpl-popover-badge-streak-maintenance,
+#prpl-popover-badge-streak-content {
+	padding: var(--prpl-gap);
+}
+
 .prpl-badge-track-popover {
 	--badge-track-color: var(--prpl-color-streak);
 	--badge-track-background: var(--prpl-background-streak);
