@@ -43,11 +43,15 @@ const prplDriverObj = prplDriver( {
 } );
 
 function prplTourShowPopover( popover ) {
+	// The popover sits above the tour box (top layer); this class keeps it at
+	// the top of the screen and leaves room for the tour box below it.
+	popover.classList.add( 'prpl-popover-in-tour' );
 	popover.showPopover();
 	prplMakePopoverBackdropTransparent( popover );
 }
 
 function prplTourHidePopover( popover ) {
+	popover.classList.remove( 'prpl-popover-in-tour' );
 	popover.hidePopover();
 	document.getElementById( popover.id + '-backdrop-transparency' ).remove();
 }
