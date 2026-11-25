@@ -612,6 +612,12 @@ button.prpl-info-icon {
 	}
 }
 
+/* While the tour points at a popover, keep it at the top so the tour box fits below. */
+.prpl-popover.prpl-popover-in-tour {
+	margin-top: var(--prpl-padding);
+	max-height: calc(100vh - 280px);
+}
+
 .driver-popover.prpl-driverjs-theme {
 	background-color: var(--prpl-background-monthly);
 	color: var(--prpl-color-text);
