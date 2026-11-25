@@ -119,26 +119,30 @@ customElements.define(
 		/**
 		 * Get the SVG stroke attributes for a line style.
 		 *
-		 * Dots are zero-length dashes with round caps, so each one is a circle
-		 * as wide as the line. Dashes are three line-widths long.
+		 * Dots are zero-length dashes with round caps, so each one is a circle.
+		 * A thin dotted line reads lighter than a solid one, so dots are 1.5
+		 * line-widths wide and sit close together. Dashes are three
+		 * line-widths long.
 		 *
 		 * @param {string} key         - The key of the data.
 		 * @param {number} strokeWidth - The width of the line.
 		 *
-		 * @return {string} The stroke attributes.
+		 * @return {string} The stroke attributes, including stroke-width.
 		 */
 		getStrokeStyleAttributes = ( key, strokeWidth ) => {
 			switch ( this.getLineStyle( key ) ) {
-				case 'dotted':
-					return `stroke-dasharray="0 ${
-						strokeWidth * 2
+				case 'dotted': {
+					const dotWidth = strokeWidth * 1.5;
+					return `stroke-width="${ dotWidth }" stroke-dasharray="0 ${
+						dotWidth * 1.75
 					}" stroke-linecap="round" stroke-linejoin="round"`;
+				}
 				case 'dashed':
-					return `stroke-dasharray="${ strokeWidth * 3 } ${
-						strokeWidth * 2
-					}" stroke-linejoin="round"`;
+					return `stroke-width="${ strokeWidth }" stroke-dasharray="${
+						strokeWidth * 3
+					} ${ strokeWidth * 2 }" stroke-linejoin="round"`;
 				default:
-					return '';
+					return `stroke-width="${ strokeWidth }"`;
 			}
 		};
 
@@ -153,18 +157,15 @@ customElements.define(
 			`<svg
 				class="prpl-chart-line-legend-line"
 				width="100%"
-				height="2"
+				height="3"
 				aria-hidden="true"
 				focusable="false"
 				style="display: block; overflow: visible; opacity: ${
 					this.options.showCharts.includes( key ) ? 1 : 0.35
 				};"
-			><line x1="1" x2="100%" y1="1" y2="1" stroke="${
+			><line x1="2" x2="100%" y1="1.5" y2="1.5" stroke="${
 				this.options.dataArgs[ key ].color
-			}" stroke-width="2" ${ this.getStrokeStyleAttributes(
-				key,
-				2
-			) } /></svg>`;
+			}" ${ this.getStrokeStyleAttributes( key, 2 ) } /></svg>`;
 
 		/**
 		 * Get the filters label.
@@ -229,8 +230,6 @@ customElements.define(
 
 			return `<g><polyline fill="none" stroke="${
 				this.options.dataArgs[ key ].color
-			}" stroke-width="${
-				this.options.strokeWidth
 			}" ${ this.getStrokeStyleAttributes(
 				key,
 				this.options.strokeWidth
