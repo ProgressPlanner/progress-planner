@@ -65,62 +65,15 @@
 \*------------------------------------*/
 #prpl-popover-monthly-badges {
 
-	.prpl-monthly-badges-popover {
-		container-type: inline-size;
-	}
-
-	/* Number cards: the totals at the top and the per-year cards. */
 	.prpl-badges-stat {
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-		justify-content: center;
-		gap: 0.25rem;
-		padding: var(--prpl-padding);
-		border-radius: var(--prpl-border-radius-big);
 		background: var(--prpl-background-monthly);
-		text-align: center;
 	}
 
-	.prpl-badges-stat-number {
-		font-size: var(--prpl-font-size-3xl);
-		font-weight: 600;
-		line-height: 1;
-		color: var(--prpl-color-text);
-	}
-
-	.prpl-badges-stat-label {
-		font-size: var(--prpl-font-size-base);
-	}
-
-	/* Top row: intro text and the two totals. */
 	.prpl-badges-summary {
-		display: grid;
-		grid-template-columns: repeat(3, 1fr);
-		gap: var(--prpl-padding);
-		padding-bottom: var(--prpl-gap);
-		border-bottom: 1px solid var(--prpl-color-divider);
 
 		.prpl-badges-stat,
 		.prpl-badges-summary-intro {
 			background: var(--prpl-background-content);
-		}
-	}
-
-	.prpl-badges-summary-intro {
-		padding: var(--prpl-padding);
-		border-radius: var(--prpl-border-radius-big);
-
-		p {
-			margin: 0;
-
-			& + p {
-				margin-top: 0.5rem;
-			}
-		}
-
-		strong {
-			color: var(--prpl-color-text);
 		}
 	}
 
@@ -166,52 +119,25 @@
 		line-height: 1.2;
 	}
 
-	/* The content and streak badges (until they get their own popovers). */
+	/* Badge groups added by other plugins (pp-hosts onboarding badges). */
 	.prpl-widgets-container.in-popover {
 		display: grid;
 		grid-template-columns: repeat(auto-fit, minmax(var(--prpl-column-min-width), 1fr));
 		grid-gap: var(--prpl-gap);
-		grid-auto-rows: auto;
 		margin-top: var(--prpl-gap);
-	}
 
-	.prpl-widget-title {
-		padding: 0.5rem 1rem;
-		border-radius: 0.5rem;
-		background: var(--prpl-background-monthly);
-	}
-
-	.prpl-widget-wrapper-content {
+		&:not(:has(*)) {
+			display: none;
+		}
 
 		.prpl-widget-title {
-			background: var(--prpl-background-content-badge);
-		}
-
-		.badge-group-content {
-			background-color: transparent;
-		}
-	}
-
-	.prpl-widget-wrapper-maintenance {
-
-		.prpl-widget-title {
-			background: var(--prpl-background-streak);
-		}
-
-		.badge-group-maintenance {
-			background-color: transparent;
+			padding: 0.5rem 1rem;
+			border-radius: 0.5rem;
+			background: var(--prpl-background-monthly);
 		}
 	}
 
 	@container (max-width: 900px) {
-
-		.prpl-badges-summary {
-			grid-template-columns: 1fr 1fr;
-		}
-
-		.prpl-badges-summary-intro {
-			grid-column: 1 / -1;
-		}
 
 		.prpl-badges-year-content {
 			grid-template-columns: 1fr;

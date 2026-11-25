@@ -1,82 +1,6 @@
-
-
-#popover-badge-streak-content,
-#popover-badge-streak-maintenance {
-	display: grid;
-	grid-template-columns: 1fr 1fr 1fr;
-	grid-gap: var(--prpl-padding);
-
-	.inner {
-		border-radius: var(--prpl-border-radius-big);
-		padding: var(--prpl-padding);
-		font-size: var(--prpl-font-size-small);
-		text-align: center;
-	}
-}
-
-#popover-badge-streak-content .inner {
-	background: var(--prpl-background-streak);
-}
-
-#popover-badge-streak-maintenance .inner {
-	background: var(--prpl-background-content-badge);
-}
-
-.badges-popover-progress-total {
-	display: block;
-	width: 100%;
-	height: 20px;
-	background: var(--prpl-color-gauge-remain);
-
-	> span {
-		display: block;
-		height: 100%;
-		background: var(--prpl-graph-color-1);
-	}
-}
-
 /*------------------------------------*\
-	Badges popover.
+	Streak and content badges widgets.
 \*------------------------------------*/
-
-#prpl-popover-badge-streak {
-
-	.indicators {
-		display: grid;
-		grid-template-columns: 1fr 1fr 1fr;
-		grid-gap: var(--prpl-padding);
-
-		.indicator {
-			text-align: center;
-			line-height: 1.2;
-			margin-top: 5px;
-
-			.number {
-				font-size: var(--prpl-font-size-2xl);
-				font-weight: 500;
-				display: block;
-			}
-		}
-	}
-
-	.prpl-widgets-container.in-popover {
-		display: grid;
-		grid-template-columns: repeat(auto-fit, minmax(var(--prpl-column-min-width), 1fr));
-		grid-gap: var(--prpl-gap);
-		grid-auto-rows: auto;
-
-		.prpl-widget-wrapper {
-			display: flex;
-			flex-direction: column;
-			justify-content: space-between;
-		}
-	}
-}
-
-.string-freeze-explain {
-	max-width: 42em;
-}
-
 .prpl-widget-wrapper.prpl-badge-streak,
 .prpl-widget-wrapper.prpl-badge-streak-content,
 .prpl-widget-wrapper.prpl-badge-streak-maintenance {
@@ -119,5 +43,289 @@
 
 	.badge-group-monthly {
 		background-color: transparent;
+	}
+}
+
+.prpl-badge-track-progress {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 1rem;
+	margin-bottom: 0;
+}
+
+.prpl-badge-track-value {
+	white-space: nowrap;
+	font-weight: 600;
+}
+
+.prpl-badge-track-number {
+	font-size: var(--prpl-font-size-3xl);
+}
+
+.prpl-streak-freeze-line {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	margin: var(--prpl-padding) 0 0;
+}
+
+.prpl-streak-freeze-icon {
+	display: inline-flex;
+	flex-shrink: 0;
+
+	svg {
+		width: 24px;
+		height: 24px;
+	}
+}
+
+#prpl-popover-badge-streak-maintenance-trigger,
+#prpl-popover-badge-streak-content-trigger {
+	font-size: var(--prpl-font-size-base);
+	color: var(--prpl-color-link);
+	text-decoration: underline;
+	margin-top: 1.25rem;
+	text-align: start;
+}
+
+/*------------------------------------*\
+	Streak and content badges popovers.
+\*------------------------------------*/
+.prpl-badge-track-popover {
+	--badge-track-color: var(--prpl-color-streak);
+	--badge-track-background: var(--prpl-background-streak);
+
+	&.prpl-badge-track-content {
+		--badge-track-color: var(--prpl-color-content-badge);
+		--badge-track-background: var(--prpl-background-content-badge);
+	}
+
+	.prpl-badges-summary {
+		grid-template-columns: 2fr 1fr 1fr;
+
+		.prpl-badges-stat {
+			background: var(--badge-track-background);
+		}
+	}
+
+	.prpl-badge-track-message {
+		margin: var(--prpl-padding) 0;
+	}
+
+	/* The track: a bar from 0 to the last badge, with a circle per badge. */
+	.prpl-badge-track-bar {
+		position: relative;
+		height: calc(2rem + 48px);
+		margin: 0 24px var(--prpl-padding);
+	}
+
+	.prpl-badge-track-line {
+		position: absolute;
+		top: calc(2rem + 14px);
+		left: 0;
+		right: 0;
+		height: 20px;
+		border-radius: 999px;
+		background: var(--prpl-color-gauge-remain);
+		overflow: hidden;
+	}
+
+	.prpl-badge-track-fill {
+		display: block;
+		width: var(--badge-track-value);
+		height: 100%;
+		background: var(--badge-track-color);
+	}
+
+	.prpl-badge-track-current {
+		position: absolute;
+		top: 0;
+		left: var(--badge-track-value);
+		transform: translateX(-50%);
+		white-space: nowrap;
+		line-height: 1.5;
+
+		&::after {
+			content: "";
+			position: absolute;
+			top: 1.75rem;
+			left: 50%;
+			height: 34px;
+			border-left: 1px dashed var(--prpl-color-text);
+		}
+	}
+
+	.prpl-badge-track-current-number {
+		font-size: var(--prpl-font-size-xl);
+		font-weight: 600;
+	}
+
+	.prpl-badge-track-milestone {
+		position: absolute;
+		top: 2rem;
+		left: var(--badge-track-at);
+		transform: translateX(-50%);
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		box-sizing: border-box;
+		width: 48px;
+		height: 48px;
+		border-radius: 50%;
+		border: 1px solid var(--prpl-color-border);
+		background: var(--prpl-background);
+		font-size: var(--prpl-font-size-xl);
+		font-weight: 500;
+		color: var(--prpl-color-text);
+
+		&.is-earned {
+			border: 2px solid var(--badge-track-color);
+			background: var(--prpl-background-paper);
+		}
+
+		prpl-badge {
+			width: 34px;
+			margin: 0;
+		}
+
+		.prpl-badge-earned-check {
+			position: absolute;
+			top: -4px;
+			right: -4px;
+		}
+	}
+
+	.prpl-badge-track-freeze {
+		position: absolute;
+		z-index: 1;
+		top: calc(2rem + 14px);
+		left: var(--badge-track-at);
+		transform: translateX(-50%);
+		display: flex;
+
+		svg {
+			width: 20px;
+			height: 20px;
+		}
+	}
+
+	/* The badges, with what each one takes. */
+	.prpl-badge-track-badges {
+		display: grid;
+		grid-template-columns: repeat(3, 1fr);
+		gap: var(--prpl-padding);
+		padding: var(--prpl-padding) 0;
+		border-top: 1px solid var(--prpl-color-divider);
+	}
+
+	.prpl-badge-track-badge {
+		display: flex;
+		align-items: center;
+		gap: 1rem;
+
+		.prpl-badge-image {
+			flex: 0 0 120px;
+
+			prpl-badge {
+				display: block;
+				margin: 0;
+			}
+		}
+	}
+
+	.prpl-badge-track-badge-text {
+		display: flex;
+		flex-direction: column;
+		align-items: flex-start;
+		gap: 0.125rem;
+		line-height: 1.3;
+	}
+
+	.prpl-badge-to-go {
+		visibility: hidden;
+		color: var(--prpl-color-button-primary);
+		font-weight: 600;
+	}
+
+	.prpl-badge-track-badge-goal {
+		font-size: var(--prpl-font-size-lg);
+		font-weight: 600;
+
+		strong {
+			font-size: var(--prpl-font-size-2xl);
+		}
+	}
+
+	.prpl-badge-track-badge-name {
+		font-size: var(--prpl-font-size-small);
+	}
+
+	.prpl-badge-track-badge[data-state="to-go"]:is(:hover, :focus-visible) {
+
+		.prpl-badge-to-go {
+			visibility: visible;
+		}
+
+		prpl-badge img {
+			animation: prpl-badge-wobble 0.8s ease-in-out;
+		}
+	}
+
+	/* Green circle with a white tick, for an earned badge. */
+	.prpl-badge-earned-check {
+		position: relative;
+		display: inline-block;
+		width: 16px;
+		height: 16px;
+		border-radius: 50%;
+		background: var(--prpl-color-alert-success);
+
+		&::after {
+			content: "";
+			position: absolute;
+			top: 3px;
+			left: 5px;
+			width: 4px;
+			height: 7px;
+			border: solid var(--prpl-background-paper);
+			border-width: 0 2px 2px 0;
+			transform: rotate(45deg);
+		}
+	}
+
+	.prpl-streak-freeze {
+		display: flex;
+		align-items: flex-start;
+		gap: 0.75rem;
+		padding-top: var(--prpl-padding);
+		border-top: 1px solid var(--prpl-color-divider);
+
+		p {
+			margin: 0;
+		}
+
+		.prpl-streak-freeze-icon svg {
+			width: 34px;
+			height: 34px;
+		}
+	}
+
+	@container (max-width: 700px) {
+
+		.prpl-badges-summary {
+			grid-template-columns: 1fr 1fr;
+		}
+
+		.prpl-badge-track-badges {
+			grid-template-columns: 1fr;
+		}
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+	.prpl-badge-track-popover .prpl-badge-track-badge[data-state="to-go"]:is(:hover, :focus-visible) prpl-badge img {
+		animation: none;
 	}
 }
