@@ -484,6 +484,76 @@ button.prpl-info-icon {
 }
 
 /*------------------------------------*\
+	Badge popovers: shared number cards.
+	Used by the monthly, streak and content badges popovers.
+\*------------------------------------*/
+.prpl-monthly-badges-popover,
+.prpl-badge-track-popover {
+	container-type: inline-size;
+
+	/* A number with a short label. */
+	.prpl-badges-stat {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		gap: 0.25rem;
+		padding: var(--prpl-padding);
+		border-radius: var(--prpl-border-radius-big);
+		text-align: center;
+	}
+
+	.prpl-badges-stat-number {
+		font-size: var(--prpl-font-size-3xl);
+		font-weight: 600;
+		line-height: 1;
+		color: var(--prpl-color-text);
+	}
+
+	.prpl-badges-stat-label {
+		font-size: var(--prpl-font-size-base);
+	}
+
+	/* Top row: intro text and two numbers. */
+	.prpl-badges-summary {
+		display: grid;
+		grid-template-columns: repeat(3, 1fr);
+		gap: var(--prpl-padding);
+		padding-bottom: var(--prpl-gap);
+		border-bottom: 1px solid var(--prpl-color-divider);
+	}
+
+	.prpl-badges-summary-intro {
+		padding: var(--prpl-padding);
+		border-radius: var(--prpl-border-radius-big);
+		background: var(--prpl-background-content);
+
+		p {
+			margin: 0;
+
+			& + p {
+				margin-top: 0.5rem;
+			}
+		}
+
+		strong {
+			color: var(--prpl-color-text);
+		}
+	}
+
+	@container (max-width: 900px) {
+
+		.prpl-badges-summary {
+			grid-template-columns: 1fr 1fr;
+		}
+
+		.prpl-badges-summary-intro {
+			grid-column: 1 / -1;
+		}
+	}
+}
+
+/*------------------------------------*\
 	Popovers close button.
 \*------------------------------------*/
 .prpl-popover-close {

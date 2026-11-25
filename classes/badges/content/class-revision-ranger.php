@@ -15,6 +15,13 @@ use Progress_Planner\Badges\Badge_Content;
 final class Revision_Ranger extends Badge_Content {
 
 	/**
+	 * The number of new posts or pages to earn this badge.
+	 *
+	 * @var int
+	 */
+	const TARGET = 30;
+
+	/**
 	 * The badge ID.
 	 *
 	 * @var string
@@ -37,7 +44,7 @@ final class Revision_Ranger extends Badge_Content {
 	 */
 	public function get_description() {
 		/* translators: %d: The number of new posts to write. */
-		return \sprintf( \esc_html__( 'Write %d new posts or pages', 'progress-planner' ), 30 );
+		return \sprintf( \esc_html__( 'Write %d new posts or pages', 'progress-planner' ), self::TARGET );
 	}
 
 	/**
@@ -66,8 +73,8 @@ final class Revision_Ranger extends Badge_Content {
 			)
 		);
 
-		$percent   = \min( 100, \floor( 100 * $new_count / 30 ) );
-		$remaining = 30 - \min( 30, $new_count );
+		$percent   = \min( 100, \floor( 100 * $new_count / self::TARGET ) );
+		$remaining = self::TARGET - \min( self::TARGET, $new_count );
 
 		$this->save_progress(
 			[

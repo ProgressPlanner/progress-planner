@@ -124,42 +124,11 @@ $prpl_years = $prpl_stats['years'];
 
 	<?php
 	/*
-	 * The content and streak badges stay here until they get their own
-	 * popovers (pro#190); the streak and content widgets still open this one.
+	 * Other plugins can add badge groups here. pp-hosts adds its onboarding
+	 * badges, until they get a place of their own.
 	 */
-	$prpl_badges_groups = [
-		'content'     => \__( 'Content badges', 'progress-planner' ),
-		'maintenance' => \__( 'Streak badges', 'progress-planner' ),
-	];
 	?>
 	<div class="prpl-widgets-container in-popover">
-		<?php foreach ( $prpl_badges_groups as $prpl_badge_group => $prpl_widget_title ) : ?>
-			<div class="prpl-widget-wrapper prpl-widget-wrapper-<?php echo \esc_attr( $prpl_badge_group ); ?> in-popover  prpl-badge-streak">
-				<h3 class="prpl-widget-title">
-					<?php echo \esc_html( $prpl_widget_title ); ?>
-				</h3>
-				<div class="prpl-badges-container-achievements">
-					<?php $prpl_group_badges = \progress_planner()->get_badges()->get_badges( $prpl_badge_group ); ?>
-					<div class="progress-wrapper badge-group-<?php echo \esc_attr( $prpl_badge_group ); ?>">
-						<?php foreach ( $prpl_group_badges as $prpl_badge ) : ?>
-							<?php $prpl_badge_progress = $prpl_badge->get_progress(); ?>
-							<span
-								class="prpl-badge"
-								data-value="<?php echo \esc_attr( $prpl_badge_progress['progress'] ); ?>"
-							>
-								<prpl-badge
-									complete="<?php echo 100 === (int) $prpl_badge_progress['progress'] ? 'true' : 'false'; ?>"
-									badge-id="<?php echo \esc_attr( $prpl_badge->get_id() ); ?>"
-									badge-name="<?php echo \esc_attr( $prpl_badge->get_name() ); ?>"
-									branding-id="<?php echo (int) $prpl_branding_id; ?>"
-								></prpl-badge>
-								<p><?php echo \esc_html( $prpl_badge->get_name() ); ?></p>
-							</span>
-						<?php endforeach; ?>
-					</div>
-				</div>
-			</div>
-		<?php endforeach; ?>
 		<?php \do_action( 'progress_planner_popover_after_badge_groups' ); ?>
 	</div>
 </div>

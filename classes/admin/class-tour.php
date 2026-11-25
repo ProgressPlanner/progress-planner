@@ -81,10 +81,10 @@ class Tour {
 				],
 			],
 			[
-				'element' => '.prpl-widget-wrapper.prpl-badge-streak .prpl-info-icon',
+				'element' => '#prpl-popover-badge-streak-maintenance-trigger',
 				'popover' => [
 					'title'       => \esc_html__( 'Your badge progress', 'progress-planner' ),
-					'description' => \esc_html__( 'Clicking the info icon will show you more information about your badge progress. You can also learn about streak freezes here.', 'progress-planner' ),
+					'description' => \esc_html__( 'This link shows how to collect your streak badges and how far along you are. You can also learn about streak freezes here.', 'progress-planner' ),
 					'side'        => 'top',
 					'align'       => 'center',
 				],

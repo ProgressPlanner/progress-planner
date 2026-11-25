@@ -181,10 +181,11 @@ prpl-badge {
 	.prpl-badge-name-hover {
 		display: inline;
 	}
+}
 
-	prpl-badge img {
-		animation: prpl-badge-wobble 0.8s ease-in-out;
-	}
+/* A badge still to earn (current month, or a streak/content badge) wobbles on hover. */
+.prpl-badge:is([data-state="in-progress"], [data-state="to-go"]):is(:hover, :focus) prpl-badge img {
+	animation: prpl-badge-wobble 0.8s ease-in-out;
 }
 
 @keyframes prpl-badge-wobble {
@@ -213,7 +214,7 @@ prpl-badge {
 
 @media (prefers-reduced-motion: reduce) {
 
-	.prpl-badge[data-state="in-progress"]:is(:hover, :focus) prpl-badge img {
+	.prpl-badge:is([data-state="in-progress"], [data-state="to-go"]):is(:hover, :focus) prpl-badge img {
 		animation: none;
 	}
 }
