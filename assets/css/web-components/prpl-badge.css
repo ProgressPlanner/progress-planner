@@ -77,7 +77,7 @@ prpl-badge {
 			width: 20px;
 			height: 20px;
 			background-color: var(--prpl-color-icon-missed-badge);
-			border: 2px solid #fff;
+			border: 2px solid var(--prpl-background-paper);
 			border-radius: 50%;
 			position: absolute;
 			top: 10%;
@@ -85,5 +85,129 @@ prpl-badge {
 			color: #fff;
 
 		}
+	}
+}
+
+/*------------------------------------*\
+	Monthly badges popover: hover states.
+
+	A missed badge (still earnable) shows how many points are left;
+	the current month's badge shows "In progress" with a small wobble.
+\*------------------------------------*/
+.prpl-badge[data-state] {
+	position: relative;
+	cursor: default;
+	border-radius: var(--prpl-radius-paper);
+
+	&:focus-visible {
+		outline: 2px solid var(--prpl-color-link);
+		outline-offset: 4px;
+	}
+
+	.prpl-badge-image {
+		position: relative;
+		display: block;
+	}
+
+	&:is(:hover, :focus-visible) prpl-badge[complete="false"] img {
+		opacity: 1;
+		filter: none;
+	}
+}
+
+.prpl-badge-points-to-go {
+	position: absolute;
+	top: 0;
+	left: 50%;
+	z-index: 1;
+	display: inline-flex;
+	align-items: center;
+	gap: 0.25rem;
+	padding: 2px 0.5rem 2px 2px;
+	border-radius: 999px;
+	background: var(--prpl-background-alert-error);
+	color: var(--prpl-color-text);
+	font-size: var(--prpl-font-size-small);
+	line-height: 1.2;
+	white-space: nowrap;
+	pointer-events: none;
+	opacity: 0;
+	transform: translate(-50%, 4px);
+	transition: opacity 0.2s ease-in-out, transform 0.2s ease-in-out;
+}
+
+.prpl-badge-points-to-go-icon {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 20px;
+	height: 20px;
+	border-radius: 50%;
+	background: var(--prpl-color-icon-missed-badge);
+	color: #fff;
+	font-weight: 600;
+}
+
+.prpl-badge[data-state="missed"]:is(:hover, :focus-visible) {
+
+	.prpl-badge-points-to-go {
+		opacity: 1;
+		transform: translate(-50%, 0);
+	}
+
+	/* The pill carries the "!" now. */
+	prpl-badge::after {
+		opacity: 0;
+	}
+}
+
+.prpl-badge-name-hover {
+	display: none;
+	font-weight: 600;
+}
+
+.prpl-badge[data-state="in-progress"]:is(:hover, :focus-visible) {
+
+	.prpl-badge-name-default {
+		display: none;
+	}
+
+	.prpl-badge-name-hover {
+		display: inline;
+	}
+
+	prpl-badge img {
+		animation: prpl-badge-wobble 0.8s ease-in-out;
+	}
+}
+
+@keyframes prpl-badge-wobble {
+
+	0%,
+	100% {
+		transform: rotate(0);
+	}
+
+	20% {
+		transform: rotate(-8deg);
+	}
+
+	40% {
+		transform: rotate(6deg);
+	}
+
+	60% {
+		transform: rotate(-4deg);
+	}
+
+	80% {
+		transform: rotate(2deg);
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+	.prpl-badge[data-state="in-progress"]:is(:hover, :focus-visible) prpl-badge img {
+		animation: none;
 	}
 }
