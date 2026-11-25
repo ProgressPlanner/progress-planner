@@ -5,20 +5,17 @@
  * @package Progress_Planner
  */
 
-use Progress_Planner\Badges\Monthly;
-
 // Exit if accessed directly.
 if ( ! \defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-$prpl_widget      = \progress_planner()->get_admin__widgets__monthly_badges();
-$prpl_stats       = $prpl_widget->get_popover_stats();
+$prpl_stats       = \progress_planner()->get_admin__widgets__monthly_badges()->get_popover_stats();
 $prpl_branding_id = (int) \progress_planner()->get_ui__branding()->get_branding_id();
 
 // Newest year first.
-$prpl_badges_years = \array_keys( Monthly::get_instances() );
-\rsort( $prpl_badges_years );
+$prpl_years = $prpl_stats['years'];
+\krsort( $prpl_years );
 ?>
 <h2 class="screen-reader-text"><?php \esc_html_e( 'Your badges', 'progress-planner' ); ?></h2>
 
@@ -53,13 +50,7 @@ $prpl_badges_years = \array_keys( Monthly::get_instances() );
 		</div>
 	</div>
 
-	<?php foreach ( $prpl_badges_years as $prpl_badges_year ) : ?>
-		<?php
-		$prpl_year_stats = $prpl_stats['years'][ (int) $prpl_badges_year ] ?? [
-			'badges' => 0,
-			'tasks'  => 0,
-		];
-		?>
+	<?php foreach ( $prpl_years as $prpl_badges_year => $prpl_year_stats ) : ?>
 		<section class="prpl-badges-year">
 			<h3 class="prpl-badges-year-title">
 				<?php
@@ -72,11 +63,12 @@ $prpl_badges_years = \array_keys( Monthly::get_instances() );
 			</h3>
 			<div class="prpl-badges-year-content">
 				<div class="prpl-badges-year-grid badge-group-monthly">
-					<?php foreach ( Monthly::get_instances_for_year( $prpl_badges_year ) as $prpl_badge ) : ?>
+					<?php foreach ( $prpl_year_stats['items'] as $prpl_item ) : ?>
 						<?php
-						$prpl_badge_progress = $prpl_badge->progress_callback();
+						$prpl_badge          = $prpl_item['badge'];
+						$prpl_badge_progress = $prpl_item['progress'];
+						$prpl_badge_state    = $prpl_item['state'];
 						$prpl_is_complete    = 100 === (int) $prpl_badge_progress['progress'];
-						$prpl_badge_state    = $prpl_widget->get_popover_badge_state( $prpl_badge );
 						?>
 						<span
 							class="prpl-badge prpl-badge-<?php echo \esc_attr( $prpl_badge->get_id() ); ?>"

@@ -99,6 +99,12 @@ prpl-badge {
 	cursor: default;
 	border-radius: var(--prpl-radius-paper);
 
+	/* Reveal on :focus too, so a tap on a touch screen shows the details;
+	   the outline is only for keyboard focus. */
+	&:focus {
+		outline: none;
+	}
+
 	&:focus-visible {
 		outline: 2px solid var(--prpl-color-link);
 		outline-offset: 4px;
@@ -109,7 +115,7 @@ prpl-badge {
 		display: block;
 	}
 
-	&:is(:hover, :focus-visible) prpl-badge[complete="false"] img {
+	&:is(:hover, :focus) prpl-badge[complete="false"] img {
 		opacity: 1;
 		filter: none;
 	}
@@ -148,7 +154,7 @@ prpl-badge {
 	font-weight: 600;
 }
 
-.prpl-badge[data-state="missed"]:is(:hover, :focus-visible) {
+.prpl-badge[data-state="missed"]:is(:hover, :focus) {
 
 	.prpl-badge-points-to-go {
 		opacity: 1;
@@ -166,7 +172,7 @@ prpl-badge {
 	font-weight: 600;
 }
 
-.prpl-badge[data-state="in-progress"]:is(:hover, :focus-visible) {
+.prpl-badge[data-state="in-progress"]:is(:hover, :focus) {
 
 	.prpl-badge-name-default {
 		display: none;
@@ -207,7 +213,7 @@ prpl-badge {
 
 @media (prefers-reduced-motion: reduce) {
 
-	.prpl-badge[data-state="in-progress"]:is(:hover, :focus-visible) prpl-badge img {
+	.prpl-badge[data-state="in-progress"]:is(:hover, :focus) prpl-badge img {
 		animation: none;
 	}
 }

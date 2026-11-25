@@ -148,4 +148,44 @@ class Monthly_Badges_Popover_Test extends \WP_UnitTestCase {
 		$this->assertSame( Monthly::TARGET_POINTS, $stats['tasks'] );
 		$this->assertSame( 7, $stats['months'] );
 	}
+
+	/**
+	 * Tasks completed before the first badge month are not counted for that year.
+	 *
+	 * @return void
+	 */
+	public function test_tasks_before_the_first_badge_month_are_not_counted() {
+		$this_month = new \DateTime( 'first day of this month' );
+		if ( 1 === (int) $this_month->format( 'n' ) ) {
+			$this->markTestSkipped( 'Needs an earlier month in the same year.' );
+		}
+
+		// Activated this month, so this year's first badge is this month's.
+		$this->set_activation_date( clone $this_month );
+
+		$this->insert_activities( ( clone $this_month )->modify( '-1 month' )->format( 'Y-m-d' ), 2 );
+		$this->insert_activities( $this_month->format( 'Y-m-d' ), 3 );
+
+		$stats = ( new Monthly_Badges() )->get_popover_stats();
+
+		$this->assertSame( 3, $stats['years'][ (int) $this_month->format( 'Y' ) ]['tasks'] );
+	}
+
+	/**
+	 * Every badge in the popover data carries its progress and state.
+	 *
+	 * @return void
+	 */
+	public function test_popover_items_carry_progress_and_state() {
+		$year  = (int) ( new \DateTime() )->format( 'Y' );
+		$items = ( new Monthly_Badges() )->get_popover_stats()['years'][ $year ]['items'];
+
+		$states = [];
+		foreach ( $items as $item ) {
+			$this->assertArrayHasKey( 'progress', $item['progress'] );
+			$states[ $item['badge']->get_id() ] = $item['state'];
+		}
+
+		$this->assertSame( 'in-progress', $states[ Monthly::get_badge_id_from_date( new \DateTime() ) ] );
+	}
 }
