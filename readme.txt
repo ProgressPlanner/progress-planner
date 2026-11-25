@@ -56,8 +56,8 @@ Currently, Progress Planner supports tracking for one website per WordPress inst
 If you've found a bug, please follow the following steps:
 
 1. If it's a security report, please report it through our [PatchStack Vulnerability Disclosure Program](https://patchstack.com/database/vdp/progress-planner).
-2. If it's not a security report, search through the open issues on [our GitHub repository](https://github.com/emilia-Capital/progress-planner/issues/) to see if there's already an issue for this problem.
-3. If if doesn't exist yet, file a [bug report on GitHub](https://github.com/Emilia-Capital/progress-planner/issues/new/choose).
+2. If it's not a security report, search through the open issues on [our GitHub repository](https://github.com/ProgressPlanner/progress-planner/issues/) to see if there's already an issue for this problem.
+3. If no issue exists yet, file a [bug report on GitHub](https://github.com/ProgressPlanner/progress-planner/issues/new/choose).
 
 == Installation ==
 
@@ -80,6 +80,8 @@ https://youtu.be/e1bmxZYyXFY
 5. Maintain a simple to-do list per site on your dashboard or your Progress Planner page.
 6. See your Website activity score.
 7. Get a weekly email with stats on how well you're doing on your site!
+8. Work through website improvement challenges.
+9. Watch practical mini courses from the WordPress editor sidebar.
 
 == Changelog ==
 
@@ -190,7 +192,7 @@ Bugs we fixed:
 
 = 1.7.2 =
 
-* Backported some features from the Progress Planner Pro plugin.
+* Expanded the features included in the plugin.
 
 = 1.7.1 =
 
