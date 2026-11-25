@@ -20,6 +20,13 @@ final class Badge_Streak_Maintenance extends Badge_Streak {
 	protected $id = 'badge-streak-maintenance';
 
 	/**
+	 * The badges context this widget shows.
+	 *
+	 * @var string
+	 */
+	protected $context = 'maintenance';
+
+	/**
 	 * Whether the widget should be forced to the last column.
 	 *
 	 * @var bool

@@ -152,4 +152,20 @@ class Goal_Recurring_Test extends \WP_UnitTestCase {
 		$this->assertNull( $streak['freeze_week'] );
 		$this->assertSame( 4, $streak['current_streak'] );
 	}
+
+	/**
+	 * A freeze used in an earlier streak that later broke is not placed on the best streak.
+	 *
+	 * @return void
+	 */
+	public function test_freeze_in_an_earlier_streak_is_not_in_the_best_streak() {
+		// Met, met, miss (freeze), met, miss (streak breaks), then met until now.
+		$goal = $this->weekly_goal( 'test-streak-earlier-freeze', 8, [ 6, 4 ] );
+
+		$streak = $goal->get_streak();
+
+		$this->assertTrue( $streak['freeze_used'] );
+		$this->assertNull( $streak['freeze_week'], 'The best streak did not use the freeze' );
+		$this->assertSame( 4, $streak['max_streak'] );
+	}
 }

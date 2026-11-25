@@ -55,6 +55,13 @@ class Goal_Recurring {
 	private $occurences = [];
 
 	/**
+	 * The streak, once worked out for this request.
+	 *
+	 * @var array|null
+	 */
+	private $streak = null;
+
+	/**
 	 * An array of instances for this class.
 	 *
 	 * @var Goal_Recurring[]
@@ -175,12 +182,16 @@ class Goal_Recurring {
 	 *     @type int    $max_streak     The longest streak achieved (consecutive goals met).
 	 *     @type int    $current_streak Current active streak (from most recent backwards).
 	 *     @type bool   $freeze_used    Whether the allowed break (streak freeze) was used.
-	 *     @type int    $freeze_week    The streak length when the break was used, or null.
+	 *     @type int    $freeze_week    Where the break falls in the best streak (weeks into it), or null if it was not part of it.
 	 *     @type string $title          The goal title.
 	 *     @type string $description    The goal description.
 	 * }
 	 */
 	public function get_streak() {
+		if ( null !== $this->streak ) {
+			return $this->streak;
+		}
+
 		// Get all occurrences of this recurring goal.
 		$occurences = $this->get_occurences();
 
@@ -192,7 +203,8 @@ class Goal_Recurring {
 		// break here must not change the result of the next call.
 		$allowed_break = $this->allowed_break;
 		$freeze_used   = false;
-		$freeze_week   = null; // The streak length when the break was used.
+		$run_freeze    = null; // Where the break was used in the current run.
+		$freeze_week   = null; // Where the break was used in the best run.
 
 		$last_index = \count( $occurences ) - 1;
 		foreach ( $occurences as $index => $occurence ) {
@@ -202,7 +214,10 @@ class Goal_Recurring {
 			if ( $evaluation ) {
 				// Goal was met: Increment streak and track if it's a new record.
 				++$streak_nr;
-				$max_streak = \max( $max_streak, $streak_nr );
+				if ( $streak_nr > $max_streak ) {
+					$max_streak  = $streak_nr;
+					$freeze_week = $run_freeze;
+				}
 				continue;
 			}
 
@@ -217,15 +232,16 @@ class Goal_Recurring {
 				// This prevents the streak from resetting for this missed goal.
 				--$allowed_break;
 				$freeze_used = true;
-				$freeze_week = $streak_nr;
+				$run_freeze  = $streak_nr;
 				continue;
 			}
 
 			// No allowed breaks remaining: Streak is broken, reset to 0.
-			$streak_nr = 0;
+			$streak_nr  = 0;
+			$run_freeze = null;
 		}
 
-		return [
+		$this->streak = [
 			'max_streak'     => $max_streak,
 			'current_streak' => $streak_nr,
 			'freeze_used'    => $freeze_used,
@@ -233,6 +249,8 @@ class Goal_Recurring {
 			'title'          => $this->get_goal()->get_details()['title'],
 			'description'    => $this->get_goal()->get_details()['description'],
 		];
+
+		return $this->streak;
 	}
 
 	/**

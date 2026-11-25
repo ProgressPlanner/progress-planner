@@ -12,10 +12,9 @@ if ( ! \defined( 'ABSPATH' ) ) {
 }
 
 $prpl_context = isset( $args['context'] ) && 'content' === $args['context'] ? 'content' : 'maintenance';
-$prpl_widget  = 'content' === $prpl_context
-	? \progress_planner()->get_admin__widgets__badge_streak_content()
-	: \progress_planner()->get_admin__widgets__badge_streak_maintenance();
-$prpl_track   = $prpl_widget->get_track( $prpl_context );
+$prpl_track   = 'content' === $prpl_context
+	? \progress_planner()->get_admin__widgets__badge_streak_content()->get_track()
+	: \progress_planner()->get_admin__widgets__badge_streak_maintenance()->get_track();
 
 if ( empty( $prpl_track['badges'] ) ) {
 	return;

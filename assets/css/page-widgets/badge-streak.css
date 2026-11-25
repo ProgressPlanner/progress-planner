@@ -266,15 +266,8 @@
 		font-size: var(--prpl-font-size-small);
 	}
 
-	.prpl-badge-track-badge[data-state="to-go"]:is(:hover, :focus-visible) {
-
-		.prpl-badge-to-go {
-			visibility: visible;
-		}
-
-		prpl-badge img {
-			animation: prpl-badge-wobble 0.8s ease-in-out;
-		}
+	.prpl-badge-track-badge[data-state="to-go"]:is(:hover, :focus) .prpl-badge-to-go {
+		visibility: visible;
 	}
 
 	/* Green circle with a white tick, for an earned badge. */
@@ -325,12 +318,5 @@
 		.prpl-badge-track-badges {
 			grid-template-columns: 1fr;
 		}
-	}
-}
-
-@media (prefers-reduced-motion: reduce) {
-
-	.prpl-badge-track-popover .prpl-badge-track-badge[data-state="to-go"]:is(:hover, :focus-visible) prpl-badge img {
-		animation: none;
 	}
 }

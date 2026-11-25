@@ -15,6 +15,20 @@ use Progress_Planner\Badges\Badge_Content;
 final class Content_Curator extends Badge_Content {
 
 	/**
+	 * The number of new posts or pages to earn this badge.
+	 *
+	 * @var int
+	 */
+	const TARGET = 10;
+
+	/**
+	 * Or: the number of published posts or pages, old and new.
+	 *
+	 * @var int
+	 */
+	const TARGET_EXISTING = 20;
+
+	/**
 	 * The badge ID.
 	 *
 	 * @var string
@@ -61,7 +75,7 @@ final class Content_Curator extends Badge_Content {
 			$total_posts_count += \wp_count_posts( $post_type )->publish;
 		}
 
-		$remaining = 20 - \min( 20, $total_posts_count );
+		$remaining = self::TARGET_EXISTING - \min( self::TARGET_EXISTING, $total_posts_count );
 
 		// If there are 20 existing posts, save the badge as complete and return.
 		if ( 0 === $remaining ) {
@@ -89,11 +103,11 @@ final class Content_Curator extends Badge_Content {
 			)
 		);
 
-		$remaining_new = 10 - \min( 10, $new_count );
+		$remaining_new = self::TARGET - \min( self::TARGET, $new_count );
 
 		$final_percent   = \max(
 			\min( 100, \floor( $total_posts_count / 2 ) ),
-			\min( 100, \floor( $new_count * 10 ) )
+			\min( 100, \floor( 100 * $new_count / self::TARGET ) )
 		);
 		$final_remaining = \min( $remaining, $remaining_new );
 
