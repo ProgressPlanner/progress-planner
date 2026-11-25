@@ -13,16 +13,19 @@ $prpl_widget = \progress_planner()->get_admin__widgets__content_activity();
 
 $prpl_activity_types = [
 	'publish' => [
-		'label' => \__( 'published', 'progress-planner' ),
-		'color' => 'var(--prpl-graph-color-2)',
+		'label'     => \__( 'published', 'progress-planner' ),
+		'color'     => 'var(--prpl-graph-color-2)',
+		'lineStyle' => 'solid',
 	],
 	'update'  => [
-		'label' => \__( 'updated', 'progress-planner' ),
-		'color' => 'var(--prpl-graph-color-3)',
+		'label'     => \__( 'updated', 'progress-planner' ),
+		'color'     => 'var(--prpl-graph-color-3)',
+		'lineStyle' => 'dotted',
 	],
 	'delete'  => [
-		'label' => \__( 'deleted', 'progress-planner' ),
-		'color' => 'var(--prpl-graph-color-4)',
+		'label'     => \__( 'deleted', 'progress-planner' ),
+		'color'     => 'var(--prpl-graph-color-4)',
+		'lineStyle' => 'dashed',
 	],
 ];
 
@@ -50,8 +53,9 @@ foreach ( $prpl_activity_types as $prpl_activity_type => $prpl_activity_data ) {
 		);
 
 	$prpl_chart_options['dataArgs'][ $prpl_activity_type ] = [
-		'color' => $prpl_activity_data['color'],
-		'label' => $prpl_activity_data['label'],
+		'color'     => $prpl_activity_data['color'],
+		'label'     => $prpl_activity_data['label'],
+		'lineStyle' => $prpl_activity_data['lineStyle'],
 	];
 }
 
