@@ -13,10 +13,64 @@ namespace Progress_Planner\Rest;
 abstract class Base {
 
 	/**
+	 * HTTP header that carries the site token.
+	 */
+	const TOKEN_HEADER = 'X-Progress-Planner-Token';
+
+	/**
+	 * REST namespace of the token-authenticated endpoints.
+	 */
+	const REST_NAMESPACE = '/progress-planner/v1';
+
+	/**
+	 * Route of the endpoint, relative to the namespace. Empty means no route.
+	 */
+	const ROUTE = '';
+
+	/**
 	 * Constructor.
 	 */
 	public function __construct() {
 		\add_action( 'rest_api_init', [ $this, 'register_rest_endpoint' ] );
+		\add_filter( 'rest_post_dispatch', [ $this, 'prevent_caching' ], 10, 3 );
+	}
+
+	/**
+	 * Keep responses of this endpoint out of every cache.
+	 *
+	 * With header authentication every caller requests the same URL. A cache
+	 * that stored an authenticated response would hand it to anyone requesting
+	 * that URL, and the server would get stale data back. WordPress only sends
+	 * no-cache headers to logged-in users, and the server is not logged in.
+	 * Runs for successful and rejected requests alike.
+	 *
+	 * @param mixed $response The response.
+	 * @param mixed $server   The REST server.
+	 * @param mixed $request  The request.
+	 *
+	 * @return mixed
+	 */
+	public function prevent_caching( $response, $server, $request ) { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.FoundAfterLastUsed
+		if ( '' === static::ROUTE
+			|| ! $response instanceof \WP_HTTP_Response
+			|| ! $request instanceof \WP_REST_Request
+		) {
+			return $response;
+		}
+
+		$route = self::REST_NAMESPACE . static::ROUTE;
+		if ( $route !== $request->get_route() && 0 !== \strpos( $request->get_route(), $route . '/' ) ) {
+			return $response;
+		}
+
+		$response->header( 'Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0, private' );
+		$response->header( 'Expires', 'Wed, 11 Jan 1984 05:00:00 GMT' );
+
+		// LiteSpeed Cache caches REST responses for guests by default and sends
+		// its own cache header, so the headers above alone do not stop it.
+		\do_action( 'litespeed_control_set_nocache', 'Progress Planner token-authenticated endpoint' ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- LiteSpeed Cache's public API.
+
+		return $response;
 	}
 
 	/**
@@ -40,31 +94,18 @@ abstract class Base {
 	}
 
 	/**
-	 * Authenticate a request using a bearer token, never a URL parameter.
+	 * Authenticate a request using the site token header, never a URL parameter.
+	 *
+	 * A dedicated header, not `Authorization: Bearer`: bearer-auth plugins (JWT
+	 * and OAuth) try to decode every bearer token and reject the request before
+	 * this check runs, and some Apache setups strip `Authorization` entirely.
 	 *
 	 * @param \WP_REST_Request $request The REST request.
 	 * @return bool
 	 */
 	public function permissions_check( $request ) {
-		$authorization = $request->get_header( 'authorization' );
-		// Apache may expose Authorization only through its original request headers
-		// when WordPress's rewrite rules have not populated HTTP_AUTHORIZATION.
-		if ( null === $authorization ) {
-			$headers       = \array_change_key_case( $this->get_http_request_headers(), CASE_LOWER );
-			$authorization = $headers['authorization'] ?? null;
-		}
-		return \is_string( $authorization )
-			&& 1 === \preg_match( '/^Bearer ([^\s]+)$/iD', $authorization, $matches )
-			&& $this->validate_token( $matches[1] );
-	}
-
-	/**
-	 * Read original HTTP headers when the web server exposes them separately.
-	 *
-	 * @return array
-	 */
-	protected function get_http_request_headers() {
-		return \function_exists( 'getallheaders' ) ? \getallheaders() : [];
+		$token = $request->get_header( self::TOKEN_HEADER );
+		return \is_string( $token ) && $this->validate_token( \trim( $token ) );
 	}
 
 	/**
