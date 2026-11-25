@@ -23,9 +23,9 @@ final class Monthly_Badges extends Widget {
 	protected $id = 'monthly-badges';
 
 	/**
-	 * The popover numbers, computed once per request.
+	 * The popover data, computed once per request.
 	 *
-	 * @var array{months: int, badges: int, tasks: int, years: array<int, array{badges: int, tasks: int}>}|null
+	 * @var array{months: int, badges: int, tasks: int, years: array<int, array{badges: int, tasks: int, items: array<int, array{badge: Monthly, progress: array, state: string}>}>}|null
 	 */
 	private $popover_stats = null;
 
@@ -79,12 +79,14 @@ final class Monthly_Badges extends Widget {
 	}
 
 	/**
-	 * Get the numbers shown in the monthly badges popover.
+	 * Get everything the monthly badges popover shows.
 	 *
-	 * Badges are the monthly badges earned; tasks are the completed tasks
-	 * (recommendations and golden to-do tasks) that earn monthly badge points.
+	 * Each badge's progress is worked out once here; the template reads it
+	 * from the result. Badges are the monthly badges earned; tasks are the
+	 * completed tasks (recommendations and golden to-do tasks), counted from
+	 * the first month that has a badge.
 	 *
-	 * @return array{months: int, badges: int, tasks: int, years: array<int, array{badges: int, tasks: int}>}
+	 * @return array{months: int, badges: int, tasks: int, years: array<int, array{badges: int, tasks: int, items: array<int, array{badge: Monthly, progress: array, state: string}>}>}
 	 */
 	public function get_popover_stats() {
 		if ( null !== $this->popover_stats ) {
@@ -98,31 +100,43 @@ final class Monthly_Badges extends Widget {
 			'years'  => [],
 		];
 
-		foreach ( \array_keys( Monthly::get_instances() ) as $year ) {
+		foreach ( Monthly::get_instances() as $year => $year_badges ) {
+			$year   = (int) $year;
 			$badges = 0;
-			foreach ( Monthly::get_instances_for_year( $year ) as $badge ) {
-				if ( 100 === (int) $badge->progress_callback()['progress'] ) {
+			$items  = [];
+			foreach ( $year_badges as $badge ) {
+				$progress = $badge->progress_callback();
+				$items[]  = [
+					'badge'    => $badge,
+					'progress' => $progress,
+					'state'    => $this->get_badge_state( $badge->get_id(), (int) $progress['progress'] ),
+				];
+				if ( 100 === (int) $progress['progress'] ) {
 					++$badges;
 				}
 			}
 
-			$tasks = \count(
-				\progress_planner()->get_activities__query()->query_activities(
-					[
-						'category'   => 'suggested_task',
-						'type'       => 'completed',
-						'start_date' => new DateTime( "{$year}-01-01" ),
-						'end_date'   => new DateTime( "{$year}-12-31" ),
-					]
-				)
-			);
+			$tasks = 0;
+			if ( ! empty( $year_badges ) ) {
+				$tasks = \count(
+					\progress_planner()->get_activities__query()->query_activities(
+						[
+							'category'   => 'suggested_task',
+							'type'       => 'completed',
+							'start_date' => new DateTime( \sprintf( '%d-%02d-01', $year, (int) $year_badges[0]->get_month() ) ),
+							'end_date'   => new DateTime( "{$year}-12-31" ),
+						]
+					)
+				);
+			}
 
-			$stats['years'][ (int) $year ] = [
+			$stats['years'][ $year ] = [
 				'badges' => $badges,
 				'tasks'  => $tasks,
+				'items'  => $items,
 			];
-			$stats['badges']              += $badges;
-			$stats['tasks']               += $tasks;
+			$stats['badges']        += $badges;
+			$stats['tasks']         += $tasks;
 		}
 
 		$this->popover_stats = $stats;
@@ -141,17 +155,36 @@ final class Monthly_Badges extends Widget {
 	 * @return string
 	 */
 	public function get_popover_badge_state( $badge ) {
-		if ( 100 === (int) $badge->progress_callback()['progress'] ) {
+		return $this->get_badge_state( $badge->get_id(), (int) $badge->progress_callback()['progress'] );
+	}
+
+	/**
+	 * Get a badge's hover state from its ID and progress.
+	 *
+	 * @param string $badge_id The badge ID.
+	 * @param int    $progress The badge progress (0-100).
+	 *
+	 * @return string
+	 */
+	private function get_badge_state( $badge_id, $progress ) {
+		if ( 100 <= $progress ) {
 			return '';
 		}
 
-		foreach ( $this->get_previous_incomplete_months_badges() as $missed_badge ) {
-			if ( $missed_badge->get_id() === $badge->get_id() ) {
+		$month = new DateTime( 'first day of this month' );
+		if ( Monthly::get_badge_id_from_date( $month ) === $badge_id ) {
+			return 'in-progress';
+		}
+
+		// The previous two months can still be earned.
+		for ( $i = 0; $i < 2; $i++ ) {
+			$month->modify( 'first day of previous month' );
+			if ( Monthly::get_badge_id_from_date( $month ) === $badge_id ) {
 				return 'missed';
 			}
 		}
 
-		return Monthly::get_badge_id_from_date( new DateTime() ) === $badge->get_id() ? 'in-progress' : '';
+		return '';
 	}
 
 	/**
