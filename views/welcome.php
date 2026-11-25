@@ -128,6 +128,7 @@ if ( false !== \progress_planner()->get_license_key() ) {
 					</label>
 				</div>
 				<br>
+				<p id="prpl-onboarding-error" class="prpl-onboarding-error" role="alert" hidden></p>
 				<div id="prpl-onboarding-submit-wrapper" class="prpl-disabled">
 					<div id="prpl-onboarding-submit-grid-wrapper">
 						<span>

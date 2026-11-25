@@ -13,7 +13,6 @@
  * @param {string} licenseKey The license key.
  */
 const progressPlannerSaveLicenseKey = ( licenseKey ) => {
-	console.log( 'License key: ' + licenseKey );
 	return progressPlannerAjaxRequest( {
 		url: progressPlanner.ajaxUrl,
 		data: {
@@ -22,6 +21,34 @@ const progressPlannerSaveLicenseKey = ( licenseKey ) => {
 			key: licenseKey,
 		},
 	} );
+};
+
+/**
+ * Show an onboarding error and let the user submit the form again.
+ *
+ * @param {Object} response The server response, if any.
+ */
+const progressPlannerShowOnboardError = ( response ) => {
+	console.warn( response );
+
+	const errorElement = document.getElementById( 'prpl-onboarding-error' );
+	if ( errorElement ) {
+		// textContent: the message comes from the remote server.
+		errorElement.textContent =
+			response && 'string' === typeof response.message && response.message
+				? response.message
+				: progressPlanner.onboardError;
+		errorElement.hidden = false;
+	}
+
+	document
+		.querySelectorAll( '#prpl-onboarding-form input[type="submit"]' )
+		.forEach( ( input ) => {
+			input.disabled = false;
+		} );
+	document
+		.querySelectorAll( '#prpl-onboarding-submit-wrapper .prpl-spinner' )
+		.forEach( ( spinner ) => spinner.remove() );
 };
 
 /**
@@ -35,15 +62,17 @@ const progressPlannerAjaxAPIRequest = ( data ) => {
 		data,
 	} )
 		.then( ( response ) => {
+			if ( ! response || ! response.license_key ) {
+				progressPlannerShowOnboardError( response );
+				return;
+			}
 			// Make a local request to save the response data.
 			progressPlannerSaveLicenseKey( response.license_key ).then( () => {
 				// Refresh the page.
 				window.location.reload();
 			} );
 		} )
-		.catch( ( error ) => {
-			console.warn( error );
-		} );
+		.catch( progressPlannerShowOnboardError );
 };
 
 /**
@@ -58,15 +87,19 @@ const progressPlannerOnboardCall = ( data ) => {
 	progressPlannerAjaxRequest( {
 		url: progressPlanner.onboardNonceURL,
 		data,
-	} ).then( ( response ) => {
-		if ( 'ok' === response.status ) {
+	} )
+		.then( ( response ) => {
+			if ( ! response || 'ok' !== response.status ) {
+				progressPlannerShowOnboardError( response );
+				return;
+			}
 			// Add the nonce to our data object.
 			data.nonce = response.nonce;
 
 			// Make the request to the API.
 			progressPlannerAjaxAPIRequest( data );
-		}
-	} );
+		} )
+		.catch( progressPlannerShowOnboardError );
 };
 
 if ( document.getElementById( 'prpl-onboarding-form' ) ) {
@@ -132,6 +165,9 @@ if ( document.getElementById( 'prpl-onboarding-form' ) ) {
 			if ( ! privacyPolicyAccepted ) {
 				return;
 			}
+
+			// Hide an error from a previous attempt.
+			document.getElementById( 'prpl-onboarding-error' ).hidden = true;
 
 			// Disable all (both buttons) submit buttons.
 			document

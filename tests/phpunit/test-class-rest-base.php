@@ -33,7 +33,26 @@ class Rest_Base_Test extends \WP_UnitTestCase {
 	}
 
 	/**
-	 * Test get_client_ip with Cloudflare header.
+	 * Only the dedicated token header authenticates; a bearer token is never read,
+	 * so bearer-auth plugins and the site token cannot interfere with each other.
+	 *
+	 * @return void
+	 */
+	public function test_only_the_token_header_authenticates() {
+		\update_option( 'progress_planner_license_key', 'fixture-license' );
+		\delete_transient( 'prpl_api_rate_limit_' . \md5( '0.0.0.0' ) );
+		unset( $_SERVER['REMOTE_ADDR'] );
+		$request = new \WP_REST_Request( 'GET', '/progress-planner/v1/tasks' );
+		$request->set_header( 'Authorization', 'Bearer fixture-license' );
+		$this->assertFalse( $this->rest_instance->permissions_check( $request ) );
+		$request->set_header( 'x-progress-planner-token', 'fixture-license' );
+		$this->assertTrue( $this->rest_instance->permissions_check( $request ) );
+		$request->set_header( 'X-Progress-Planner-Token', 'wrong-key' );
+		$this->assertFalse( $this->rest_instance->permissions_check( $request ) );
+	}
+
+	/**
+	 * Test get_client_ip ignores an untrusted Cloudflare header.
 	 *
 	 * @return void
 	 */
@@ -49,11 +68,11 @@ class Rest_Base_Test extends \WP_UnitTestCase {
 
 		$ip = $method->invoke( $this->rest_instance );
 
-		$this->assertEquals( '192.168.1.100', $ip );
+		$this->assertEquals( '0.0.0.0', $ip );
 	}
 
 	/**
-	 * Test get_client_ip with X-Real-IP header.
+	 * Test get_client_ip ignores an untrusted X-Real-IP header.
 	 *
 	 * @return void
 	 */
@@ -69,7 +88,7 @@ class Rest_Base_Test extends \WP_UnitTestCase {
 
 		$ip = $method->invoke( $this->rest_instance );
 
-		$this->assertEquals( '192.168.1.101', $ip );
+		$this->assertEquals( '0.0.0.0', $ip );
 	}
 
 	/**
@@ -89,7 +108,7 @@ class Rest_Base_Test extends \WP_UnitTestCase {
 
 		$ip = $method->invoke( $this->rest_instance );
 
-		$this->assertEquals( '192.168.1.102', $ip );
+		$this->assertEquals( '0.0.0.0', $ip );
 	}
 
 	/**
@@ -109,7 +128,7 @@ class Rest_Base_Test extends \WP_UnitTestCase {
 
 		$ip = $method->invoke( $this->rest_instance );
 
-		$this->assertEquals( '192.168.1.103', $ip );
+		$this->assertEquals( '0.0.0.0', $ip );
 	}
 
 	/**
@@ -250,7 +269,7 @@ class Rest_Base_Test extends \WP_UnitTestCase {
 	}
 
 	/**
-	 * Test validate_token with token containing "token/" prefix.
+	 * Token validation compares the entire token, including any prefix.
 	 *
 	 * @return void
 	 */
@@ -270,7 +289,7 @@ class Rest_Base_Test extends \WP_UnitTestCase {
 
 		$result = $this->rest_instance->validate_token( $token );
 
-		$this->assertTrue( $result );
+		$this->assertFalse( $result );
 	}
 
 	/**

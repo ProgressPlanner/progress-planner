@@ -150,12 +150,14 @@ class Onboard {
 			]
 		);
 
-		// Make the request.
+		// Make the request. Not wp_safe_remote_post(): the URL is hardcoded or set by the
+		// site owner in wp-config.php, and may be a local development server.
 		$response = \wp_remote_post(
 			$this->get_remote_url( 'onboard' ),
 			[
-				'timeout' => 10,
-				'body'    => $data,
+				'timeout'     => 10,
+				'redirection' => 0,
+				'body'        => $data,
 			]
 		);
 

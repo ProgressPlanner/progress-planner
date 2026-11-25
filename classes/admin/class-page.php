@@ -178,6 +178,7 @@ class Page {
 					'onboardAPIUrl'   => \progress_planner()->get_utils__onboard()->get_remote_url( 'onboard' ),
 					'ajaxUrl'         => \admin_url( 'admin-ajax.php' ),
 					'nonce'           => \wp_create_nonce( 'progress_planner' ),
+					'onboardError'    => \__( 'We could not connect your site. Please try again, or contact support if this keeps happening.', 'progress-planner' ),
 				],
 			];
 

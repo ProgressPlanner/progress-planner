@@ -15,6 +15,16 @@ namespace Progress_Planner;
 class Lessons {
 
 	/**
+	 * Lesson fields that contain HTML; every other string field is plain text.
+	 */
+	private const HTML_FIELDS = [ 'text', 'todo_description' ];
+
+	/**
+	 * Version of the sanitized lessons cache. Bump it whenever `sanitize_items()` changes.
+	 */
+	private const CACHE_VERSION = 2;
+
+	/**
 	 * The ID for this API object.
 	 *
 	 * @var string
@@ -53,18 +63,10 @@ class Lessons {
 	 *               - Additional fields as provided by remote API
 	 */
 	public function get_remote_api_items() {
-		$url = \progress_planner()->get_remote_server_root_url() . '/wp-json/progress-planner-saas/v1/lessons';
-		$url = \add_query_arg(
-			[
-				'site'        => \get_site_url(),
-				'license_key' => \progress_planner()->get_license_key(),
-				'locale'      => \apply_filters( 'prpl_lesson_locale', \get_locale() ),
-			],
-			$url
-		);
+		$url       = $this->get_remote_api_url();
+		$cache_key = $this->get_cache_key();
 
-		$cache_key = \md5( $url );
-
+		// Cached lessons were sanitized before they were stored (see CACHE_VERSION).
 		$cached = \progress_planner()->get_utils__cache()->get( $cache_key );
 		if ( \is_array( $cached ) ) {
 			return $cached;
@@ -91,10 +93,91 @@ class Lessons {
 			return [];
 		}
 
-		// Cache successful response for one week.
-		\progress_planner()->get_utils__cache()->set( $cache_key, $json, WEEK_IN_SECONDS );
+		// Sanitize once, then cache the successful response for one week.
+		$items = $this->sanitize_items( $json );
+		\progress_planner()->get_utils__cache()->set( $cache_key, $items, WEEK_IN_SECONDS );
 
-		return $json;
+		return $items;
+	}
+
+	/**
+	 * Get the URL of the remote lessons endpoint for this site and locale.
+	 *
+	 * @return string
+	 */
+	public function get_remote_api_url() {
+		return \add_query_arg(
+			[
+				'site'   => \get_site_url(),
+				'locale' => \apply_filters( 'prpl_lesson_locale', \get_locale() ),
+			],
+			\progress_planner()->get_remote_server_root_url() . '/wp-json/progress-planner-saas/v1/lessons'
+		);
+	}
+
+	/**
+	 * Get the cache key for the lessons.
+	 *
+	 * The key includes CACHE_VERSION, so entries cached before sanitizing (or before
+	 * a sanitizer change) are never read and are fetched again once.
+	 *
+	 * @return string
+	 */
+	public function get_cache_key() {
+		return \md5( $this->get_remote_api_url() . '|v' . self::CACHE_VERSION );
+	}
+
+	/**
+	 * Sanitize remote lesson content before it is cached.
+	 *
+	 * Only fields that carry markup keep (filtered) HTML. Everything else is plain
+	 * text: running it through kses would HTML-encode `&` in names and IDs.
+	 *
+	 * @param array $items Lesson data.
+	 * @return array
+	 */
+	public function sanitize_items( array $items ): array {
+		foreach ( $items as $key => $value ) {
+			if ( \is_array( $value ) ) {
+				$items[ $key ] = $this->sanitize_items( $value );
+			} elseif ( \is_string( $value ) ) {
+				if ( 'video' === $key ) {
+					$items[ $key ] = $this->sanitize_video( $value );
+				} elseif ( \in_array( $key, self::HTML_FIELDS, true ) ) {
+					$items[ $key ] = \wp_kses_post( $value );
+				} else {
+					$items[ $key ] = \sanitize_text_field( $value );
+				}
+			}
+		}
+		return $items;
+	}
+
+	/**
+	 * Allow video embeds only from known video players, without active attributes.
+	 *
+	 * @param string $html Video markup.
+	 * @return string
+	 */
+	public function sanitize_video( string $html ): string {
+		$allowed = \wp_kses_allowed_html( 'post' );
+		// `style` is filtered by kses (safecss); `allow` and `loading` are needed by the Cloudflare Stream embed.
+		$allowed['iframe'] = \array_fill_keys( [ 'src', 'title', 'width', 'height', 'allowfullscreen', 'frameborder', 'style', 'allow', 'loading' ], true );
+		$html              = \wp_kses( $html, $allowed );
+		$tags              = new \WP_HTML_Tag_Processor( $html );
+		while ( $tags->next_tag( 'iframe' ) ) {
+			$src  = $tags->get_attribute( 'src' );
+			$host = \is_string( $src ) ? \strtolower( (string) \wp_parse_url( $src, PHP_URL_HOST ) ) : '';
+			if ( ! \is_string( $src ) || 'https' !== \wp_parse_url( $src, PHP_URL_SCHEME )
+				|| ( ! \in_array( $host, [ 'www.youtube.com', 'www.youtube-nocookie.com', 'player.vimeo.com', 'iframe.mediadelivery.net' ], true )
+					// Lesson videos are served from per-account Cloudflare Stream subdomains.
+					&& ! \str_ends_with( $host, '.cloudflarestream.com' ) )
+			) {
+				$tags->remove_attribute( 'src' );
+			}
+			$tags->set_attribute( 'sandbox', 'allow-scripts allow-same-origin allow-presentation' );
+		}
+		return $tags->get_updated_html();
 	}
 
 	/**

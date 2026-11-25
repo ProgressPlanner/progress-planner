@@ -62,7 +62,8 @@ abstract class Widget {
 	 * @return string
 	 */
 	public function get_range() {
-		return $this->get_sanitized_get( 'range', '-6 months' );
+		$range = $this->get_sanitized_get( 'range', '-6 months' );
+		return \in_array( $range, [ '-3 months', '-6 months', '-12 months', '-18 months', '-24 months' ], true ) ? $range : '-6 months';
 	}
 
 	/**
@@ -71,7 +72,8 @@ abstract class Widget {
 	 * @return string
 	 */
 	public function get_frequency() {
-		return $this->get_sanitized_get( 'frequency', 'monthly' );
+		$frequency = $this->get_sanitized_get( 'frequency', 'monthly' );
+		return \in_array( $frequency, [ 'weekly', 'monthly' ], true ) ? $frequency : 'monthly';
 	}
 
 	/**
