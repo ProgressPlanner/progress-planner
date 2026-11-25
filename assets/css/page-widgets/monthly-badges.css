@@ -64,6 +64,7 @@
 	Popover styles.
 \*------------------------------------*/
 #prpl-popover-monthly-badges {
+	padding: var(--prpl-gap);
 
 	.prpl-monthly-badges-popover {
 		container-type: inline-size;
@@ -147,6 +148,11 @@
 		display: grid;
 		grid-template-columns: repeat(4, 1fr);
 		gap: var(--prpl-padding);
+
+		/* The badge's own 6px margin is the only space above the name. */
+		.prpl-badge {
+			gap: 0;
+		}
 	}
 
 	.prpl-badges-year-stats {
@@ -157,6 +163,7 @@
 	/* The wrapper is not a grid item, so the badge needs to be a block to size it. */
 	.prpl-badge-image prpl-badge {
 		display: block;
+		margin-bottom: 6px; /* Design: 6px between badge and name; no spacing variable gives 6px. */
 	}
 
 	.prpl-badge-name {
