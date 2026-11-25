@@ -55,13 +55,22 @@ customElements.define(
 				class="chart-line-checkboxes"
 				style="
 					display: flex;
-					gap: 1em;
+					flex-wrap: wrap;
+					align-items: flex-start;
+					gap: 0.5em 1em;
 					margin-bottom: 1em;
-					justify-content: space-between;
 					font-size: 0.85rem;"
-			>${ this.getCheckboxesFiltersLabel() }${ Object.keys( this.options.dataArgs )
+			>${ this.getCheckboxesFiltersLabel() }<div
+				class="chart-line-checkboxes-items"
+				style="
+					display: flex;
+					flex: 1 1 auto;
+					flex-wrap: wrap;
+					gap: 0.5em 1em;
+					justify-content: space-between;"
+			>${ Object.keys( this.options.dataArgs )
 				.map( ( key ) => this.getCheckboxHTML( key ) )
-				.join( '' ) }</div>`;
+				.join( '' ) }</div></div>`;
 
 		/**
 		 * Get the HTML for a single checkbox.
@@ -72,10 +81,9 @@ customElements.define(
 		 */
 		getCheckboxHTML = ( key ) =>
 			`<label
-				style="display: inline-flex; flex-direction: column; gap: 0.25em; cursor: pointer;"
+				style="position: relative; display: flex; align-items: center; gap: 0.25em; padding-bottom: 0.5em; cursor: pointer;"
 				data-color="${ this.options.dataArgs[ key ].color }"
 			>
-				<span style="display: flex; align-items: center; gap: 0.25em;">
 				<span
 					class="prpl-chart-line-checkbox-color"
 					style="
@@ -98,7 +106,6 @@ customElements.define(
 					style="display: none;"
 				/>
 				${ this.options.dataArgs[ key ].label }
-				</span>
 				${ this.getLegendLineHTML( key ) }
 			</label>`;
 
@@ -160,7 +167,7 @@ customElements.define(
 				height="3"
 				aria-hidden="true"
 				focusable="false"
-				style="display: block; overflow: visible; opacity: ${
+				style="position: absolute; left: 0; bottom: 0; overflow: visible; opacity: ${
 					this.options.showCharts.includes( key ) ? 1 : 0.35
 				};"
 			><line x1="2" x2="100%" y1="1.5" y2="1.5" stroke="${
