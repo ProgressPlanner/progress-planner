@@ -4,7 +4,7 @@ import dotenv from 'dotenv';
 // Load environment variables
 dotenv.config();
 
-const baseURL = process.env.WORDPRESS_URL || 'http://localhost:8080';
+const baseURL = process.env.WORDPRESS_URL || 'http://127.0.0.1:8080';
 
 export default defineConfig({
   testDir: './tests/e2e/specs',
@@ -98,7 +98,7 @@ export default defineConfig({
   // Run WP Playground server before starting the tests
   webServer: {
     command: 'npx @wp-playground/cli server --mount=.:/wordpress/wp-content/plugins/progress-planner --blueprint=tests/e2e/blueprint.json --port=8080',
-    url: 'http://localhost:8080',
+    url: 'http://127.0.0.1:8080',
     // Always reuse if server is already running (needed for Yoast tests which use Docker WordPress)
     reuseExistingServer: true,
     timeout: 120 * 1000,

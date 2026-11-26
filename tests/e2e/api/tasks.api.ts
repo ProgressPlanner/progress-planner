@@ -20,7 +20,7 @@ export class TasksApi {
 	constructor( page: Page, request: APIRequestContext ) {
 		this.page = page;
 		this.request = request;
-		this.baseUrl = process.env.WORDPRESS_URL || 'http://localhost:8080';
+		this.baseUrl = process.env.WORDPRESS_URL || 'http://127.0.0.1:8080';
 	}
 
 	/**
