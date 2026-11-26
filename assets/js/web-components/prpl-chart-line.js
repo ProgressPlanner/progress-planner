@@ -55,13 +55,22 @@ customElements.define(
 				class="chart-line-checkboxes"
 				style="
 					display: flex;
-					gap: 1em;
+					flex-wrap: wrap;
+					align-items: flex-start;
+					gap: 0.5em 1em;
 					margin-bottom: 1em;
-					justify-content: space-between;
 					font-size: 0.85rem;"
-			>${ this.getCheckboxesFiltersLabel() }${ Object.keys( this.options.dataArgs )
+			>${ this.getCheckboxesFiltersLabel() }<div
+				class="chart-line-checkboxes-items"
+				style="
+					display: flex;
+					flex: 1 1 auto;
+					flex-wrap: wrap;
+					gap: 0.5em 1em;
+					justify-content: space-between;"
+			>${ Object.keys( this.options.dataArgs )
 				.map( ( key ) => this.getCheckboxHTML( key ) )
-				.join( '' ) }</div>`;
+				.join( '' ) }</div></div>`;
 
 		/**
 		 * Get the HTML for a single checkbox.
@@ -72,7 +81,7 @@ customElements.define(
 		 */
 		getCheckboxHTML = ( key ) =>
 			`<label
-				style="display: flex; align-items: center; gap: 0.25em; cursor: pointer;"
+				style="position: relative; display: flex; align-items: center; gap: 0.25em; padding-bottom: 0.5em; cursor: pointer;"
 				data-color="${ this.options.dataArgs[ key ].color }"
 			>
 				<span
@@ -97,7 +106,73 @@ customElements.define(
 					style="display: none;"
 				/>
 				${ this.options.dataArgs[ key ].label }
+				${ this.getLegendLineHTML( key ) }
 			</label>`;
+
+		/**
+		 * Get the line style of a data series.
+		 *
+		 * @param {string} key - The key of the data.
+		 *
+		 * @return {string} The line style: solid, dotted or dashed.
+		 */
+		getLineStyle = ( key ) =>
+			[ 'dotted', 'dashed' ].includes(
+				this.options.dataArgs[ key ]?.lineStyle
+			)
+				? this.options.dataArgs[ key ].lineStyle
+				: 'solid';
+
+		/**
+		 * Get the SVG stroke attributes for a line style.
+		 *
+		 * Dots are zero-length dashes with round caps, so each one is a circle.
+		 * A thin dotted line reads lighter than a solid one, so dots are 1.5
+		 * line-widths wide and sit close together. Dashes are three
+		 * line-widths long.
+		 *
+		 * @param {string} key         - The key of the data.
+		 * @param {number} strokeWidth - The width of the line.
+		 *
+		 * @return {string} The stroke attributes, including stroke-width.
+		 */
+		getStrokeStyleAttributes = ( key, strokeWidth ) => {
+			switch ( this.getLineStyle( key ) ) {
+				case 'dotted': {
+					const dotWidth = strokeWidth * 1.5;
+					return `stroke-width="${ dotWidth }" stroke-dasharray="0 ${
+						dotWidth * 1.75
+					}" stroke-linecap="round" stroke-linejoin="round"`;
+				}
+				case 'dashed':
+					return `stroke-width="${ strokeWidth }" stroke-dasharray="${
+						strokeWidth * 3
+					} ${ strokeWidth * 2 }" stroke-linejoin="round"`;
+				default:
+					return `stroke-width="${ strokeWidth }"`;
+			}
+		};
+
+		/**
+		 * Get the line sample shown under a legend label.
+		 *
+		 * @param {string} key - The key of the data.
+		 *
+		 * @return {string} The line sample SVG.
+		 */
+		getLegendLineHTML = ( key ) =>
+			`<svg
+				class="prpl-chart-line-legend-line"
+				width="100%"
+				height="3"
+				aria-hidden="true"
+				focusable="false"
+				style="position: absolute; left: 0; bottom: 0; overflow: visible; opacity: ${
+					this.options.showCharts.includes( key ) ? 1 : 0.35
+				};"
+			><line x1="2" x2="100%" y1="1.5" y2="1.5" stroke="${
+				this.options.dataArgs[ key ].color
+			}" ${ this.getStrokeStyleAttributes( key, 2 ) } /></svg>`;
 
 		/**
 		 * Get the filters label.
@@ -162,9 +237,10 @@ customElements.define(
 
 			return `<g><polyline fill="none" stroke="${
 				this.options.dataArgs[ key ].color
-			}" stroke-width="${
+			}" ${ this.getStrokeStyleAttributes(
+				key,
 				this.options.strokeWidth
-			}" points="${ polylinePoints
+			) } points="${ polylinePoints
 				.map( ( point ) => point.join( ',' ) )
 				.join( ' ' ) }" /></g>`;
 		};
@@ -390,16 +466,20 @@ customElements.define(
 				( checkbox ) => {
 					checkbox.addEventListener( 'change', ( e ) => {
 						const el = e.target;
-						const parentEl = el.parentElement;
-						const checkboxColorEl = parentEl.querySelector(
+						const labelEl = el.closest( 'label' );
+						const checkboxColorEl = labelEl.querySelector(
 							'.prpl-chart-line-checkbox-color'
+						);
+						const legendLineEl = labelEl.querySelector(
+							'.prpl-chart-line-legend-line'
 						);
 						if ( el.checked ) {
 							this.options.showCharts.push(
 								el.getAttribute( 'name' )
 							);
 							checkboxColorEl.style.backgroundColor =
-								parentEl.dataset.color;
+								labelEl.dataset.color;
+							legendLineEl.style.opacity = 1;
 						} else {
 							this.options.showCharts =
 								this.options.showCharts.filter(
@@ -408,6 +488,7 @@ customElements.define(
 								);
 							checkboxColorEl.style.backgroundColor =
 								'transparent';
+							legendLineEl.style.opacity = 0.35;
 						}
 
 						// Update the chart.
