@@ -21,6 +21,7 @@ use Progress_Planner\Suggested_Tasks\Data_Collector\Published_Post_Count;
 use Progress_Planner\Suggested_Tasks\Data_Collector\Yoast_Orphaned_Content;
 use Progress_Planner\Suggested_Tasks\Data_Collector\Unpublished_Content;
 use Progress_Planner\Suggested_Tasks\Data_Collector\SEO_Plugin;
+use Progress_Planner\Suggested_Tasks\Data_Collector\Spec_Audit;
 
 /**
  * Base data collector.
@@ -54,6 +55,7 @@ class Data_Collector_Manager {
 			new Published_Post_Count(),
 			new Unpublished_Content(),
 			new SEO_Plugin(),
+			new Spec_Audit(),
 		];
 
 		// Add the plugin integration.
