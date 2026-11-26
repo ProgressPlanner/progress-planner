@@ -102,4 +102,91 @@ class CPT_Recommendations_Test extends \WP_UnitTestCase {
 		\wp_cache_flush_group( \Progress_Planner\Suggested_Tasks_DB::GET_TASKS_CACHE_GROUP ); // Clear the cache.
 		$this->assertEquals( \count( $tasks_to_keep ), \count( \progress_planner()->get_suggested_tasks_db()->get_tasks_by( [ 'post_status' => 'publish' ] ) ) );
 	}
+
+	/**
+	 * Test that a confirmation code round-trips.
+	 *
+	 * @return void
+	 */
+	public function test_confirmation_code_verifies() {
+		$suggested_tasks = \progress_planner()->get_suggested_tasks();
+		$code            = $suggested_tasks->generate_task_confirmation_code( 'sending-email', 1 );
+
+		$this->assertSame( 4, \strlen( $code ) );
+		$this->assertTrue( $suggested_tasks->verify_task_confirmation_code( 'sending-email', 1, $code ) );
+	}
+
+	/**
+	 * Test that a code is accepted however a person retypes it.
+	 *
+	 * A code only has value if it survives being read aloud and typed back,
+	 * so case and surrounding whitespace must not matter.
+	 *
+	 * @return void
+	 */
+	public function test_confirmation_code_is_forgiving_about_formatting() {
+		$suggested_tasks = \progress_planner()->get_suggested_tasks();
+		$code            = $suggested_tasks->generate_task_confirmation_code( 'sending-email', 1 );
+
+		$this->assertTrue( $suggested_tasks->verify_task_confirmation_code( 'sending-email', 1, \strtolower( $code ) ) );
+		$this->assertTrue( $suggested_tasks->verify_task_confirmation_code( 'sending-email', 1, ' ' . $code . ' ' ) );
+	}
+
+	/**
+	 * Test that a wrong code is rejected.
+	 *
+	 * @return void
+	 */
+	public function test_confirmation_code_rejects_a_wrong_code() {
+		$suggested_tasks = \progress_planner()->get_suggested_tasks();
+		$suggested_tasks->generate_task_confirmation_code( 'sending-email', 1 );
+
+		$this->assertFalse( $suggested_tasks->verify_task_confirmation_code( 'sending-email', 1, 'ZZZZ' ) );
+	}
+
+	/**
+	 * Test that a code belongs to one user and one task.
+	 *
+	 * @return void
+	 */
+	public function test_confirmation_code_is_scoped() {
+		$suggested_tasks = \progress_planner()->get_suggested_tasks();
+		$code            = $suggested_tasks->generate_task_confirmation_code( 'sending-email', 1 );
+
+		$this->assertFalse( $suggested_tasks->verify_task_confirmation_code( 'sending-email', 2, $code ) );
+		$this->assertFalse( $suggested_tasks->verify_task_confirmation_code( 'other-task', 1, $code ) );
+	}
+
+	/**
+	 * Test that a code cannot be reused once consumed.
+	 *
+	 * @return void
+	 */
+	public function test_confirmation_code_is_single_use() {
+		$suggested_tasks = \progress_planner()->get_suggested_tasks();
+		$code            = $suggested_tasks->generate_task_confirmation_code( 'sending-email', 1 );
+
+		$suggested_tasks->delete_task_confirmation_code( 'sending-email', 1 );
+
+		$this->assertFalse( $suggested_tasks->verify_task_confirmation_code( 'sending-email', 1, $code ) );
+	}
+
+	/**
+	 * Test that codes avoid characters that are misread.
+	 *
+	 * @return void
+	 */
+	public function test_confirmation_code_avoids_ambiguous_characters() {
+		$suggested_tasks = \progress_planner()->get_suggested_tasks();
+
+		for ( $i = 0; $i < 40; $i++ ) {
+			$code = $suggested_tasks->generate_task_confirmation_code( 'sending-email', 1 );
+
+			$this->assertSame(
+				0,
+				\preg_match( '/[01OILSB58]/', $code ),
+				"Code {$code} contains an easily confused character."
+			);
+		}
+	}
 }
