@@ -64,22 +64,128 @@
 	Popover styles.
 \*------------------------------------*/
 #prpl-popover-monthly-badges {
+	padding: var(--prpl-gap);
 
-	.prpl-widgets-container {
+	.prpl-monthly-badges-popover {
+		container-type: inline-size;
+	}
+
+	/* Number cards: the totals at the top and the per-year cards. */
+	.prpl-badges-stat {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		gap: 0.25rem;
+		padding: var(--prpl-padding);
+		border-radius: var(--prpl-border-radius-big);
+		background: var(--prpl-background-monthly);
+		text-align: center;
+	}
+
+	.prpl-badges-stat-number {
+		font-size: var(--prpl-font-size-3xl);
+		font-weight: 600;
+		line-height: 1;
+		color: var(--prpl-color-text);
+	}
+
+	.prpl-badges-stat-label {
+		font-size: var(--prpl-font-size-base);
+	}
+
+	/* Top row: intro text and the two totals. */
+	.prpl-badges-summary {
+		display: grid;
+		grid-template-columns: repeat(3, 1fr);
+		gap: var(--prpl-padding);
+		padding-bottom: var(--prpl-gap);
+		border-bottom: 1px solid var(--prpl-color-divider);
+
+		.prpl-badges-stat,
+		.prpl-badges-summary-intro {
+			background: var(--prpl-background-content);
+		}
+	}
+
+	.prpl-badges-summary-intro {
+		padding: var(--prpl-padding);
+		border-radius: var(--prpl-border-radius-big);
+
+		p {
+			margin: 0;
+
+			& + p {
+				margin-top: 0.5rem;
+			}
+		}
+
+		strong {
+			color: var(--prpl-color-text);
+		}
+	}
+
+	/* One section per year. */
+	.prpl-badges-year {
+		padding: var(--prpl-padding) 0 var(--prpl-gap);
+		border-bottom: 1px solid var(--prpl-color-divider);
+	}
+
+	.prpl-badges-year-title {
+		margin: 0 0 var(--prpl-padding);
+		font-size: var(--prpl-font-size-xl);
+		color: var(--prpl-color-headings);
+	}
+
+	.prpl-badges-year-content {
+		display: grid;
+		grid-template-columns: 2fr 1fr;
+		gap: var(--prpl-padding);
+		align-items: start;
+	}
+
+	.prpl-badges-year-grid {
+		display: grid;
+		grid-template-columns: repeat(4, 1fr);
+		gap: var(--prpl-padding);
+
+		/* The badge's own 6px margin is the only space above the name. */
+		.prpl-badge {
+			gap: 0;
+		}
+	}
+
+	.prpl-badges-year-stats {
+		display: grid;
+		gap: var(--prpl-padding);
+	}
+
+	/* The wrapper is not a grid item, so the badge needs to be a block to size it. */
+	.prpl-badge-image prpl-badge {
+		display: block;
+		margin-bottom: 6px; /* Design: 6px between badge and name; no spacing variable gives 6px. */
+	}
+
+	.prpl-badge-name {
+		margin: 0;
+		font-size: var(--prpl-font-size-small);
+		text-align: center;
+		line-height: 1.2;
+	}
+
+	/* The content and streak badges (until they get their own popovers). */
+	.prpl-widgets-container.in-popover {
 		display: grid;
 		grid-template-columns: repeat(auto-fit, minmax(var(--prpl-column-min-width), 1fr));
 		grid-gap: var(--prpl-gap);
 		grid-auto-rows: auto;
+		margin-top: var(--prpl-gap);
 	}
 
 	.prpl-widget-title {
 		padding: 0.5rem 1rem;
 		border-radius: 0.5rem;
 		background: var(--prpl-background-monthly);
-	}
-
-	.badge-group-monthly {
-		background-color: transparent;
 	}
 
 	.prpl-widget-wrapper-content {
@@ -101,6 +207,32 @@
 
 		.badge-group-maintenance {
 			background-color: transparent;
+		}
+	}
+
+	@container (max-width: 900px) {
+
+		.prpl-badges-summary {
+			grid-template-columns: 1fr 1fr;
+		}
+
+		.prpl-badges-summary-intro {
+			grid-column: 1 / -1;
+		}
+
+		.prpl-badges-year-content {
+			grid-template-columns: 1fr;
+		}
+
+		.prpl-badges-year-stats {
+			grid-template-columns: 1fr 1fr;
+		}
+	}
+
+	@container (max-width: 520px) {
+
+		.prpl-badges-year-grid {
+			grid-template-columns: repeat(2, 1fr);
 		}
 	}
 }
