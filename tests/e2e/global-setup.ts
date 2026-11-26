@@ -24,7 +24,7 @@ async function globalSetup(config: FullConfig): Promise<void> {
 
   console.log('Generating fresh auth.json...');
 
-  const baseURL = process.env.WORDPRESS_URL || 'http://localhost:8080';
+  const baseURL = process.env.WORDPRESS_URL || 'http://127.0.0.1:8080';
   const browser = await chromium.launch();
   const context = await browser.newContext({
     ignoreHTTPSErrors: true,
